@@ -56,7 +56,7 @@ const Login = () => {
 
   return (
     <>
-      <div className={`min-h-screen flex flex-col ${theme ? "bg-zinc-950 text-white" : "bg-white text-zinc-900"}`}>
+      <div className={`min-h-screen flex flex-col ${theme ? "bg-gradient-to-b from-black to-gray-900 via-black text-white" : "bg-white text-zinc-900"}`}>
         <div className='flex items-center justify-between px-6 md:px-[200px] py-4'>
           <Link to='/'>
             <img src={logo} className='w-11 h-11 mt-1 rounded-full object-cover' alt="Logo" />
@@ -78,7 +78,7 @@ const Login = () => {
         </div>
         
         <div className="flex-grow pb-10 flex items-center justify-center">
-          <div className={`rounded-lg border ${theme ? "border-slate-800 bg-zinc-950 text-white" : "border-gray-200 bg-white text-zinc-900"} shadow-md max-w-md w-full`}>
+          <div className={`rounded-lg border ${theme ? "border-slate-800 bg-black/70 text-white" : "border-gray-200 bg-white text-zinc-900"} shadow-md max-w-md w-full`}>
             <div className="flex h-full flex-col justify-center gap-4 p-6">
               <div className="left-0 right-0 inline-block border-gray-200 px-2 py-2.5 sm:px-4">
                 <form className="flex flex-col gap-4 pb-4" onSubmit={handleSubmit}>

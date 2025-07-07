@@ -33,7 +33,7 @@ const FindAllUsers = () => {
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
-      <div className={`flex-1 pt-8 pb-10 ${theme ? "bg-zinc-950 text-white" : "bg-white"}`}>
+      <div className={`flex-1 pt-8 ${theme ? "bg-zinc-950 text-white" : "bg-white"}`}>
         {/* Content without the search bar */}
         <div className='mb-10'>
           {isLoading || searchUserLoading ? (
