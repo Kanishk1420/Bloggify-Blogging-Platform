@@ -2,7 +2,7 @@ import { User } from "../models/User.js";
 import bcrypt from "bcrypt";
 import { setCookie } from "../utils/jwt.js";
 import jwt from "jsonwebtoken";
-import { sendEmail } from "../utils/sendOtp.js";
+import { sendVerificationEmail } from "../utils/sendOtp.js";
 
 export const sendOtp = async (req, res) => {
   try {
@@ -22,7 +22,7 @@ export const sendOtp = async (req, res) => {
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-    await sendEmail(otp, email, user.firstname + " " + user.lastname);
+    await sendVerificationEmail(otp, email, user.firstname + " " + user.lastname);
 
     user.otp = otp;
 

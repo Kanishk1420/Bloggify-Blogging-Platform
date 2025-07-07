@@ -111,13 +111,17 @@ const Login = () => {
                           <FaEyeSlash className='absolute right-4 top-3 cursor-pointer' onClick={handleShow} />
                         }
                         <input
-                          value={password} onChange={(e) => setPassword(e.target.value)} className="block w-full border bg-black border-slate-800 text-white focus:border-cyan-500 placeholder-gray-400 focus:ring-cyan-500 p-2.5 text-sm rounded-lg"
-                          id="password" type={showPassword ? "text" : "password"}
-                          name="password" required
+                          value={password} 
+                          onChange={(e) => setPassword(e.target.value)} 
+                          className="block w-full border bg-black border-slate-800 text-white focus:border-cyan-500 placeholder-gray-400 focus:ring-cyan-500 p-2.5 text-sm rounded-lg"
+                          id="password" 
+                          type={showPassword ? "text" : "password"}
+                          name="password" 
+                          required
                         />
                       </div>
                     </div>
-                    <p className="mt-2 cursor-pointer text-blue-500 hover:text-blue-600">Forgot password?</p>
+                    <Link to="/reset-password" className="mt-2 block cursor-pointer text-blue-500 hover:text-blue-600">Forgot password?</Link>
                   </div>
 
                   <div className="flex flex-col gap-2">

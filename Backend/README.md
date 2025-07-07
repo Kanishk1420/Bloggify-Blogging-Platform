@@ -2,10 +2,6 @@
 
 Stack Spot is a full stack blog application that includes user system functionalities such as follow/unfollow, like post, bookmark post, and dark theme. It is built using React, Node.js, MongoDB, and Cloudinary. The application also incorporates real-time analytics and an auto-login feature.
 
-## Frontend GitHub Repository
-
-Access the source code and project files on the GitHub repository: [Stack Spot Frontend Repository](https://github.com/itsvanshchavda/StackSpot-Frontend)
-
 ## Deployment and Integration
 
 The backend is deployable on various server platforms, including Vercel and Netlify. Once deployed, you can seamlessly integrate it into your frontend application, enabling users to register, create posts, interact with content, and establish connections on your social media platform.
@@ -38,7 +34,7 @@ These environment variables are crucial for the proper functioning and security 
 
     bashCopy code
 
-    `git clone https://github.com/itsvanshchavda/StackSpot-Backend.git`
+    `git clone https://github.com/Kanishk1420/Bloggify-Blogging-Platform.git`
 
 2.  Environment Configuration: Edit the environment variables in the `.env` file in the source code. For mongodb installation, use `mongodb://mongo_db:2717` as the local `MONGO_URI`.
 
