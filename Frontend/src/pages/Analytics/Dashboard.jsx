@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { FaBookmark, FaHeart, FaUser } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
@@ -11,10 +11,20 @@ import { useUserFollowerListQuery } from '../../api/user';
 const Dashboard = () => {
   const { userInfo } = useSelector((state) => state.auth);
   const navigate = useNavigate();
+  
+  // Redirect if not logged in
+  useEffect(() => {
+    if (!userInfo?.token) {
+      navigate('/login');
+    }
+  }, [userInfo, navigate]);
+  
   const userId = userInfo?.user?._id;
   const { data: userData } = useGetUserPostQuery(userId);
   const { data: followerData } = useUserFollowerListQuery(userId);
-  const { data: analytics } = useGetAnalyticsQuery();
+  const { data: analytics } = useGetAnalyticsQuery(undefined, {
+    skip: !userInfo?.token
+  });
   const { theme } = useSelector((state) => state.theme);
   const [currentPage, setCurrentPage] = useState(1);
   const startIndex = (currentPage - 1) * 5;

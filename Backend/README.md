@@ -136,8 +136,4 @@ MIT LICENSE [LICENSE](LICENSE)
 
 ## Developed By
 
-👤 Vansh Chavda
-
-- Email : vanshchavda111@gmail.com
-- Twitter : [@vansh*chavda*](https://twitter.com/vansh_chavda_)
-- LinkedIn : [Vansh Chavda](https://www.linkedin.com/in/vanshchavda07)
+👤 Kanishk

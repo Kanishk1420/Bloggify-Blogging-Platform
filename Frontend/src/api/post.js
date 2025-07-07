@@ -3,16 +3,18 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export const postApi = createApi({
   reducerPath: "postApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: import.meta.env.VITE_API_URL,
+    baseUrl: "http://localhost:5000/api/",
     credentials: "include",
-    prepareHeaders: (headers) => {
-      // Get token from localStorage if it exists
-      const token = localStorage.getItem('token');
+    prepareHeaders: (headers, { getState }) => {
+      // Get the token from state
+      const token = getState().auth.userInfo?.token;
+
+      // If we have a token, include it in requests
       if (token) {
-        headers.set('authorization', `Bearer ${token}`);
+        headers.set("Authorization", `Bearer ${token}`);
       }
       return headers;
-    }
+    },
   }),
   tagTypes: ["Post"],
   endpoints: (builder) => ({
@@ -111,13 +113,13 @@ export const postApi = createApi({
       }),
     }),
 
-    getFollowingPost:builder.query({
-      query:() => `/post/followings`
+    getFollowingPost: builder.query({
+      query: () => `/post/followings`,
     }),
 
-    getAnalytics:builder.query({
-        query:() => '/post/analytics'
-    })
+    getAnalytics: builder.query({
+      query: () => "post/analytics",
+    }),
   }),
 });
 
@@ -135,5 +137,5 @@ export const {
   useAddBookmarkMutation,
   useRemoveBookmarkMutation,
   useGetFollowingPostQuery,
-  useGetAnalyticsQuery
+  useGetAnalyticsQuery,
 } = postApi;
