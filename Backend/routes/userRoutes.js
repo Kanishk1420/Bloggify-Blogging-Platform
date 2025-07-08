@@ -30,5 +30,11 @@ router.patch(
   upload.single("profilePhoto"),
   updateUser
 );
+router.put(
+  "/profile",
+  isAuthenticated,
+  upload.single("profilePhoto"),
+  updateUser
+);
 // router.post("/upload", upload.single("profilePhoto"), uploadProfilePhoto);
 export default router;

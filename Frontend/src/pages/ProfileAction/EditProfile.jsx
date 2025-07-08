@@ -168,55 +168,67 @@ const EditProfile = () => {
             let usernameUpdated = false;
             if (username !== originalUsername) {
                 console.log("Username change detected:", originalUsername, "→", username);
-                
-                // Try to update username first as a separate operation
                 usernameUpdated = await handleUsernameUpdate(username);
                 setLoading(30);
                 
                 if (!usernameUpdated) {
-                    // If username update failed but wasn't critical, continue with other updates
                     console.log("Username update failed, continuing with other updates");
                 }
             }
             
-            // Prepare user data - exclude username if we already updated it
-            let newUserInfo = {
-              email: email,
-              bio: bio || '',  
-              firstname: firstname,
-              lastname: lastname,
-            };
-
+            // Create FormData for file upload
+            const formData = new FormData();
+            
+            // Only add the file if one was selected
+            if (file) {
+                formData.append('profilePhoto', file); // CHANGE FROM 'profilePicture' to 'profilePhoto'
+                console.log("Adding profile photo to request");
+            }
+            
+            // Add other user data to FormData
+            formData.append('email', email);
+            formData.append('bio', bio || '');
+            formData.append('firstname', firstname);
+            formData.append('lastname', lastname);
+            
             // Only include username in this update if we didn't do it separately
             if (!usernameUpdated && username !== originalUsername) {
-              newUserInfo.username = username;
+                formData.append('username', username);
             }
-
-            console.log("Submitting profile data:", newUserInfo);
-
-            if (password) {
-              newUserInfo.password = password;
-            }
-
-            // Update user information - send properties directly, not in a user object
-            const updatedUserResponse = await updateUser(newUserInfo).unwrap();
             
-            // Debug the response
+            if (password) {
+                formData.append('password', password);
+            }
+
+            console.log("Submitting profile data with FormData");
+            setLoading(50);
+            
+            // Debug code to check FormData contents
+            console.log("FormData field names:");
+            for (const pair of formData.entries()) {
+              console.log(pair[0], pair[1]);
+            }
+
+            // Update user with FormData
+            const updatedUserResponse = await updateUser(formData).unwrap();
+            
             console.log("API Response:", updatedUserResponse);
+            setLoading(80);
             
             const userData = updatedUserResponse.user || updatedUserResponse;
             
-            // Create proper Redux update - FORCE the values we want
+            // Create proper Redux update
             const updatedReduxData = {
                 ...userInfo,
                 user: {
                     ...userInfo.user,
                     ...userData,
-                    username: username,  // Always use our submitted username
-                    bio: bio,           // Keep the bio fix
-                    email: email,       // Ensure email is updated
+                    username: username,
+                    bio: bio,
+                    email: email,
                     firstname: firstname,
-                    lastname: lastname
+                    lastname: lastname,
+                    profilePhoto: userData.profilePhoto || userInfo.user.profilePhoto
                 }
             };
             
@@ -225,22 +237,17 @@ const EditProfile = () => {
             // Dispatch the update to Redux
             dispatch(setCredentials(updatedReduxData));
             
-            // Force local state values immediately
-            setBio(bio || '');
-            setUsername(username);
-            setOriginalUsername(username);
-            
-            // Force cache invalidation and navigate
+            // Force cache invalidation
             dispatch(userApi.util.invalidateTags(['User']));
             
             toast.success("Profile updated successfully!");
+            setLoading(100);
             
-            // Add a small delay before navigating
+            // Navigate after a small delay
             setTimeout(() => {
                 navigate(`/profile/${id}`);
             }, 500);
             
-            setLoading(100);
         } catch (err) {
             console.log("Update error:", err);
             toast.error(err?.data?.message || 'Failed to update profile');
@@ -248,13 +255,19 @@ const EditProfile = () => {
         }
     };
 
+    // Make sure your file input is properly set up
     const handleFileChange = (e) => {
-        const selectedFile = e.target.files[0];
-        if (selectedFile) {
-            setFile(selectedFile);
-            const imageUrl = URL.createObjectURL(selectedFile);
-            setPreview(imageUrl);
-        }
+      const selectedFile = e.target.files[0];
+      
+      if (selectedFile) {
+        setFile(selectedFile);
+        
+        // Create a preview URL for the selected image
+        const objectUrl = URL.createObjectURL(selectedFile);
+        setPreview(objectUrl);
+        
+        console.log("File selected:", selectedFile.name);
+      }
     };
 
     // Don't use an effect for refetch - it creates a race condition

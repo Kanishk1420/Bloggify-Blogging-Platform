@@ -6,6 +6,9 @@ import getDataUri from "../utils/dataUri.js";
 // Update User
 export const updateUser = async (req, res) => {
   try {
+    console.log("Update request file:", req.file);
+    console.log("Update request body fields:", Object.keys(req.body));
+
     const id = req.userId;
     const { password, username, firstname, lastname, email, bio } = req.body;
     const updateFields = {};
@@ -53,8 +56,8 @@ export const updateUser = async (req, res) => {
     // Send updated user data in the response
     res.status(200).json({ success: true, user });
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ message: "Internal Server Error" });
+    console.error("Update user error:", err);
+    return res.status(500).json({ message: err.message });
   }
 };
 
