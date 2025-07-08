@@ -22,7 +22,10 @@ export const updateUser = async (req, res) => {
     }
 
 
-    if (username) updateFields.username = username;
+    if (username) {
+      console.log("Updating username from:", authUser.username, "to:", username);
+      updateFields.username = username;
+    }
     if (firstname) updateFields.firstname = firstname;
     if (lastname) updateFields.lastname = lastname;
     if (email) updateFields.email = email;

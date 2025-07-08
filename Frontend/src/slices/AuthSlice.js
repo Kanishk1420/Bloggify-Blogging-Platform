@@ -15,9 +15,8 @@ const authSlice = createSlice({
   reducers: {
     setCredentials: (state, action) => {
       state.userInfo = action.payload;
-      // Make sure it's storing the complete user object with all fields
-      console.log("Updated user in redux:", action.payload);
-      state.isAuthenticated = action.payload ? true : false;
+      // Only set authenticated if we have both user data and token
+      state.isAuthenticated = !!(action.payload && action.payload.token);
       localStorage.setItem("userInfo", JSON.stringify(action.payload));
     },
     logout: (state) => {

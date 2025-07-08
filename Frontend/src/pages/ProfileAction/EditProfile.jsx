@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -66,20 +67,37 @@ const EditProfile = () => {
             const user = data.user;
             console.log("Loading from API:", user);
             
-            // Get bio from Redux as backup since API doesn't return it
-            const redisBio = userInfo?.user?.bio || '';
+            // Track username specifically
+            console.log("USERNAME FROM API:", user.username);
+            console.log("USERNAME FROM REDUX:", userInfo?.user?.username);
+            console.log("CURRENT USERNAME STATE:", username);
             
-            // Set all values from API data
+            // Preserve form values with priority from:
+            // 1. Form's current state if editing
+            // 2. Redux state as backup
+            // 3. API data as last resort
+            
             setUserId(user._id || '');
-            setUsername(user.username || '');
-            setOriginalUsername(user.username || '');
-            setEmail(user.email || '');
-            setFirstname(user.firstname || '');
-            setLastname(user.lastname || '');
             
-            // CRITICAL FIX: Use bio from Redux, not API
+            // For username, keep any changes in progress
+            if (username && username !== user.username && isEditing) {
+                console.log("Preserving edited username:", username);
+                // Don't override username if user is currently editing
+            } else {
+                // Otherwise use API/Redux data
+                const redisUsername = userInfo?.user?.username;
+                setUsername(user.username || redisUsername || '');
+                setOriginalUsername(user.username || redisUsername || '');
+            }
+            
+            // Similar approach for other fields
+            setEmail(user.email || userInfo?.user?.email || '');
+            setFirstname(user.firstname || userInfo?.user?.firstname || '');
+            setLastname(user.lastname || userInfo?.user?.lastname || '');
+            
+            // Keep using bio from Redux
+            const redisBio = userInfo?.user?.bio || '';
             setBio(redisBio);
-            console.log("Setting bio value:", redisBio);
             
             if (user.profilePhoto?.url) {
                 setPreview(user.profilePhoto.url);
@@ -102,7 +120,7 @@ const EditProfile = () => {
                 setPreview(user.profilePhoto.url);
             }
         }
-    }, [data, userInfo]); // Add userInfo as dependency
+    }, [data, userInfo, username]); // Add username to dependencies
 
     // Add these debug logs at the top of your useEffect:
     useEffect(() => {
@@ -137,55 +155,68 @@ const EditProfile = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        // Validate the username first
+        if (username !== originalUsername && !isUsernameAvailable) {
+            toast.error("Username is not available. Please choose another one.");
+            return;
+        }
+
         try {
             setLoading(10);
 
-            // Prepare user data - ensure bio is explicitly included
-            let newUserInfo = {
-                username: username,
-                email: email,
-                bio: bio || '', // Ensure bio is never undefined
-                firstname: firstname,
-                lastname: lastname,
-            };
-
-            console.log("Submitting data with bio:", bio); // Debug bio value on submit
-
-            if (password) {
-                newUserInfo.password = password;
-            }
-
-            // Upload profile photo if changed
-            if (file) {
-                const formData = new FormData();
-                formData.append('profilePhoto', file);
-                const photoRes = await updateUser(formData).unwrap();
-                setLoading(50);
-
-                if (photoRes?.secure_url) {
-                    newUserInfo.profilePhoto = {
-                        public_id: photoRes.public_id,
-                        url: photoRes.secure_url
-                    };
+            // Check if username is being updated
+            let usernameUpdated = false;
+            if (username !== originalUsername) {
+                console.log("Username change detected:", originalUsername, "→", username);
+                
+                // Try to update username first as a separate operation
+                usernameUpdated = await handleUsernameUpdate(username);
+                setLoading(30);
+                
+                if (!usernameUpdated) {
+                    // If username update failed but wasn't critical, continue with other updates
+                    console.log("Username update failed, continuing with other updates");
                 }
             }
-
-            // Update user information
-            const updatedUserResponse = await updateUser({ user: newUserInfo }).unwrap();
             
-            // Debug the response specifically checking bio
+            // Prepare user data - exclude username if we already updated it
+            let newUserInfo = {
+              email: email,
+              bio: bio || '',  
+              firstname: firstname,
+              lastname: lastname,
+            };
+
+            // Only include username in this update if we didn't do it separately
+            if (!usernameUpdated && username !== originalUsername) {
+              newUserInfo.username = username;
+            }
+
+            console.log("Submitting profile data:", newUserInfo);
+
+            if (password) {
+              newUserInfo.password = password;
+            }
+
+            // Update user information - send properties directly, not in a user object
+            const updatedUserResponse = await updateUser(newUserInfo).unwrap();
+            
+            // Debug the response
             console.log("API Response:", updatedUserResponse);
             
-            // IMPORTANT CHANGE: Store the submitted bio regardless of API response
             const userData = updatedUserResponse.user || updatedUserResponse;
             
-            // Create proper Redux update - FORCE the bio value from our form submission
+            // Create proper Redux update - FORCE the values we want
             const updatedReduxData = {
                 ...userInfo,
                 user: {
                     ...userInfo.user,
                     ...userData,
-                    bio: bio  // CRITICAL FIX: Use the form value directly instead of API response
+                    username: username,  // Always use our submitted username
+                    bio: bio,           // Keep the bio fix
+                    email: email,       // Ensure email is updated
+                    firstname: firstname,
+                    lastname: lastname
                 }
             };
             
@@ -194,20 +225,25 @@ const EditProfile = () => {
             // Dispatch the update to Redux
             dispatch(setCredentials(updatedReduxData));
             
-            // Force bio to be set in local state
+            // Force local state values immediately
             setBio(bio || '');
+            setUsername(username);
+            setOriginalUsername(username);
             
-            // Force refetch after a delay
+            // Force cache invalidation and navigate
+            dispatch(userApi.util.invalidateTags(['User']));
+            
+            toast.success("Profile updated successfully!");
+            
+            // Add a small delay before navigating
             setTimeout(() => {
-                safeRefetch();
-                toast.success("Profile updated successfully!");
                 navigate(`/profile/${id}`);
             }, 500);
             
             setLoading(100);
         } catch (err) {
             console.log("Update error:", err);
-            toast.error(err?.data?.message || 'Failed to update user info');
+            toast.error(err?.data?.message || 'Failed to update profile');
             setLoading(0);
         }
     };
@@ -241,6 +277,53 @@ const EditProfile = () => {
     console.log("Redux state userInfo:", userInfo);
     console.log("API data:", data);
     console.log("Current state values:", { bio, username, email });
+
+    // Add this state variable at the top with your other state declarations:
+    const [isEditing, setIsEditing] = useState(false);
+
+    // Add this to track when user starts editing:
+    const handleUsernameChange = (e) => {
+        setIsEditing(true);
+        
+        let value = e.target.value.toLowerCase();
+        value = value.replace(/[^a-z0-9_]/g, '');
+        const newUsername = value.startsWith('@') ? value : `@${value}`;
+        setUsername(newUsername);
+        
+        // Reset availability message if same as original
+        if (newUsername === originalUsername) {
+          setUsernameMessage('');
+        }
+    };
+
+    // Add a dedicated username update function
+    const handleUsernameUpdate = async (newUsername) => {
+      try {
+        console.log("SENDING USERNAME UPDATE REQUEST:", newUsername);
+        
+        // Send username directly without the user wrapper
+        const usernameUpdateResponse = await updateUser({ 
+          username: newUsername  // Changed from { user: { username: newUsername } }
+        }).unwrap();
+        
+        console.log("USERNAME UPDATE RESPONSE:", usernameUpdateResponse);
+        
+        // Force Redux update for username
+        dispatch(setCredentials({
+          ...userInfo,
+          user: {
+            ...userInfo.user,
+            username: newUsername
+          }
+        }));
+        
+        return true;
+      } catch (err) {
+        console.error("Username update failed:", err);
+        toast.error("Failed to update username. Please try again.");
+        return false;
+      }
+    };
 
     return (
         <>
@@ -340,17 +423,7 @@ const EditProfile = () => {
                                                 <input
                                                     type="text"
                                                     value={username}
-                                                    onChange={(e) => {
-                                                        let value = e.target.value.toLowerCase();
-                                                        value = value.replace(/[^a-z0-9_]/g, '');
-                                                        const newUsername = value.startsWith('@') ? value : `@${value}`;
-                                                        setUsername(newUsername);
-                                                        
-                                                        // Reset availability message if same as original
-                                                        if (newUsername === originalUsername) {
-                                                          setUsernameMessage('');
-                                                        }
-                                                      }}
+                                                    onChange={handleUsernameChange}
                                                     className={`border font-semibold text-sm rounded-lg block w-full p-2.5 
                                                         ${theme ? "border-slate-900 bg-black text-white" : "bg-zinc-100"}
                                                         ${!isUsernameAvailable && username !== originalUsername ? "border-red-500" :

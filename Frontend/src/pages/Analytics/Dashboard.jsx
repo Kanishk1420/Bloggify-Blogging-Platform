@@ -14,9 +14,19 @@ const Dashboard = () => {
   
   // Redirect if not logged in
   useEffect(() => {
-    if (!userInfo?.token) {
-      navigate('/login');
-    }
+    // Check both token and isAuthenticated flag
+    const authCheck = setTimeout(() => {
+      if (!userInfo?.token && !userInfo?.user) {
+        console.log("Authentication required, redirecting to login");
+        // Store the intended destination for redirect after login
+        sessionStorage.setItem('redirectAfterLogin', '/dashboard');
+        navigate('/login');
+      } else {
+        console.log("User authenticated for dashboard:", userInfo?.user?.username);
+      }
+    }, 100);
+    
+    return () => clearTimeout(authCheck);
   }, [userInfo, navigate]);
   
   const userId = userInfo?.user?._id;
@@ -33,6 +43,14 @@ const Dashboard = () => {
   const renderNoPostsMessage = () => {
     return <h1>Please post something :(</h1>;
   };
+
+  useEffect(() => {
+    console.log("Dashboard rendered, auth state:", {
+      hasToken: !!userInfo?.token,
+      userId: userInfo?.user?._id,
+      isAuthenticated: !!userInfo
+    });
+  }, [userInfo]);
 
   return (
     <>
