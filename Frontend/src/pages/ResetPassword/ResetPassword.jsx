@@ -84,6 +84,13 @@ const ResetPassword = () => {
             return;
         }
 
+        // Add password strength validation
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        if (!passwordRegex.test(newPassword)) {
+            toast.error('Password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number and one special character');
+            return;
+        }
+
         setLoading(true);
         try {
             const body = {
@@ -96,12 +103,16 @@ const ResetPassword = () => {
             toast.success(res?.success || 'Password reset successfully');
             setLoading(false);
             dispatch(setCredentials(res?.user))
-
             navigate('/login');
-
         } catch (err) {
             setLoading(false);
-            toast.error(err?.data?.message || 'Password reset failed');
+            
+            // Check specifically for password reuse error
+            if (err?.data?.message === "New password cannot be the same as your old password") {
+              toast.error("Please choose a new password different from your current one");
+            } else {
+              toast.error(err?.data?.message || 'Password reset failed');
+            }
         }
     };
 

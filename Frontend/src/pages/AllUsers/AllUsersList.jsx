@@ -89,7 +89,7 @@ const AllUsersList = ({ users }) => {
       )}
 
 
-      <div className={`h-auto pb-96 ${theme ? "bg-gradient-to-b from-black to-gray-800 via-black text-white " : ""} `}>
+      <div className={`h-auto  ${theme ? "bg-gradient-to-b from-black to-gray-800 via-black text-white " : ""} `}>
         <div className="max-w-sm mx-auto py-10">
           {users?.slice(startIndex, endIndex).map((user) => (
             <div key={user._id} className={`p-3 flex items-center justify-between border-t cursor-pointer duration-300 ${theme ? " hover:bg-slate-800 border-gray-200" : "hover:bg-gray-200 text-black"}`}>

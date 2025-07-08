@@ -160,7 +160,7 @@ const Profile = () => {
       )}
 
 
-      <div className={`px-4  pb-20 overflow-y-auto ${theme ? " bg-gradient-to-b from-black to-gray-900 via-black text-white" : ""}  `}>
+      <div className={`px-4  pb-80 overflow-y-auto ${theme ? " bg-gradient-to-b from-black to-gray-900 via-black text-white" : ""}  `}>
         <div className='flex md:flex-row justify-center flex-col-reverse '>
           <div className='md:w-2/3 md:px-4 mt-4'>
             {userInfo?.user?._id === userId && (

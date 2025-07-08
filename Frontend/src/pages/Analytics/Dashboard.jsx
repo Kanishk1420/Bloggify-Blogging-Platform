@@ -37,7 +37,7 @@ const Dashboard = () => {
   return (
     <>
       <Navbar />
-      <div className={`min-h-screen ${theme ? 'bg-gradient-to-b from-black to-gray-900 via-black text-white' : 'bg-white'}`}>
+      <div className={`min-h-20 pb-80 ${theme ? 'bg-gradient-to-b from-black to-gray-900 via-black text-white' : 'bg-white'}`}>
         <h1 className={`text-2xl font-semibold pt-5 pb-5 px-5 ${theme ? 'text-white' : 'text-black'}`}>Your Analytics</h1>
         <article className={`flex flex-col md:flex-row gap-4 rounded-lg p-6 ${theme ? 'bg-black/70 text-white ring-1 ring-slate-700' : 'bg-white border border-gray-200'}`}>
           {/* Views */}
