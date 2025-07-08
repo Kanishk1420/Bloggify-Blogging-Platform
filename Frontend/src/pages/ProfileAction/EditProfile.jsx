@@ -58,7 +58,7 @@ const EditProfile = () => {
     lastname: "",
     profilePhotoUrl: "",
   });
-   const [emailErrorMessage, setEmailErrorMessage] = useState("");
+  const [emailErrorMessage, setEmailErrorMessage] = useState("");
   // Use the username check RTK Query hook
   const { data: usernameData, isFetching: isCheckingUsername } =
     useCheckUsernameAvailabilityQuery(username, {
@@ -518,6 +518,7 @@ const EditProfile = () => {
     <>
       <Navbar />
 
+      {/* Progress bar */}
       <span
         role="progressbar"
         aria-labelledby="ProgressLabel"
@@ -531,88 +532,185 @@ const EditProfile = () => {
         ></span>
       </span>
 
+      {/* Main Container */}
       <div
-        className={` w-full flex flex-col gap-5 px-3 md:px-16 lg:px-28 md:flex-row ${
+        className={`min-h-screen ${
           theme
-            ? " bg-gradient-to-b from-black to-gray-800 via-black text-white"
-            : "bg-white"
+            ? "bg-gradient-to-b from-black to-gray-800 via-black text-white"
+            : "bg-gray-50"
         }`}
       >
-        {/* Sidebar */}
-        <aside className="hidden py-4 md:w-1/3 lg:w-1/4 md:block">
-          <div
-            className={`sticky flex flex-col gap-2 p-4 text-sm border-r ${
-              theme ? "border-slate-700" : "border-zinc-100"
-            } top-12`}
-          >
-            <h2 className="pl-[2.8em] mb-4 text-2xl font-semibold">Settings</h2>
-          </div>
-        </aside>
+        <div className="max-w-6xl mx-auto px-4 py-8">
+          <div className="flex flex-col md:flex-row gap-6">
+            {/* Sidebar with Improved Sticky Behavior */}
+            <aside className="w-full md:w-1/4 md:self-start">
+              <div
+                className={`md:sticky md:top-20 p-6 rounded-xl z-30 transition-all duration-200 ${
+                  theme
+                    ? "bg-zinc-900 text-white shadow-zinc-800/50"
+                    : "bg-white shadow-lg"
+                }`}
+                style={{
+                  maxHeight: "calc(100vh - 120px)",
+                  overflow: "auto",
+                }}
+              >
+                <h2 className="text-xl font-bold mb-6">Profile Settings</h2>
 
-        {/* Main Content */}
-        <main className="w-full min-h-screen py-1 md:w-2/3 lg:w-3/4 ">
-          <div className="p-2 md:p-4">
-            <div className="w-full px-6 pb-8 mt-8 sm:max-w-xl sm:rounded-lg">
-              <h2 className="pl-6 text-2xl font-bold sm:text-xl">
-                Public Profile
-              </h2>
+                <nav className="space-y-2">
+                  <a
+                    href="#personal-info"
+                    className={`flex items-center px-4 py-2.5 rounded-lg ${
+                      theme
+                        ? "bg-blue-900/30 text-blue-200"
+                        : "bg-blue-50 text-blue-700"
+                    }`}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5 mr-3"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                      />
+                    </svg>
+                    Personal Info
+                  </a>
+                </nav>
+              </div>
+            </aside>
 
-              <form onSubmit={handleSubmit}>
-                <div className="grid max-w-2xl mx-auto mt-8">
-                  {/* Profile Picture */}
-                  <div className="flex flex-col space-y-5 sm:flex-row sm:space-y-0">
-                    <img
-                      className="object-cover w-40 h-40 p-1 rounded-full ring-2 ring-zinc-300 dark:ring-zinc-500"
-                      src={
-                        preview
-                          ? preview
-                          : data?.user?.profilePhoto
-                          ? `${img}${data?.user?.profilePhoto}`
-                          : avatar
-                      }
-                      alt="Profile Avatar"
-                    />
-                    <div className="flex flex-col space-y-5 sm:ml-8">
-                      <label
-                        htmlFor="profilePicInput"
-                        className="cursor-pointer"
-                      >
-                        <input
-                          type="file"
-                          id="profilePicInput"
-                          className="hidden"
-                          onChange={handleFileChange}
+            {/* Main Content */}
+            <main className="w-full md:w-3/4">
+              <div
+                className={`p-8 rounded-xl ${
+                  theme
+                    ? "bg-zinc-900 shadow-zinc-800/50"
+                    : "bg-white shadow-lg"
+                }`}
+              >
+                <h1 className="text-2xl font-bold mb-8">Public Profile</h1>
+
+                <form onSubmit={handleSubmit}>
+                  {/* Profile Picture Section */}
+                  <div className="mb-8 pb-8 border-b border-dashed border-gray-700/30">
+                    <h2
+                      className={`text-lg font-semibold mb-4 ${
+                        theme ? "text-gray-200" : "text-gray-700"
+                      }`}
+                    >
+                      Profile Photo
+                    </h2>
+
+                    <div className="flex flex-col md:flex-row items-center gap-8">
+                      <div className="relative">
+                        <img
+                          className="w-36 h-36 object-cover rounded-full ring-4 ring-offset-2 shadow-lg 
+                          ${theme ? 'ring-blue-600 ring-offset-zinc-900' : 'ring-blue-500 ring-offset-white'}"
+                          src={
+                            preview ||
+                            (data?.user?.profilePhoto
+                              ? `${img}${data?.user?.profilePhoto}`
+                              : avatar)
+                          }
+                          alt="Profile Avatar"
                         />
+
+                        <div className="absolute bottom-0 right-0 transform translate-x-1/4">
+                          <label
+                            htmlFor="profilePicInput"
+                            className={`flex items-center justify-center w-10 h-10 rounded-full cursor-pointer shadow-lg ${
+                              theme
+                                ? "bg-blue-600 hover:bg-blue-700"
+                                : "bg-blue-500 hover:bg-blue-600"
+                            }`}
+                          >
+                            <input
+                              type="file"
+                              id="profilePicInput"
+                              className="hidden"
+                              onChange={handleFileChange}
+                            />
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-5 w-5 text-white"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                              />
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+                              />
+                            </svg>
+                          </label>
+                        </div>
+                      </div>
+
+                      <div>
+                        <h3
+                          className={`text-md font-medium mb-2 ${
+                            theme ? "text-gray-200" : "text-gray-700"
+                          }`}
+                        >
+                          Profile photo
+                        </h3>
+                        <p
+                          className={`text-sm mb-4 ${
+                            theme ? "text-gray-400" : "text-gray-500"
+                          }`}
+                        >
+                          Add a photo to personalize your profile. Recommended
+                          size: 400x400px (max 5MB).
+                        </p>
                         <button
                           type="button"
                           onClick={() =>
                             document.getElementById("profilePicInput").click()
                           }
-                          className="py-3.5 mt-10 px-7 text-base font-medium text-zinc-100 focus:outline-none bg-zinc-900 rounded-lg border border-zinc-200 hover:bg-zinc-800 focus:z-10 focus:ring-4 focus:ring-zinc-200"
+                          className={`py-2 px-4 text-sm font-medium rounded-lg ${
+                            theme
+                              ? "bg-zinc-800 text-white hover:bg-zinc-700"
+                              : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                          } transition-all duration-200`}
                         >
-                          Add Profile Picture
+                          Change photo
                         </button>
-                      </label>
-                      {/* 
-                                                <button
-                                                    type="button"
-                                                    className="py-3.5 px-7 text-base font-medium text-black focus:outline-none bg-white rounded-lg border border-zinc-200 hover:bg-zinc-100 hover:text-black focus:z-10 focus:ring-4 focus:ring-zinc-200"
-                                                    onClick={() => setFile(null)}
-                                                >
-                                                    Remove Picture
-                                                </button> */}
+                      </div>
                     </div>
                   </div>
 
-                  {/* Other Form Fields */}
-                  <div
-                    className={`items-center mt-8 sm:mt-14 ${
-                      theme ? "text-white" : "text-black"
-                    } `}
-                  >
-                    <div className="flex space-x-6">
-                      <div className="w-1/2">
-                        <label className="block mb-2 text-sm font-medium">
+                  {/* Personal Information Section */}
+                  <div className="mb-8 pb-8 border-b border-dashed border-gray-700/30">
+                    <h2
+                      className={`text-lg font-semibold mb-4 ${
+                        theme ? "text-gray-200" : "text-gray-700"
+                      }`}
+                    >
+                      Personal Information
+                    </h2>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <label
+                          className={`block mb-2 text-sm font-medium ${
+                            theme ? "text-gray-300" : "text-gray-700"
+                          }`}
+                        >
                           First Name
                         </label>
                         <input
@@ -622,17 +720,22 @@ const EditProfile = () => {
                             setFirstname(e.target.value);
                             setFormChanged(true);
                           }}
-                          className={`border font-semibold text-sm rounded-lg block w-full p-2.5 ${
+                          className={`w-full px-4 py-3 rounded-lg ${
                             theme
-                              ? "border-slate-900 bg-black text-white"
-                              : "bg-zinc-100 "
-                          }`}
+                              ? "bg-zinc-800 border border-zinc-700 text-white focus:border-blue-500"
+                              : "bg-gray-50 border border-gray-300 text-gray-900 focus:border-blue-500"
+                          } focus:ring-blue-500 focus:ring-1 outline-none transition-colors`}
                           placeholder="First name"
                           required
                         />
                       </div>
-                      <div className="w-1/2">
-                        <label className="block mb-2 text-sm font-medium ">
+
+                      <div>
+                        <label
+                          className={`block mb-2 text-sm font-medium ${
+                            theme ? "text-gray-300" : "text-gray-700"
+                          }`}
+                        >
                           Last Name
                         </label>
                         <input
@@ -642,272 +745,335 @@ const EditProfile = () => {
                             setLastname(e.target.value);
                             setFormChanged(true);
                           }}
-                          className={`border font-semibold  text-sm rounded-lg  block w-full p-2.5 ${
+                          className={`w-full px-4 py-3 rounded-lg ${
                             theme
-                              ? "border-slate-900  bg-black text-white"
-                              : "bg-zinc-100 "
-                          }`}
+                              ? "bg-zinc-800 border border-zinc-700 text-white focus:border-blue-500"
+                              : "bg-gray-50 border border-gray-300 text-gray-900 focus:border-blue-500"
+                          } focus:ring-blue-500 focus:ring-1 outline-none transition-colors`}
                           placeholder="Last name"
                           required
                         />
                       </div>
-                    </div>
 
-                    <div className="mb-2 mt-2 sm:mb-6">
-                      <label className="block mb-2 text-sm font-medium">
-                        Your Username
-                      </label>
-                      <div className="relative">
-                        <input
-                          type="text"
-                          value={username}
-                          onChange={handleUsernameChange}
-                          className={`border font-semibold text-sm rounded-lg block w-full p-2.5 
-                                                        ${
-                                                          theme
-                                                            ? "border-slate-900 bg-black text-white"
-                                                            : "bg-zinc-100"
-                                                        }
-                                                        ${
-                                                          !isUsernameAvailable &&
-                                                          username !==
-                                                            originalUsername
-                                                            ? "border-red-500"
-                                                            : !validateUsername(
-                                                                username
-                                                              ).valid
-                                                            ? "border-yellow-500"
-                                                            : isUsernameAvailable &&
-                                                              username !==
-                                                                originalUsername
-                                                            ? "border-green-500"
-                                                            : ""
-                                                        }`}
-                          placeholder="@username"
-                          required
-                        />
+                      <div className="col-span-1 md:col-span-2">
+                        <label
+                          className={`block mb-2 text-sm font-medium ${
+                            theme ? "text-gray-300" : "text-gray-700"
+                          }`}
+                        >
+                          Username
+                        </label>
+                        <div className="relative">
+                          <input
+                            type="text"
+                            value={username}
+                            onChange={handleUsernameChange}
+                            className={`w-full px-4 py-3 rounded-lg ${
+                              theme
+                                ? "bg-zinc-800 border text-white"
+                                : "bg-gray-50 border text-gray-900"
+                            } focus:ring-1 outline-none transition-colors ${
+                              !isUsernameAvailable &&
+                              username !== originalUsername
+                                ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                                : !validateUsername(username).valid
+                                ? "border-yellow-500 focus:border-yellow-500 focus:ring-yellow-500"
+                                : isUsernameAvailable &&
+                                  username !== originalUsername
+                                ? "border-green-500 focus:border-green-500 focus:ring-green-500"
+                                : theme
+                                ? "border-zinc-700 focus:border-blue-500 focus:ring-blue-500"
+                                : "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                            }`}
+                            placeholder="@username"
+                            required
+                          />
 
-                        {/* Username availability indicator */}
+                          {username !== originalUsername && (
+                            <div className="absolute inset-y-0 right-0 flex items-center pr-4">
+                              {isCheckingUsername ? (
+                                <svg
+                                  className="animate-spin h-5 w-5 text-gray-500"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <circle
+                                    className="opacity-25"
+                                    cx="12"
+                                    cy="12"
+                                    r="10"
+                                    stroke="currentColor"
+                                    strokeWidth="4"
+                                  ></circle>
+                                  <path
+                                    className="opacity-75"
+                                    fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014.708 14H2c0 4.418 3.582 8 8 8v-2c-3.314 0-6-2.686-6-6zM20 12c0-4.418-3.582-8-8-8v2c3.314 0 6 2.686 6 6 0 1.385-.468 2.657-1.25 3.682l1.562 1.562A7.962 7.962 0 0020 12z"
+                                  ></path>
+                                </svg>
+                              ) : !validateUsername(username).valid ? (
+                                <FaTimes className="text-yellow-500" />
+                              ) : isUsernameAvailable ? (
+                                <FaCheck className="text-green-500" />
+                              ) : (
+                                <FaTimes className="text-red-500" />
+                              )}
+                            </div>
+                          )}
+                        </div>
+
                         {username !== originalUsername && (
-                          <div className="absolute right-4 top-3">
-                            {isCheckingUsername ? (
-                              <svg
-                                className="animate-spin h-5 w-5 text-gray-500"
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                              >
-                                <circle
-                                  className="opacity-25"
-                                  cx="12"
-                                  cy="12"
-                                  r="10"
-                                  stroke="currentColor"
-                                  strokeWidth="4"
-                                ></circle>
-                                <path
-                                  className="opacity-75"
-                                  fill="currentColor"
-                                  d="M4 12c0-4.418 3.582-8 8-8s8 3.582 8 8-3.582 8-8 8-8-3.582-8-8zm2 0a6 6 0 1012 0 6 6 0 00-12 0z"
-                                ></path>
-                              </svg>
-                            ) : !validateUsername(username).valid ? (
-                              <FaTimes className="text-yellow-500" />
-                            ) : isUsernameAvailable ? (
-                              <FaCheck className="text-green-500" />
-                            ) : (
-                              <FaTimes className="text-red-500" />
-                            )}
-                          </div>
+                          <p
+                            className={`mt-2 text-sm ${
+                              !validateUsername(username).valid
+                                ? "text-yellow-500"
+                                : isUsernameAvailable
+                                ? "text-green-500"
+                                : "text-red-500"
+                            }`}
+                          >
+                            {!validateUsername(username).valid
+                              ? validateUsername(username).message
+                              : usernameMessage}
+                          </p>
                         )}
                       </div>
 
-                      {/* Username validation message */}
-                      {username !== originalUsername && (
-                        <p
-                          className={`mt-1 text-xs ${
-                            !validateUsername(username).valid
-                              ? "text-yellow-500"
-                              : isUsernameAvailable
-                              ? "text-green-500"
-                              : "text-red-500"
+                      <div className="col-span-1 md:col-span-2">
+                        <label
+                          className={`block mb-2 text-sm font-medium ${
+                            theme ? "text-gray-300" : "text-gray-700"
                           }`}
                         >
-                          {!validateUsername(username).valid
-                            ? validateUsername(username).message
-                            : usernameMessage}
-                        </p>
-                      )}
-                    </div>
+                          Email Address
+                        </label>
+                        <input
+                          type="email"
+                          value={email}
+                          onChange={handleEmailChange}
+                          className={`w-full px-4 py-3 rounded-lg ${
+                            theme
+                              ? "bg-zinc-800 border text-white"
+                              : "bg-gray-50 border text-gray-900"
+                          } focus:ring-1 outline-none transition-colors ${
+                            !isEmailValid
+                              ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                              : theme
+                              ? "border-zinc-700 focus:border-blue-500 focus:ring-blue-500"
+                              : "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                          }`}
+                          placeholder="Your email address"
+                          required
+                        />
 
-                    <div className="mb-2 sm:mb-6">
-                      <label className="block mb-2 text-sm font-medium">
-                        Your email
-                      </label>
-                      <input
-                        type="email"
-                        onChange={handleEmailChange}
-                        className={`border font-semibold text-sm rounded-lg block w-full p-2.5 
-                                                  ${
-                                                    theme
-                                                      ? "border-slate-900 bg-black text-white"
-                                                      : "bg-zinc-100"
-                                                  }
-                                                  ${
-                                                    !isEmailValid
-                                                      ? "border-red-500"
-                                                      : ""
-                                                  }`}
-                        value={email}
-                        placeholder="Email"
-                        required
-                      />
-                      {!isEmailValid && (
-                        <p className="mt-1 text-xs text-red-500">
-                          {emailErrorMessage || "Please enter a valid email address"}
-                        </p>
-                      )}
-                    </div>
+                        {!isEmailValid && (
+                          <p className="mt-2 text-sm text-red-500">
+                            {emailErrorMessage ||
+                              "Please enter a valid email address"}
+                          </p>
+                        )}
+                      </div>
 
-                    <div className="mb-6">
-                      <label
-                        htmlFor="message"
-                        className="block mb-2 text-sm font-medium "
-                      >
-                        Bio
-                      </label>
-                      <textarea
-                        rows="4"
-                        value={bio || ""}
-                        required
-                        onChange={(e) => {
-                          const newBio = e.target.value;
-                          console.log("Setting bio to:", newBio);
-                          setBio(newBio);
-                          setFormChanged(true);
-                        }}
-                        className={`border font-semibold text-sm rounded-lg block w-full p-2.5 ${
-                          theme
-                            ? "border-slate-900 bg-black text-white"
-                            : "bg-zinc-100 "
-                        }`}
-                        placeholder="Write your bio..."
-                      ></textarea>
+                      <div className="col-span-1 md:col-span-2">
+                        <label
+                          className={`block mb-2 text-sm font-medium ${
+                            theme ? "text-gray-300" : "text-gray-700"
+                          }`}
+                        >
+                          Bio
+                        </label>
+                        <textarea
+                          rows="4"
+                          value={bio || ""}
+                          onChange={(e) => {
+                            setBio(e.target.value);
+                            setFormChanged(true);
+                          }}
+                          className={`w-full px-4 py-3 rounded-lg ${
+                            theme
+                              ? "bg-zinc-800 border border-zinc-700 text-white focus:border-blue-500"
+                              : "bg-gray-50 border border-gray-300 text-gray-900 focus:border-blue-500"
+                          } focus:ring-blue-500 focus:ring-1 outline-none transition-colors`}
+                          placeholder="Write a short bio about yourself..."
+                          required
+                        ></textarea>
+                      </div>
                     </div>
+                  </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 mb-8">
+                  {/* Password Section */}
+                  <div className="mb-8">
+                    <h2
+                      className={`text-lg font-semibold mb-4 ${
+                        theme ? "text-gray-200" : "text-gray-700"
+                      }`}
+                    >
+                      Change Password
+                    </h2>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <div className="mb-2">
-                          <label
-                            className={`text-sm font-medium ${
-                              theme ? "text-white" : "text-gray-800"
-                            }`}
-                          >
-                            New Password:
-                          </label>
-                        </div>
+                        <label
+                          className={`block mb-2 text-sm font-medium ${
+                            theme ? "text-gray-300" : "text-gray-700"
+                          }`}
+                        >
+                          New Password
+                        </label>
                         <div className="relative">
-                          {showPassword ? (
-                            <FaRegEye
-                              onClick={() => setShowPassword(false)}
-                              className="absolute right-4 top-3 cursor-pointer"
-                            />
-                          ) : (
-                            <FaEyeSlash
-                              onClick={() => setShowPassword(true)}
-                              className="absolute right-4 top-3 cursor-pointer"
-                            />
-                          )}
                           <input
+                            type={showPassword ? "text" : "password"}
                             value={password}
                             onChange={(e) => {
                               setPassword(e.target.value);
                               setFormChanged(true);
                             }}
-                            className={`block w-full border ${
+                            className={`w-full pl-4 pr-12 py-3 rounded-lg ${
                               theme
-                                ? "bg-black text-white border-slate-800"
-                                : "bg-white text-gray-800 border-gray-300"
-                            } focus:border-cyan-500 placeholder-gray-400 focus:ring-cyan-500 p-2.5 text-sm rounded-lg ${
-                              passwordError ? "border-red-500" : ""
+                                ? "bg-zinc-800 border text-white"
+                                : "bg-gray-50 border text-gray-900"
+                            } focus:ring-1 outline-none transition-colors ${
+                              passwordError
+                                ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                                : theme
+                                ? "border-zinc-700 focus:border-blue-500 focus:ring-blue-500"
+                                : "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                             }`}
-                            type={showPassword ? "text" : "password"}
-                            placeholder="Leave blank to keep current pass"
+                            placeholder="Leave blank to keep current password"
                           />
+
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-500"
+                          >
+                            {showPassword ? (
+                              <FaRegEye size={18} />
+                            ) : (
+                              <FaEyeSlash size={18} />
+                            )}
+                          </button>
                         </div>
                       </div>
 
                       <div>
-                        <div className="mb-2">
-                          <label
-                            className={`text-sm font-medium ${
-                              theme ? "text-white" : "text-gray-800"
-                            }`}
-                          >
-                            Confirm Password:
-                          </label>
-                        </div>
+                        <label
+                          className={`block mb-2 text-sm font-medium ${
+                            theme ? "text-gray-300" : "text-gray-700"
+                          }`}
+                        >
+                          Confirm New Password
+                        </label>
                         <div className="relative">
-                          {showConfirmPassword ? (
-                            <FaRegEye
-                              onClick={() => setShowConfirmPassword(false)}
-                              className="absolute right-4 top-3 cursor-pointer"
-                            />
-                          ) : (
-                            <FaEyeSlash
-                              onClick={() => setShowConfirmPassword(true)}
-                              className="absolute right-4 top-3 cursor-pointer"
-                            />
-                          )}
                           <input
+                            type={showConfirmPassword ? "text" : "password"}
                             value={confirmPassword}
                             onChange={(e) => {
                               setConfirmPassword(e.target.value);
                               setFormChanged(true);
                             }}
-                            className={`block w-full border ${
+                            className={`w-full pl-4 pr-12 py-3 rounded-lg ${
                               theme
-                                ? "bg-black text-white border-slate-800"
-                                : "bg-white text-gray-800 border-gray-300"
-                            } focus:border-cyan-500 placeholder-gray-400 focus:ring-cyan-500 p-2.5 text-sm rounded-lg ${
-                              passwordError ? "border-red-500" : ""
+                                ? "bg-zinc-800 border text-white"
+                                : "bg-gray-50 border text-gray-900"
+                            } focus:ring-1 outline-none transition-colors ${
+                              passwordError
+                                ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                                : theme
+                                ? "border-zinc-700 focus:border-blue-500 focus:ring-blue-500"
+                                : "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                             }`}
-                            type={showConfirmPassword ? "text" : "password"}
-                            placeholder="Confirm new password"
+                            placeholder="Confirm your new password"
                           />
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setShowConfirmPassword(!showConfirmPassword)
+                            }
+                            className="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-500"
+                          >
+                            {showConfirmPassword ? (
+                              <FaRegEye size={18} />
+                            ) : (
+                              <FaEyeSlash size={18} />
+                            )}
+                          </button>
                         </div>
                       </div>
-                    </div>
 
-                    {passwordError && (
-                      <p className="text-red-500 text-sm mt-1 mb-6">
-                        {passwordError}
-                      </p>
-                    )}
-
-                    {/* Save button with consistent styling */}
-                    <div className="flex justify-center mt-8">
-                      <button
-                        type="submit"
-                        disabled={!formChanged && !hasChanges()}
-                        className={`text-white ${
-                          !formChanged && !hasChanges()
-                            ? "bg-zinc-500 cursor-not-allowed"
-                            : "bg-zinc-900 hover:bg-zinc-800"
-                        } focus:ring-4 focus:outline-none focus:ring-zinc-300 font-medium rounded-lg text-sm px-12 py-3 text-center transition-all duration-200`}
-                      >
-                        {!formChanged && !hasChanges()
-                          ? "No Changes"
-                          : "Save Changes"}
-                      </button>
+                      {passwordError && (
+                        <p className="col-span-1 md:col-span-2 text-sm text-red-500 mt-0">
+                          {passwordError}
+                        </p>
+                      )}
                     </div>
                   </div>
-                </div>
-              </form>
-            </div>
+
+                  {/* Form Actions */}
+                  <div className="flex justify-between items-center pt-6 border-t border-gray-700/30">
+                    <button
+                      type="button"
+                      onClick={() => navigate(`/profile/${id}`)}
+                      className={`px-6 py-2.5 rounded-lg text-sm font-medium ${
+                        theme
+                          ? "bg-transparent text-white hover:bg-zinc-800"
+                          : "bg-transparent text-gray-700 hover:bg-gray-100"
+                      } transition-colors`}
+                    >
+                      Cancel
+                    </button>
+
+                    <button
+                      type="submit"
+                      disabled={!formChanged && !hasChanges()}
+                      className={`px-6 py-2.5 rounded-lg text-sm font-medium ${
+                        !formChanged && !hasChanges()
+                          ? "bg-gray-400 cursor-not-allowed text-white"
+                          : theme
+                          ? "bg-blue-600 hover:bg-blue-700 text-white"
+                          : "bg-blue-600 hover:bg-blue-700 text-white"
+                      } transition-colors`}
+                    >
+                      {loading > 0 ? (
+                        <span className="flex items-center">
+                          <svg
+                            className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            ></circle>
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014.708 14H2c0 4.418 3.582 8 8 8v-2c-3.314 0-6-2.686-6-6zM20 12c0-4.418-3.582-8-8-8v2c3.314 0 6 2.686 6 6 0 1.385-.468 2.657-1.25 3.682l1.562 1.562A7.962 7.962 0 0020 12z"
+                            ></path>
+                          </svg>
+                          Saving...
+                        </span>
+                      ) : !formChanged && !hasChanges() ? (
+                        "No Changes"
+                      ) : (
+                        "Save Changes"
+                      )}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </main>
           </div>
-        </main>
+        </div>
       </div>
+
       <Footer />
     </>
   );
