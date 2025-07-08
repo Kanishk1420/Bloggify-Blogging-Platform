@@ -255,11 +255,30 @@ const EditProfile = () => {
         }
     };
 
-    // Make sure your file input is properly set up
+    // Update the handleFileChange function with validation
+
     const handleFileChange = (e) => {
       const selectedFile = e.target.files[0];
       
       if (selectedFile) {
+        // Check if file is an image
+        const validImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/jpg', 'image/webp', 'image/svg+xml'];
+        
+        if (!validImageTypes.includes(selectedFile.type)) {
+          // Not a valid image type
+          toast.error("Please select a valid image file (PNG, JPG, GIF, WEBP, SVG)");
+          e.target.value = null; // Reset the input
+          return;
+        }
+        
+        // File size validation (optional) - limit to 5MB
+        const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+        if (selectedFile.size > maxSize) {
+          toast.error("Image size should be less than 5MB");
+          e.target.value = null; // Reset the input
+          return;
+        }
+        
         setFile(selectedFile);
         
         // Create a preview URL for the selected image
@@ -267,6 +286,8 @@ const EditProfile = () => {
         setPreview(objectUrl);
         
         console.log("File selected:", selectedFile.name);
+        console.log("File type:", selectedFile.type);
+        console.log("File size:", (selectedFile.size / 1024 / 1024).toFixed(2) + "MB");
       }
     };
 
