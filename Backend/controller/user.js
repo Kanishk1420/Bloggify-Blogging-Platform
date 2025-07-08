@@ -19,11 +19,19 @@ export const updateUser = async (req, res) => {
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
-
     if (password) {
+      // Check if new password is same as current
+      const isSamePassword = await bcrypt.compare(password, authUser.password);
+      if (isSamePassword) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "New password cannot be the same as your old password" 
+        });
+      }
+      
+      // Hash the new password
       updateFields.password = await bcrypt.hash(password, 10);
     }
-
 
     if (username) {
       console.log("Updating username from:", authUser.username, "to:", username);
