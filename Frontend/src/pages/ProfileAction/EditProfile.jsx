@@ -47,6 +47,17 @@ const EditProfile = () => {
   const [isEmailValid, setIsEmailValid] = useState(true);
   const [originalEmail, setOriginalEmail] = useState("");
 
+  // Add this to your state variables at the top
+  const [formChanged, setFormChanged] = useState(false);
+  const [initialState, setInitialState] = useState({
+    username: "",
+    email: "",
+    bio: "",
+    firstname: "",
+    lastname: "",
+    profilePhotoUrl: "",
+  });
+
   // Use the username check RTK Query hook
   const { data: usernameData, isFetching: isCheckingUsername } =
     useCheckUsernameAvailabilityQuery(username, {
@@ -197,8 +208,50 @@ const EditProfile = () => {
     return true;
   };
 
+  // Add this effect to track initial state
+  useEffect(() => {
+    if (data?.user || userInfo?.user) {
+      const user = data?.user || userInfo?.user;
+      // Store initial values to compare later
+      setInitialState({
+        username: user.username || "",
+        email: user.email || "",
+        bio: user.bio || "",
+        firstname: user.firstname || "",
+        lastname: user.lastname || "",
+        profilePhotoUrl: user.profilePhoto?.url || "",
+      });
+    }
+  }, [data, userInfo]);
+
+  // Add a function to check if any changes were made
+  const hasChanges = () => {
+    // Check if file was added (new profile picture)
+    if (file) {
+      return true;
+    }
+
+    // Check if any text fields changed
+    if (username !== initialState.username) return true;
+    if (email !== initialState.email) return true;
+    if (bio !== initialState.bio) return true;
+    if (firstname !== initialState.firstname) return true;
+    if (lastname !== initialState.lastname) return true;
+    if (password) return true; // Any password input counts as a change
+
+    return false;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Check if any changes were made
+    if (!hasChanges()) {
+      toast.info(
+        "No changes detected. Please update some information before saving."
+      );
+      return;
+    }
 
     // Validate the username first
     if (username !== originalUsername && !isUsernameAvailable) {
@@ -402,6 +455,7 @@ const EditProfile = () => {
     value = value.replace(/[^a-z0-9_]/g, "");
     const newUsername = value.startsWith("@") ? value : `@${value}`;
     setUsername(newUsername);
+    setFormChanged(true);
 
     // Reset availability message if same as original
     if (newUsername === originalUsername) {
@@ -444,6 +498,7 @@ const EditProfile = () => {
   const handleEmailChange = (e) => {
     const newEmail = e.target.value;
     setEmail(newEmail);
+    setFormChanged(true);
 
     // Reset validation if returning to original email
     if (newEmail === originalEmail) {
@@ -559,7 +614,10 @@ const EditProfile = () => {
                         <input
                           type="text"
                           value={firstname}
-                          onChange={(e) => setFirstname(e.target.value)}
+                          onChange={(e) => {
+                            setFirstname(e.target.value);
+                            setFormChanged(true);
+                          }}
                           className={`border font-semibold text-sm rounded-lg block w-full p-2.5 ${
                             theme
                               ? "border-slate-900 bg-black text-white"
@@ -576,7 +634,10 @@ const EditProfile = () => {
                         <input
                           type="text"
                           value={lastname}
-                          onChange={(e) => setLastname(e.target.value)}
+                          onChange={(e) => {
+                            setLastname(e.target.value);
+                            setFormChanged(true);
+                          }}
                           className={`border font-semibold  text-sm rounded-lg  block w-full p-2.5 ${
                             theme
                               ? "border-slate-900  bg-black text-white"
@@ -719,6 +780,7 @@ const EditProfile = () => {
                           const newBio = e.target.value;
                           console.log("Setting bio to:", newBio);
                           setBio(newBio);
+                          setFormChanged(true);
                         }}
                         className={`border font-semibold text-sm rounded-lg block w-full p-2.5 ${
                           theme
@@ -754,7 +816,10 @@ const EditProfile = () => {
                           )}
                           <input
                             value={password}
-                            onChange={(e) => setPassword(e.target.value)}
+                            onChange={(e) => {
+                              setPassword(e.target.value);
+                              setFormChanged(true);
+                            }}
                             className={`block w-full border ${
                               theme
                                 ? "bg-black text-white border-slate-800"
@@ -792,7 +857,10 @@ const EditProfile = () => {
                           )}
                           <input
                             value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            onChange={(e) => {
+                              setConfirmPassword(e.target.value);
+                              setFormChanged(true);
+                            }}
                             className={`block w-full border ${
                               theme
                                 ? "bg-black text-white border-slate-800"
@@ -817,9 +885,16 @@ const EditProfile = () => {
                     <div className="flex justify-center mt-8">
                       <button
                         type="submit"
-                        className="text-white bg-zinc-900 hover:bg-zinc-800 focus:ring-4 focus:outline-none focus:ring-zinc-300 font-medium rounded-lg text-sm px-12 py-3 text-center dark:bg-zinc-600 dark:hover:bg-zinc-700 transition-all duration-200"
+                        disabled={!formChanged && !hasChanges()}
+                        className={`text-white ${
+                          !formChanged && !hasChanges()
+                            ? "bg-zinc-500 cursor-not-allowed"
+                            : "bg-zinc-900 hover:bg-zinc-800"
+                        } focus:ring-4 focus:outline-none focus:ring-zinc-300 font-medium rounded-lg text-sm px-12 py-3 text-center transition-all duration-200`}
                       >
-                        Save Changes
+                        {!formChanged && !hasChanges()
+                          ? "No Changes"
+                          : "Save Changes"}
                       </button>
                     </div>
                   </div>
