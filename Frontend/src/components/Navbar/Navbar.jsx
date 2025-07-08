@@ -118,7 +118,8 @@ const Navbar = () => {
                 </div>
 
                 {/* Desktop Search Bar - with more distinct styling */}
-                {(['/', '/dashboard', '/finduser'].includes(path) || path.includes('/profile')) && (
+                {(['/', '/dashboard', '/finduser'].includes(path) || 
+                  (path.includes('/profile') && !path.includes('/edit'))) && (
                     <div className='flex-grow max-w-lg mx-4 hidden sm:flex justify-center items-center'>
                         <div className="relative w-full">
                             <div className={`absolute left-4 top-1/2 transform -translate-y-1/2 z-10`}>
@@ -145,7 +146,8 @@ const Navbar = () => {
                 )}
 
                 {/* Mobile Search Bar - matching more distinct style */}
-                {(['/', '/dashboard', '/finduser'].includes(path) || path.includes('/profile')) && (
+                {(['/', '/dashboard', '/finduser'].includes(path) || 
+                  (path.includes('/profile') && !path.includes('/edit'))) && (
                     <div className='flex sm:hidden flex-grow mx-2'>
                         <div className="relative w-full">
                             <div className={`absolute left-3.5 top-1/2 transform -translate-y-1/2 z-10`}>

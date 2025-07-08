@@ -832,7 +832,7 @@ const EditProfile = () => {
                               passwordError ? "border-red-500" : ""
                             }`}
                             type={showPassword ? "text" : "password"}
-                            placeholder="Leave blank to keep current password"
+                            placeholder="Leave blank to keep current pass"
                           />
                         </div>
                       </div>
