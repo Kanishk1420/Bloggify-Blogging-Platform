@@ -6,6 +6,7 @@ export const userApi = createApi({
     baseUrl: import.meta.env.VITE_API_URL,
     credentials: "include",
   }),
+  tagTypes: ['User'],
   endpoints: (builder) => ({
     getUser: builder.query({
       query: (id) => {
@@ -14,7 +15,8 @@ export const userApi = createApi({
         }
         return `/user/${id}`;
       },
-      skip: (id) => !id
+      skip: (id) => !id,
+      providesTags: ['User'],
     }),
 
     updateUser: builder.mutation({
@@ -23,9 +25,8 @@ export const userApi = createApi({
         method: "PATCH",
         body: user,
       }),
+      invalidatesTags: ['User'],
     }),
-
-   
 
     getAllUsers: builder.query({
       query: (id) => `/alluser/${id}`,

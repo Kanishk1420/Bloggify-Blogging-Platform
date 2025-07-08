@@ -26,7 +26,7 @@ export const updateUser = async (req, res) => {
     if (firstname) updateFields.firstname = firstname;
     if (lastname) updateFields.lastname = lastname;
     if (email) updateFields.email = email;
-    if (bio) updateFields.bio = bio;
+    updateFields.bio = bio !== undefined ? bio : authUser.bio;
 
     const file = req.file;
     if (file) {
