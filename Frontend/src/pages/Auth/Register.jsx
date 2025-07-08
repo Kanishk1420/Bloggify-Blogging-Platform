@@ -13,6 +13,7 @@ import { LoaderCircle } from 'lucide-react';
 import logo from '../../assets/logo.png';
 import { useRegisterMutation } from '../../api/auth';
 import axios from 'axios';
+import { validateEmailDomain } from "../../utils/emailValidator";
 
 const Register = () => {
   // Existing state variables
@@ -29,6 +30,10 @@ const Register = () => {
   const [isUsernameAvailable, setIsUsernameAvailable] = useState(true);
   const [usernameMessage, setUsernameMessage] = useState('');
   
+  // Add states for email validation
+  const [isEmailValid, setIsEmailValid] = useState(true);
+  const [emailErrorMessage, setEmailErrorMessage] = useState('');
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { userInfo } = useSelector((state) => state.auth);
@@ -88,6 +93,12 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    // Validate email before proceeding
+    if (!isEmailValid) {
+      toast.error(emailErrorMessage || "Please use a valid email address");
+      return;
+    }
+
     // Username validation
     const usernameValidation = validateUsername(username);
     if (!usernameValidation.valid) {
@@ -120,6 +131,15 @@ const Register = () => {
     value = value.replace(/[^a-z0-9_]/g, ''); // Allow only lowercase letters, numbers and underscores
     setUsername(value.startsWith('@') ? value : `@${value}`);
   }
+
+  const handleEmailChange = (e) => {
+    const newEmail = e.target.value;
+    setEmail(newEmail);
+    
+    const validation = validateEmailDomain(newEmail);
+    setIsEmailValid(validation.valid);
+    setEmailErrorMessage(validation.message);
+  };
 
   const handleShowPassword = () => {
     setShowPassword((prev) => !prev)
@@ -252,9 +272,14 @@ const Register = () => {
                   <div className="flex w-full rounded-lg pt-1">
                     <div className="relative w-full">
                       <input
-                        value={email} onChange={(e) => setEmail(e.target.value)} className="block w-full border bg-black border-slate-800 text-white focus:border-cyan-500  placeholder-gray-400 focus:ring-cyan-500 p-2.5 text-sm rounded-lg"
+                        value={email} onChange={handleEmailChange} className={`block w-full border ${theme ? "bg-black border-slate-800 text-white" : "bg-white border-gray-300 text-gray-900"} focus:border-cyan-500  placeholder-gray-400 focus:ring-cyan-500 p-2.5 text-sm rounded-lg ${!isEmailValid ? "border-red-500" : ""}`}
                         id="email" type="email" name="email" placeholder="email@example.com" required
                       />
+                      {!isEmailValid && (
+                        <p className="mt-1 text-xs text-red-500">
+                          {emailErrorMessage}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>

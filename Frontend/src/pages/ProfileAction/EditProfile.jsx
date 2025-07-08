@@ -12,6 +12,7 @@ import Navbar from "../../components/Navbar/Navbar";
 import Footer from "../../components/Footer/Footer";
 import { FaCheck, FaTimes, FaEyeSlash, FaRegEye } from "react-icons/fa";
 import { useCheckUsernameAvailabilityQuery } from "../../api/auth";
+import { validateEmailDomain } from "../../utils/emailValidator";
 
 const EditProfile = () => {
   const [file, setFile] = useState(null);
@@ -57,7 +58,7 @@ const EditProfile = () => {
     lastname: "",
     profilePhotoUrl: "",
   });
-
+   const [emailErrorMessage, setEmailErrorMessage] = useState("");
   // Use the username check RTK Query hook
   const { data: usernameData, isFetching: isCheckingUsername } =
     useCheckUsernameAvailabilityQuery(username, {
@@ -503,11 +504,14 @@ const EditProfile = () => {
     // Reset validation if returning to original email
     if (newEmail === originalEmail) {
       setIsEmailValid(true);
+      setEmailErrorMessage("");
+      return;
     }
 
-    // Basic email format validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    setIsEmailValid(emailRegex.test(newEmail));
+    // Use the advanced domain validation
+    const validation = validateEmailDomain(newEmail);
+    setIsEmailValid(validation.valid);
+    setEmailErrorMessage(validation.message);
   };
 
   return (
@@ -760,7 +764,7 @@ const EditProfile = () => {
                       />
                       {!isEmailValid && (
                         <p className="mt-1 text-xs text-red-500">
-                          Please enter a valid email address
+                          {emailErrorMessage || "Please enter a valid email address"}
                         </p>
                       )}
                     </div>
