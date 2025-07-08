@@ -6,14 +6,13 @@ import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { setCredentials } from '../../slices/AuthSlice';
 import { toggleDarkMode } from '../../slices/Theme';
-import { FaRegEye, FaEyeSlash } from "react-icons/fa";
+import { FaRegEye, FaEyeSlash, FaCheck, FaTimes } from "react-icons/fa";
 import { MdSunny } from "react-icons/md";
 import { BsMoonStarsFill } from "react-icons/bs";
+import { LoaderCircle } from 'lucide-react';
 import logo from '../../assets/logo.png';
 import { useRegisterMutation } from '../../api/auth';
-import { LoaderCircle } from 'lucide-react';
-
-
+import axios from 'axios';
 
 const Register = () => {
   // Existing state variables
@@ -25,11 +24,46 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   
+  // Add states for username validation
+  const [isCheckingUsername, setIsCheckingUsername] = useState(false);
+  const [isUsernameAvailable, setIsUsernameAvailable] = useState(true);
+  const [usernameMessage, setUsernameMessage] = useState('');
+  
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { userInfo } = useSelector((state) => state.auth);
   const { theme } = useSelector((state) => state.theme);
   const [register, { isLoading, isError }] = useRegisterMutation();
+  
+  // Username check with debounce
+  useEffect(() => {
+    const checkUsernameAvailability = async () => {
+      // Don't check if username is less than 4 characters (including @)
+      if (!username || username.length <= 2) {
+        setIsUsernameAvailable(true);
+        setUsernameMessage('');
+        return;
+      }
+      
+      setIsCheckingUsername(true);
+      try {
+        const response = await axios.get(`/api/auth/check-username?username=${username}`);
+        setIsUsernameAvailable(response.data.available);
+        setUsernameMessage(response.data.message);
+      } catch (error) {
+        console.error("Error checking username:", error);
+      } finally {
+        setIsCheckingUsername(false);
+      }
+    };
+    
+    // Debounce the username check
+    const timer = setTimeout(() => {
+      if (username) checkUsernameAvailability();
+    }, 500);
+    
+    return () => clearTimeout(timer);
+  }, [username]);
 
   useEffect(() => {
     if (userInfo) {
@@ -37,25 +71,53 @@ const Register = () => {
     }
   }, [setCredentials, navigate]);
 
+  // Add the validateUsername function
+  const validateUsername = (username) => {
+    if (username.length < 4) {
+      return { valid: false, message: "Username must be at least 3 characters (not including @)" };
+    }
+    
+    const validCharsRegex = /^@[a-z0-9_]+$/;
+    if (!validCharsRegex.test(username)) {
+      return { valid: false, message: "Username can only contain letters, numbers and underscores" };
+    }
+    
+    return { valid: true, message: "" };
+  };
+
   const handleSubmit = async (e) => {
-    setLoading(true)
     e.preventDefault();
+    
+    // Username validation
+    const usernameValidation = validateUsername(username);
+    if (!usernameValidation.valid) {
+      toast.error(usernameValidation.message);
+      return;
+    }
+    
+    // Prevent submission if username is not available
+    if (!isUsernameAvailable) {
+      toast.error('Username is already taken');
+      return;
+    }
+    
+    setLoading(true);
     try {
       const res = await register({ email, password, username, firstname, lastname }).unwrap();
-      dispatch(setCredentials(res))
-      toast.success(res?.message || 'Registered successfully')
-      setLoading(false)
-      navigate('/')
+      dispatch(setCredentials(res));
+      toast.success(res?.message || 'Registered successfully');
+      setLoading(false);
+      navigate('/');
     } catch (err) {
-      setLoading(false)
-      toast.error(err?.data?.message)
-      console.log(err?.data?.message || err)
+      setLoading(false);
+      toast.error(err?.data?.message);
+      console.log(err?.data?.message || err);
     }
   }
 
   const handleUsernameChange = (e) => {
     let value = e.target.value.toLowerCase();
-    value = value.replace(/[^a-z]/g, '');
+    value = value.replace(/[^a-z0-9_]/g, ''); // Allow only lowercase letters, numbers and underscores
     setUsername(value.startsWith('@') ? value : `@${value}`);
   }
 
@@ -143,15 +205,42 @@ const Register = () => {
 
                 <div>
                   <div className="mb-2">
-                    <label className="text-sm font-medium text-white" htmlFor="email">Username:</label>
+                    <label className="text-sm font-medium text-white" htmlFor="username">Username:</label>
                   </div>
                   <div className="flex w-full rounded-lg pt-1">
                     <div className="relative w-full">
                       <input
-                        value={username} onChange={handleUsernameChange} className="block w-full border bg-black border-slate-800 text-white focus:border-cyan-500  placeholder-gray-400 focus:ring-cyan-500 p-2.5 text-sm rounded-lg"
-                        type="text" name="username" placeholder='@exampleuser' required maxLength={15}
+                        value={username} 
+                        onChange={handleUsernameChange} 
+                        className={`block w-full border ${theme ? "bg-black border-slate-800 text-white" : "bg-white border-gray-300 text-gray-900"} focus:border-cyan-500 placeholder-gray-400 focus:ring-cyan-500 p-2.5 text-sm rounded-lg ${!isUsernameAvailable && username.length > 2 ? "border-red-500" : isUsernameAvailable && username.length > 2 ? "border-green-500" : ""}`}
+                        type="text" 
+                        name="username" 
+                        placeholder='@exampleuser' 
+                        required 
+                        maxLength={15}
                       />
-                      <span className='text-xs float-end mt-2 text-gray-400'>{username.length}/15</span>
+                      
+                      {/* Username availability indicator */}
+                      {username.length > 2 && (
+                        <div className="absolute right-4 top-3">
+                          {isCheckingUsername ? (
+                            <LoaderCircle size={16} className="animate-spin" />
+                          ) : isUsernameAvailable ? (
+                            <FaCheck className="text-green-500" />
+                          ) : (
+                            <FaTimes className="text-red-500" />
+                          )}
+                        </div>
+                      )}
+                      
+                      <div className="flex justify-between mt-1">
+                        <span className='text-xs text-gray-400'>{username.length}/15</span>
+                        {usernameMessage && (
+                          <span className={`text-xs ${isUsernameAvailable ? 'text-green-500' : 'text-red-500'}`}>
+                            {usernameMessage}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>

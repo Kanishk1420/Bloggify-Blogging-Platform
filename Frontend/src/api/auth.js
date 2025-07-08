@@ -59,6 +59,13 @@ export const authApi = createApi({
         body: newUser,
       }),
     }),
+
+    checkUsernameAvailability: builder.query({
+      query: (username) => ({
+        url: `/auth/check-username?username=${username}`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
@@ -69,4 +76,5 @@ export const {
   useRefetchQuery,
   useResetPasswordMutation,
   useSendOtpMutation,
+  useCheckUsernameAvailabilityQuery,
 } = authApi;

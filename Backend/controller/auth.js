@@ -192,3 +192,26 @@ export const refetch = async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 };
+
+// check username availability
+export const checkUsername = async (req, res) => {
+  try {
+    const { username } = req.query;
+    
+    // If no username provided
+    if (!username) {
+      return res.status(400).json({ message: "Username is required" });
+    }
+
+    // Check if username exists in database
+    const existingUser = await User.findOne({ username });
+    
+    return res.status(200).json({ 
+      available: !existingUser,
+      message: existingUser ? "Username already taken" : "Username available" 
+    });
+  } catch (error) {
+    console.error("Error checking username:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};

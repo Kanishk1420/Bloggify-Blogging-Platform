@@ -8,6 +8,8 @@ import { useGetUserQuery, useUpdateUserMutation } from '../../api/user';
 import { setCredentials } from '../../slices/AuthSlice';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Footer/Footer';
+import { FaCheck, FaTimes } from 'react-icons/fa';
+import { useCheckUsernameAvailabilityQuery } from '../../api/auth';
 
 const EditProfile = () => {
     const [file, setFile] = useState(null);
@@ -28,11 +30,24 @@ const EditProfile = () => {
     const { data, error } = useGetUserQuery(id);
     const { theme } = useSelector((state) => state.theme)
 
+    // New state variables for username checking
+    const [isCheckingUsername, setIsCheckingUsername] = useState(false);
+    const [isUsernameAvailable, setIsUsernameAvailable] = useState(true);
+    const [usernameMessage, setUsernameMessage] = useState('');
+    const [originalUsername, setOriginalUsername] = useState('');
+
+    // Username availability check
+    const { data: availabilityData, isLoading } = useCheckUsernameAvailabilityQuery(
+        username,
+        { skip: !username || username === originalUsername }
+    );
+
     useEffect(() => {
         if (data && data.user) {
             const user = data.user;
             setUserId(user._id);
             setUsername(user.username);
+            setOriginalUsername(user.username); // Store original username
             setEmail(user.email);
             setPassword(user.password);
             setBio(user.bio);
@@ -44,6 +59,13 @@ const EditProfile = () => {
             }
         }
     }, [data]);
+
+    useEffect(() => {
+        if (availabilityData) {
+            setIsUsernameAvailable(availabilityData.available);
+            setUsernameMessage(availabilityData.message);
+        }
+    }, [availabilityData]);
 
     const handleFileChange = (e) => {
         const selectedFile = e.target.files[0];
@@ -57,6 +79,19 @@ const EditProfile = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        // Enhanced validation before submission
+        const usernameValidation = validateUsername(username);
+        if (!usernameValidation.valid) {
+          toast.error(usernameValidation.message);
+          return;
+        }
+        
+        // Prevent submission if username is not available
+        if (!isUsernameAvailable && username !== originalUsername) {
+          toast.error('Username is already taken');
+          return;
+        }
 
         try {
             setLoading(10);
@@ -76,6 +111,7 @@ const EditProfile = () => {
             }
 
 
+            // Upload profile photo if changed
             if (file) {
                 const formData = new FormData();
                 formData.append('profilePhoto', file);
@@ -87,26 +123,43 @@ const EditProfile = () => {
                     public_id: res?.public_id,
                     url: res?.secure_url
                 };
-                
             }
 
-
+            // Update user information
             const updatedUserResponse = await updateUser({ user: newUserInfo }).unwrap();
             dispatch(setCredentials(updatedUserResponse));
             setLoading(100);
+            
+            // Add success message
+            toast.success("Profile updated successfully!");
+            
+            // Set the new username as the original to reset validation state
+            setOriginalUsername(username);
+            
             console.log(updatedUserResponse);
 
         } catch (err) {
             console.log(err);
-            toast.error(err?.message || 'Failed to update user info');
+            toast.error(err?.data?.message || 'Failed to update user info');
             setLoading(0);
         }
     };
 
+    // Add this validation function at the top of your component
+    const validateUsername = (username) => {
+        // Username without the @ should be at least 3 chars (4 total with @)
+        if (username.length < 4) {
+            return { valid: false, message: "Username must be at least 3 characters (not including @)" };
+        }
 
+        // Check if username only contains allowed characters
+        const validCharsRegex = /^@[a-z0-9_]+$/;
+        if (!validCharsRegex.test(username)) {
+            return { valid: false, message: "Username can only contain letters, numbers and underscores" };
+        }
 
-
-
+        return { valid: true, message: "" };
+    };
 
     return (
         <>
@@ -200,16 +253,62 @@ const EditProfile = () => {
                                             </div>
                                         </div>
 
-                                        <div className="mb-2 mt-2 sm:mb-6 text-white">
-                                            <label className="block mb-2 text-sm font-medium ">Your Username</label>
-                                            <input
-                                                type="text"
-                                                value={username}
-                                                onChange={(e) => setUsername(e.target.value)}
-                                                className={`border font-semibold  text-sm rounded-lg  block w-full p-2.5 ${theme ? "border-slate-900  bg-black text-white" : "bg-zinc-100 "}`}
-                                                placeholder={data?.user?.username}
-                                                required
-                                            />
+                                        <div className="mb-2 mt-2 sm:mb-6">
+                                            <label className="block mb-2 text-sm font-medium">Your Username</label>
+                                            <div className="relative">
+                                                <input
+                                                    type="text"
+                                                    value={username}
+                                                    onChange={(e) => {
+                                                        let value = e.target.value.toLowerCase();
+                                                        value = value.replace(/[^a-z0-9_]/g, '');
+                                                        const newUsername = value.startsWith('@') ? value : `@${value}`;
+                                                        setUsername(newUsername);
+                                                        
+                                                        // Reset availability message if same as original
+                                                        if (newUsername === originalUsername) {
+                                                          setUsernameMessage('');
+                                                        }
+                                                      }}
+                                                    className={`border font-semibold text-sm rounded-lg block w-full p-2.5 
+                                                        ${theme ? "border-slate-900 bg-black text-white" : "bg-zinc-100"}
+                                                        ${!isUsernameAvailable && username !== originalUsername ? "border-red-500" :
+                                                          !validateUsername(username).valid ? "border-yellow-500" :
+                                                          isUsernameAvailable && username !== originalUsername ? "border-green-500" : ""}`}
+                                                    placeholder="@username"
+                                                    required
+                                                />
+
+                                                {/* Username availability indicator */}
+                                                {username !== originalUsername && (
+                                                  <div className="absolute right-4 top-3">
+                                                    {isLoading ? (
+                                                      <svg className="animate-spin h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                        <path className="opacity-75" fill="currentColor" d="M4 12c0-4.418 3.582-8 8-8s8 3.582 8 8-3.582 8-8 8-8-3.582-8-8zm2 0a6 6 0 1012 0 6 6 0 00-12 0z"></path>
+                                                      </svg>
+                                                    ) : !validateUsername(username).valid ? (
+                                                      <FaTimes className="text-yellow-500" />
+                                                    ) : isUsernameAvailable ? (
+                                                      <FaCheck className="text-green-500" />
+                                                    ) : (
+                                                      <FaTimes className="text-red-500" />
+                                                    )}
+                                                  </div>
+                                                )}
+                                            </div>
+
+                                            {/* Username validation message */}
+                                            {username !== originalUsername && (
+                                              <p className={`mt-1 text-xs ${
+                                                !validateUsername(username).valid ? 'text-yellow-500' :
+                                                isUsernameAvailable ? 'text-green-500' : 'text-red-500'}`}
+                                              >
+                                                {!validateUsername(username).valid ? 
+                                                  validateUsername(username).message : 
+                                                  usernameMessage}
+                                              </p>
+                                            )}
                                         </div>
 
                                         <div className="mb-2 sm:mb-6">
