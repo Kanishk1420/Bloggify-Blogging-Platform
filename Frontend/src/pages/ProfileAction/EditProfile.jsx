@@ -43,6 +43,10 @@ const EditProfile = () => {
     const [usernameMessage, setUsernameMessage] = useState('');
     const [originalUsername, setOriginalUsername] = useState('');
 
+    // Add a state for email validation
+    const [isEmailValid, setIsEmailValid] = useState(true);
+    const [originalEmail, setOriginalEmail] = useState('');
+
     // Use the username check RTK Query hook
     const { data: usernameData, isFetching: isCheckingUsername } = useCheckUsernameAvailabilityQuery(
         username, 
@@ -359,6 +363,21 @@ const EditProfile = () => {
       }
     };
 
+    // Email validation function
+    const handleEmailChange = (e) => {
+      const newEmail = e.target.value;
+      setEmail(newEmail);
+      
+      // Reset validation if returning to original email
+      if (newEmail === originalEmail) {
+        setIsEmailValid(true);
+      }
+      
+      // Basic email format validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      setIsEmailValid(emailRegex.test(newEmail));
+    };
+
     return (
         <>
             <Navbar />
@@ -500,15 +519,22 @@ const EditProfile = () => {
                                         </div>
 
                                         <div className="mb-2 sm:mb-6">
-                                            <label className="block mb-2 text-sm font-medium ">Your email</label>
+                                            <label className="block mb-2 text-sm font-medium">Your email</label>
                                             <input
                                                 type="email"
-                                                onChange={(e) => setEmail(e.target.value)}
-                                                className={`border font-semibold  text-sm rounded-lg  block w-full p-2.5 ${theme ? "border-slate-900  bg-black text-white" : "bg-zinc-100 "}`}
+                                                onChange={handleEmailChange}
+                                                className={`border font-semibold text-sm rounded-lg block w-full p-2.5 
+                                                  ${theme ? "border-slate-900 bg-black text-white" : "bg-zinc-100"}
+                                                  ${!isEmailValid ? "border-red-500" : ""}`}
                                                 value={email}
                                                 placeholder="Email"
                                                 required
                                             />
+                                            {!isEmailValid && (
+                                              <p className="mt-1 text-xs text-red-500">
+                                                Please enter a valid email address
+                                              </p>
+                                            )}
                                         </div>
 
                                         <div className="mb-6">

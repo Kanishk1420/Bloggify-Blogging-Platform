@@ -51,13 +51,35 @@ export const updateUser = async (req, res) => {
     }
 
     // Update user in the database
-    const user = await User.findByIdAndUpdate(id, { $set: updateFields }, { new: true });
+    const updatedUser = await User.findByIdAndUpdate(id, updateFields, { new: true });
 
     // Send updated user data in the response
-    res.status(200).json({ success: true, user });
+    res.status(200).json({ success: true, user: updatedUser });
   } catch (err) {
+    // Check if this is a duplicate key error
+    if (err.code === 11000) {
+      // Check if the duplicate key is for email
+      if (err.message.includes('email')) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "This email address is already in use. Please try a different email."
+        });
+      } 
+      // Check if it's a username duplicate
+      else if (err.message.includes('username')) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "This username is already taken. Please choose a different one."
+        });
+      }
+    }
+    
+    // Default error message for other errors
     console.error("Update user error:", err);
-    return res.status(500).json({ message: err.message });
+    return res.status(500).json({ 
+      success: false, 
+      message: "Failed to update profile. Please try again." 
+    });
   }
 };
 
