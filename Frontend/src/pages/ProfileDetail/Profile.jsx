@@ -183,93 +183,168 @@ const Profile = () => {
             )}
 
           </div>
-          <div className='md:w-1/3 pl-4 mt-8 md:mt-20'>
-            <div className={`border-b-2  mb-5 ${theme ? "border-slate-700" : "border-gray-100"}`}></div>
-            <div className='px-4'>
-              {!userData ? (
-                <Loader />
-              ) : (
-                <>
-                  <div className='flex items-center mb-4'>
-                    <img src={userData?.profilePhoto?.url ?? avatar} alt='profile' className='w-24 h-24 rounded-full object-cover mr-4' />
-                    <div>
-                      <div className='text-lg font-semibold flex gap-2 items-center'>
-                        <p>{userData?.firstname}</p>
-                        <p> {userData?.lastname}</p>
-                      </div>
-                      <p>{userData?.bio}</p>
-                    </div>
-                  </div>
-                  {userInfo?.user?._id === userId ? (
-                    <button className='btn-donate mt-3 btn-custom' onClick={() => navigate(`/profile/edit/${userInfo?.user?._id}`)}>Edit profile</button>
+          <div className='md:w-1/3 pl-4 mt-8 md:mt-8'>
+            {/* Profile Card */}
+            <div className={`rounded-xl overflow-hidden shadow-lg ${
+              theme ? "bg-zinc-900 shadow-zinc-800/50" : "bg-white shadow-gray-200/70"
+            }`}>
+              {/* Profile Header/Cover */}
+              <div className={`h-24 w-full ${
+                theme ? "bg-gradient-to-r from-blue-900 to-purple-900" : "bg-gradient-to-r from-blue-400 to-purple-500"
+              }`}></div>
+              
+              {/* Profile Content */}
+              <div className="px-6 pb-6 relative">
+                {/* Profile Picture - Positioned to overlap header */}
+                <div className="flex justify-center -mt-12 mb-3">
+                  {!userData ? (
+                    <div className={`w-24 h-24 rounded-full animate-pulse ${
+                      theme ? "bg-gray-700" : "bg-gray-300"
+                    }`}></div>
                   ) : (
-                    null
+                    <img 
+                      src={userData?.profilePhoto?.url ?? avatar} 
+                      alt='profile' 
+                      className="w-24 h-24 rounded-full object-cover border-4 border-white dark:border-zinc-900 shadow-md" 
+                    />
                   )}
-
-                  {/* Follow and unfollow button */}
-                  <div>
-
-
-                    {userInfo?.user?._id !== userId && (
-                      <div>
-                        {isFollowerData?.followers?.find((user) => user._id === userInfo?.user?._id) ? (
-                          <div>
-                            {processing ? (
-                              <button type="button" disabled className="inline-flex items-center px-4 py-2 rounded-lg text-white bg-slate-700 focus:outline-none focus:ring focus:ring-slate-100">
-                                <svg className="animate-spin h-5 w-5 mr-3 text-white" viewBox="0 0 24 24" aria-label="Loading">
-                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A8.003 8.003 0 014.707 14H2c0 4.418 3.582 8 8 8v-2.707a7.965 7.965 0 01-2-2.002zM21.707 10H22c0-4.418-3.582-8-8-8v2.707a7.965 7.965 0 012 2.002L21.707 10z"></path>
-                                </svg>
-                                Processing...
-                              </button>
-                            ) : (
-                              <button className={`px-20 py-1 rounded-lg ${theme ? "bg-gray-200 text-black" : "bg-zinc-900 text-white"}`} onClick={handleUnfollow}>
-                                Unfollow
-                              </button>
-                            )}
-                          </div>
-                        ) : (
-                          <div>
-                            {processing ? (
-                              <button type="button" disabled className="inline-flex items-center px-4 py-2 rounded-lg text-white bg-slate-700 focus:outline-none focus:ring focus:ring-slate-100">
-                                <svg className="animate-spin h-5 w-5 mr-3 text-white" viewBox="0 0 24 24" aria-label="Loading">
-                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A8.003 8.003 0 014.707 14H2c0 4.418 3.582 8 8 8v-2.707a7.965 7.965 0 01-2-2.002zM21.707 10H22c0-4.418-3.582-8-8-8v2.707a7.965 7.965 0 012 2.002L21.707 10z"></path>
-                                </svg>
-                                Processing...
-                              </button>
-                            ) : (
-                              <button className={`px-20 py-1 rounded-lg ${theme ? "bg-gray-200 text-black" : "bg-zinc-900 text-white"}`} onClick={handleFollow}>
-                                Follow
-                              </button>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                  </div>
-
-
-                </>
-              )}
-
-              <div className='mt-4 '>
-                <div className='flex gap-2'>
-                  <div onClick={handleFollowersClick} className='flex gap-2'>
-                    <p className='font-sans'>{followerCount}</p>
-                    <p className='font-semibold cursor-pointer' >Followers</p>
-                  </div>
-
-
-                  <div onClick={handleFollowingClick} className='flex gap-2'>
-                    <p className='font-sans'>{userData?.following?.length || 0}</p>
-                    <p className='cursor-pointer font-semibold' onClick={handleFollowingClick}>Following</p>
-                  </div>
                 </div>
+                
+                {!userData ? (
+                  <Loader />
+                ) : (
+                  <>
+                    {/* User Info */}
+                    <div className="text-center mb-4">
+                      <h2 className={`text-xl font-bold ${theme ? "text-white" : "text-gray-800"}`}>
+                        {userData?.firstname} {userData?.lastname}
+                      </h2>
+                      <p className={`text-sm ${theme ? "text-gray-300" : "text-gray-600"}`}>
+                        @{userData?.username?.replace('@', '')}
+                      </p>
+                      <p className={`mt-2 ${theme ? "text-gray-400" : "text-gray-700"}`}>
+                        {userData?.bio || "No bio provided"}
+                      </p>
+                    </div>
+                    
+                    {/* Action Buttons */}
+                    <div className="flex justify-center mb-4">
+                      {userInfo?.user?._id === userId ? (
+                         <button className='btn-donate mt-3 btn-custom' onClick={() => navigate(`/profile/edit/${userInfo?.user?._id}`)}>Edit profile</button>
+                      ) : (
+                        <div>
+                          {isFollowerData?.followers?.find((user) => user._id === userInfo?.user?._id) ? (
+                            // Unfollow button - keep as is
+                            <button 
+                              onClick={handleUnfollow}
+                              disabled={processing}
+                              className={`flex items-center gap-2 px-8 py-2 rounded-full font-medium transition-all ${
+                                processing
+                                  ? "bg-gray-500 cursor-not-allowed"
+                                  : theme
+                                    ? "bg-gray-200 hover:bg-gray-300 text-black" 
+                                    : "bg-zinc-800 hover:bg-zinc-700 text-white"
+                              }`}
+                            >
+                              {/* Button content remains the same */}
+                              {processing ? (
+                                <>
+                                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014.708 14H2c0 4.418 3.582 8 8 8v-2c-3.314 0-6-2.686-6-6zM20 12c0-4.418-3.582-8-8-8v2c3.314 0 6 2.686 6 6 0 1.385-.468 2.657-1.25 3.682l1.562 1.562A7.962 7.962 0 0020 12z"></path>
+                                  </svg>
+                                  Processing
+                                </>
+                              ) : (
+                                <>
+                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7a4 4 0 11-8 0 4 4 0 018 0zM9 14a6 6 0 00-6 6v1h12v-1a6 6 0 00-6-6zM21 12h-6" />
+                                  </svg>
+                                  Unfollow
+                                </>
+                              )}
+                            </button>
+                          ) : (
+                            // Follow button - keep as is
+                            <button 
+                              onClick={handleFollow}
+                              disabled={processing}
+                              className={`flex items-center gap-2 px-8 py-2 rounded-full font-medium transition-all ${
+                                processing
+                                  ? "bg-gray-500 cursor-not-allowed"
+                                  : theme
+                                    ? "bg-blue-600 hover:bg-blue-700 text-white" 
+                                    : "bg-blue-500 hover:bg-blue-600 text-white"
+                              }`}
+                            >
+                              {processing ? (
+                                <>
+                                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014.708 14H2c0 4.418 3.582 8 8 8v-2c-3.314 0-6-2.686-6-6zM20 12c0-4.418-3.582-8-8-8v2c3.314 0 6 2.686 6 6 0 1.385-.468 2.657-1.25 3.682l1.562 1.562A7.962 7.962 0 0020 12z"></path>
+                                  </svg>
+                                  Processing
+                                </>
+                              ) : (
+                                <>
+                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                  </svg>
+                                  Follow
+                                </>
+                              )}
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Stats */}
+                    <div className={`flex justify-center border-t border-b py-3 ${
+                      theme ? "border-zinc-800" : "border-gray-200"
+                    }`}>
+                      <div onClick={handleFollowersClick} className="w-1/2 text-center cursor-pointer hover:bg-opacity-10 hover:bg-blue-500 px-2 py-1 rounded-md transition-colors">
+                        <p className={`text-xl font-bold ${theme ? "text-white" : "text-gray-800"}`}>
+                          {followerCount}
+                        </p>
+                        <p className={`text-sm ${theme ? "text-gray-400" : "text-gray-600"}`}>
+                          Followers
+                        </p>
+                      </div>
+                      <div onClick={handleFollowingClick} className="w-1/2 text-center cursor-pointer hover:bg-opacity-10 hover:bg-blue-500 px-2 py-1 rounded-md transition-colors">
+                        <p className={`text-xl font-bold ${theme ? "text-white" : "text-gray-800"}`}>
+                          {userData?.following?.length || 0}
+                        </p>
+                        <p className={`text-sm ${theme ? "text-gray-400" : "text-gray-600"}`}>
+                          Following
+                        </p>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
-            <div className={`border-b-2 mt-5 ${theme ? "border-slate-700" : "border-gray-100"}`}></div>
+            
+            {/* Optional: User's Recent Activity or Additional Info */}
+            <div className={`mt-4 rounded-xl overflow-hidden shadow-lg ${
+              theme ? "bg-zinc-900 shadow-zinc-800/50" : "bg-white shadow-gray-200/70"
+            }`}>
+              <div className="p-4">
+                <h3 className={`font-medium mb-2 ${theme ? "text-gray-200" : "text-gray-700"}`}>
+                  Member since
+                </h3>
+                <p className={`text-sm ${theme ? "text-gray-400" : "text-gray-600"}`}>
+                  {userData?.createdAt 
+                    ? new Date(userData.createdAt).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })
+                    : "Loading..."
+                  }
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
