@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useGetPostByIdQuery, useUpdatePostMutation, useUploadFileMutation } from '../../api/post.js'

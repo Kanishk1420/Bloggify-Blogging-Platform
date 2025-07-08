@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from 'react';
 import { FaEyeSlash, FaRegEye } from "react-icons/fa";
 import { MdSunny } from "react-icons/md";
