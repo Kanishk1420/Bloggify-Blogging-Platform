@@ -8,10 +8,9 @@ import { toast } from 'react-toastify';
 import { useGetPostByIdQuery, useLikePostMutation, useUnlikePostMutation } from '../../api/post';
 
 const Like = ({ postId }) => {
- 
     const { likedPosts } = useSelector((state) => state.post);
     const [likecount, setLikeCount] = useState(0);
-    const [isLiked, setisLiked] = useState(false)
+    const [isLiked, setIsLiked] = useState(false);
     const [likePost, { data: LikedData }] = useLikePostMutation();
     const [unlikePost] = useUnlikePostMutation();
     const { userInfo } = useSelector((state) => state.auth)
@@ -19,59 +18,74 @@ const Like = ({ postId }) => {
     const { data } = useGetPostByIdQuery(postId);
     const dispatch = useDispatch();
 
+    // Set initial like count
     useEffect(() => {
-        if (data && postId) {
-            setLikeCount(data?.getPost?.likes?.length)
+        if (data?.getPost) {
+            setLikeCount(data.getPost.likes?.length || 0);
+            
+            // Check if user has already liked the post
+            const userHasLiked = data.getPost.likes?.some(
+                likeId => likeId === userId || 
+                (typeof likeId === 'object' && likeId._id === userId)
+            );
+            
+            setIsLiked(userHasLiked);
+            
+            // Sync with Redux store
+            if (userHasLiked) {
+                const likeExists = likedPosts.some(post => post.postId === postId && post.userId === userId);
+                if (!likeExists) {
+                    dispatch(addLike(userId, postId));
+                }
+            }
         }
+    }, [data, userId, postId, dispatch, likedPosts]);
 
-
-    }, [data?.getPost, postId])
-
+    // Initialize liked posts from backend
     useEffect(() => {
-        dispatch(getLikedPost())
-    },[dispatch])       
+        dispatch(getLikedPost());
+    }, [dispatch]);       
 
-
-    if (data?.likes?.includes(userId)) {
-        return true;
-    }
     const handleLike = async () => {
         try {
-            if (likedPosts?.some((post) => post.postId === postId)) {
-                return toast.error("You have already liked this post");
-
+            if (isLiked) {
+                return toast.info("You've already liked this post");
             }
-            await likePost({ id: postId, userId: userInfo?.user?._id });
-            setisLiked(true)
-            dispatch(addLike(userId,postId));
-            setLikeCount((prev) => prev + 1)
+            
+            await likePost({ id: postId, userId });
+            setIsLiked(true);
+            dispatch(addLike(userId, postId));
+            setLikeCount(prev => prev + 1);
+            toast.success("Post liked successfully");
         } catch (err) {
-            console.log(err);
+            console.error("Like error:", err);
+            toast.error("Failed to like post");
         }
     };
 
     const handleUnlike = async () => {
         try {
-            await unlikePost({ id: postId, userId: userInfo?.user?._id });
-            setisLiked(false)
-            dispatch(removeLike(userId));
-            setLikeCount((prev) => prev - 1)
-
+            await unlikePost({ id: postId, userId });
+            setIsLiked(false);
+            dispatch(removeLike({ userId, postId }));
+            setLikeCount(prev => prev - 1);
+            toast.info("Post unliked");
         } catch (err) {
-            console.log(err);
+            console.error("Unlike error:", err);
+            toast.error("Failed to unlike post");
         }
     };
 
     return (
         <div className='flex gap-3 justify-start items-center mx-2'>
-            {likedPosts.find((post) => post.userId === userId && post.postId === postId) ? (
+            {isLiked ? (
                 <FaHeart size={21} className='cursor-pointer' color='red' onClick={handleUnlike} />
             ) : (
                 <FaRegHeart size={21} className='cursor-pointer' onClick={handleLike} />
             )}
             <span className='mx-2'>{likecount}</span>
         </div>
-    )
+    );
 }
 
 Like.propTypes = {
