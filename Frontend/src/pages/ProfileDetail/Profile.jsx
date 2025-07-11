@@ -272,9 +272,7 @@ const Profile = () => {
                               className={`flex items-center gap-2 px-8 py-2 rounded-full font-medium transition-all ${
                                 processing
                                   ? "bg-gray-500 cursor-not-allowed"
-                                  : theme
-                                    ? "bg-blue-600 hover:bg-blue-700 text-white" 
-                                    : "bg-blue-500 hover:bg-blue-600 text-white"
+                                  : "w-full md:w-auto rounded-full font-medium transition bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white"
                               }`}
                             >
                               {processing ? (
