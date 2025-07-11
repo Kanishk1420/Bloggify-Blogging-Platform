@@ -15,15 +15,14 @@ import CreatePost from './pages/PostAction/CreatePost'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ResetPassword from './pages/ResetPassword/ResetPassword'
-
-
-
+import ThemeInitializer from './components/ThemeInitializer' // Add this import
 
 const App = () => {
   const { theme } = useSelector((state) => state.theme);
   
   return (
     <div className={`min-h-screen ${theme ? "bg-zinc-950" : "bg-white"}`}>
+      <ThemeInitializer /> 
       <Router>
         <ToastContainer autoClose={3000} />
         <Routes>

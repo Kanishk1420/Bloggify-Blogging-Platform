@@ -13,13 +13,13 @@ const Footer = () => {
           </div>
 
           <p className="mx-auto mt-4 max-w-md text-center leading-relaxed text-gray-500 text-sm sm:text-base px-4">
-            Stack Spot is a blog platform for developers to post amazing blogs and connect with other developers. Additionally, users can access real-time analytics to engage more effectively.
+            Bloggify is a blog platform for developers to post amazing blogs and connect with other developers. Additionally, users can access real-time analytics to engage more effectively.
           </p>
           
           <ul className="mt-6 sm:mt-8 flex justify-center gap-4 md:gap-6">
             <li>
               <a
-                href="https://twitter.com/vanshchavda_"
+                href="https://x.com/SushmaLal125823"
                 rel="noreferrer"
                 target="_blank"
                 className="text-gray-700 transition hover:text-gray-700/75"
@@ -33,7 +33,7 @@ const Footer = () => {
 
             <li>
               <a
-                href="https://github.com/itsvanshchavda"
+                href="https://github.com/Kanishk1420"
                 rel="noreferrer"
                 target="_blank"
                 className="text-gray-700 transition hover:text-gray-700/75"
@@ -50,7 +50,7 @@ const Footer = () => {
             </li>
           </ul>
           
-          <p className="text-slate-500 font-semibold text-center mt-4 text-xs sm:text-sm">&copy; Stack Spot {new Date().getFullYear()}</p>
+          <p className="text-slate-500 font-semibold text-center mt-4 text-xs sm:text-sm">&copy; Bloggify {new Date().getFullYear()}</p>
         </div>
       </div>
     </footer>
