@@ -9,7 +9,7 @@ import {
     useGetPostByIdQuery, 
     useLikePostMutation, 
     useUnlikePostMutation,
-    useUndislikePostMutation // Import from post API file instead
+    useUndislikePostMutation
 } from '../../api/post';
 
 const Like = ({ postId }) => {
@@ -25,7 +25,7 @@ const Like = ({ postId }) => {
     const { data, refetch } = useGetPostByIdQuery(postId);
     const dispatch = useDispatch();
 
-    // Set initial like count
+    // Set initial like count - THIS IS WHERE THE INFINITE LOOP HAPPENS
     useEffect(() => {
         if (data?.getPost) {
             setLikeCount(data.getPost.likes?.length || 0);
@@ -38,20 +38,17 @@ const Like = ({ postId }) => {
             
             setIsLiked(userHasLiked);
             
-            // Sync with Redux store
-            if (userHasLiked) {
-                const likeExists = likedPosts.some(post => post.postId === postId && post.userId === userId);
-                if (!likeExists) {
-                    dispatch(addLike({userId, postId}));
-                }
-            }
+            // CRITICAL FIX: Don't dispatch inside this effect
+            // This was causing the infinite loop by updating Redux state
+            // which triggered re-renders and called this effect again
         }
-    }, [data, userId, postId, dispatch, likedPosts]);
+    }, [data, userId, postId]); // Remove likedPosts from dependencies
 
-    // Initialize liked posts from backend
+    // Initialize liked posts from backend in a separate effect
     useEffect(() => {
+        // Only call this once on component mount, not on every update
         dispatch(getLikedPost());
-    }, [dispatch]);      
+    }, [dispatch]);       
 
     const handleLike = async () => {
         try {
@@ -59,7 +56,7 @@ const Like = ({ postId }) => {
                 return toast.info("You've already liked this post");
             }
             
-            // Check if post is already disliked
+            // Check if post is disliked by this user
             const isDisliked = dislikedPosts?.some(post => 
                 post.postId === postId && post.userId === userId
             );
@@ -69,29 +66,24 @@ const Like = ({ postId }) => {
                 await undislikePost({ id: postId, userId });
                 dispatch(removeDislike({ userId, postId }));
                 
-                // Find dislike component in same parent and update its state
-                // This is a bit hacky but works for immediate UI update
-                const dislikeCountElement = document.querySelector(`[data-dislike-id="${postId}"] span`);
-                if (dislikeCountElement) {
-                    const currentCount = parseInt(dislikeCountElement.textContent);
-                    if (!isNaN(currentCount) && currentCount > 0) {
-                        dislikeCountElement.textContent = currentCount - 1;
+                // Update dislike element if it exists
+                const dislikeElement = document.querySelector(`[data-dislike-id="${postId}"] span`);
+                if (dislikeElement) {
+                    const count = parseInt(dislikeElement.textContent);
+                    if (!isNaN(count) && count > 0) {
+                        dislikeElement.textContent = count - 1;
                     }
                 }
             }
-            
-            // Continue with the like operation
-            await likePost({ id: postId, userId });
             
             // Optimistically update UI
             setIsLiked(true);
             setLikeCount(prev => prev + 1);
             
-            // Update Redux store
+            await likePost({ id: postId, userId });
             dispatch(addLike({userId, postId}));
             
-            // Refetch to ensure data consistency
-            refetch();
+            // No need to refetch here - let RTK Query handle invalidation
             
             toast.success("Post liked successfully");
         } catch (err) {
@@ -110,12 +102,9 @@ const Like = ({ postId }) => {
             setLikeCount(prev => prev - 1);
             
             await unlikePost({ id: postId, userId });
-            
-            // Update Redux store
             dispatch(removeLike({ userId, postId }));
             
-            // Refetch to ensure data consistency
-            refetch();
+            // No need to refetch here - let RTK Query handle invalidation
             
             toast.info("Post unliked");
         } catch (err) {

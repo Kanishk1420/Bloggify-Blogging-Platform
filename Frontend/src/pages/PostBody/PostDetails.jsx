@@ -394,11 +394,7 @@ const PostDetails = () => {
                                             disabled={commentLoader} 
                                             type='submit' 
                                             onClick={commentHandler} 
-                                            className={`px-6 py-2.5 font-medium rounded-lg transition ${
-                                                theme 
-                                                    ? "bg-purple-700 hover:bg-purple-600 text-white" 
-                                                    : "bg-purple-600 hover:bg-purple-700 text-white"
-                                            }`}
+                                            className={`w-full md:w-auto px-8 py-3 rounded-lg font-medium transition bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white`}
                                         >
                                             {commentLoader ? 'Posting...' : 'Post Comment'}
                                         </button>

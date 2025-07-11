@@ -1032,8 +1032,7 @@ const EditProfile = () => {
                         !formChanged && !hasChanges()
                           ? "bg-gray-400 cursor-not-allowed text-white"
                           : theme
-                          ? "bg-blue-600 hover:bg-blue-700 text-white"
-                          : "bg-blue-600 hover:bg-blue-700 text-white"
+                          ? "w-full md:w-auto px-8 py-3 rounded-lg font-medium transition bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white":"w-full md:w-auto px-8 py-3 rounded-lg font-medium transition bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white"
                       } transition-colors`}
                     >
                       {loading > 0 ? (
