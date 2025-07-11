@@ -1,8 +1,8 @@
 
 
-# Stack Spot - Developers Can Write , Learn And Post Blogs
+# Bloggify - Developers Can Write , Learn And Post Blogs
 
-Stack Spot is a full stack blog application that includes user system functionalities such as follow/unfollow, like post, bookmark post, and dark theme. It is built using React, Node.js, MongoDB, and Cloudinary. The application also incorporates real-time analytics and an auto-login feature.
+Bloggify is a full stack blog application that includes user system functionalities such as follow/unfollow, like post, bookmark post, and dark theme. It is built using React, Node.js, MongoDB, and Cloudinary. The application also incorporates real-time analytics and an auto-login feature.
 
 ## Features
 
@@ -59,10 +59,6 @@ To get started with Stack Spot, follow these steps:
 ## Contributing
 
 Contributions are welcome! If you find any issues or have suggestions for improvement, please open an issue or submit a pull request.
-
-## License
-
-This project is licensed under the [MIT License](LICENSE).
 
 ## Developed By
 

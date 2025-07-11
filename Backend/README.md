@@ -1,6 +1,6 @@
-# Stack Spot - Backend Server
+# Bloggify - Backend Server
 
-Stack Spot is a full stack blog application that includes user system functionalities such as follow/unfollow, like post, bookmark post, and dark theme. It is built using React, Node.js, MongoDB, and Cloudinary. The application also incorporates real-time analytics and an auto-login feature.
+Bloggify is a full stack blog application that includes user system functionalities such as follow/unfollow, like post, bookmark post, and dark theme. It is built using React, Node.js, MongoDB, and Cloudinary. The application also incorporates real-time analytics and an auto-login feature.
 
 ## Deployment and Integration
 
@@ -125,10 +125,6 @@ For detailed API endpoint descriptions, refer to the API documentation.\_
 ---
 
 Feel free to provide some suggestions and feedback on the project. If you liked the project, drop a star on the GitHub repository. Your appreciation means a lot to me. Thank you for giving this project your time. Have a great day! 😃
-
-## License
-
-MIT LICENSE [LICENSE](LICENSE)
 
 ## Developed By
 
