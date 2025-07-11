@@ -8,6 +8,8 @@ import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import {useGetUserQuery} from '../../api/user'
 import avatar from '../../assets/avatar.jpg'
+import CommentLike from '../Comment/CommentLike';
+import CommentDislike from '../Comment/CommentDislike';
 
 const Comment = ({ comment, userData }) => {
     const getTimeElapsed = (timestamp) => {
@@ -73,11 +75,11 @@ const Comment = ({ comment, userData }) => {
         <>
             <div>
                 <div className={` border-b-2 ${theme ? "border-slate-700" : "border-gray-200"} `}></div>
-                <div className='px-2 py-2  my-2 rounded-md'>
+                <div className='px-2 py-2 my-2 rounded-md'>
                     <div className='flex items-center justify-between'>
                         <div className='flex items-center'>
-                            <img src={data?.user?.profilePhoto?.url ?? avatar} alt="" className='w-10 h-10 object-cover rounded-full mt-2' /> {/* Corrected image source */}
-                            <p className='font-bold  cursor-pointer ml-2' onClick={() => navigate(`/profile/${comment.userId}`)}>{comment.author}</p> {/* Added margin for spacing */}
+                            <img src={data?.user?.profilePhoto?.url ?? avatar} alt="" className='w-10 h-10 object-cover rounded-full mt-2' />
+                            <p className='font-bold cursor-pointer ml-2' onClick={() => navigate(`/profile/${comment.userId}`)}>{comment.author}</p>
                         </div>
                         <div className='flex justify-center items-center space-x-4 text-sm'>
                             <p>{getTimeElapsed(comment.updatedAt)}</p>
@@ -91,6 +93,7 @@ const Comment = ({ comment, userData }) => {
                             </div>
                         </div>
                     </div>
+                    
                     {editMode &&
                         <div className='mt-2'>
                             <div className='flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4'>
@@ -103,18 +106,26 @@ const Comment = ({ comment, userData }) => {
                                 <button
                                     type='submit'
                                     onClick={handleUpdateComment}
-                                    className='w-full md:w-auto h-auto px-6 bg-black  rounded-md hover:bg-gray-800 transition duration-300'
+                                    className='w-full md:w-auto h-auto px-6 bg-black rounded-md hover:bg-gray-800 transition duration-300'
                                 >
                                     Update
                                 </button>
                             </div>
                         </div>
                     }
+                    
                     {!editMode && <p className='mx-14'>{comment.comment}</p>}
+                    
+                    {/* Add Like/Dislike UI here */}
+                    {!editMode && (
+                        <div className="flex items-center space-x-4 mt-2 ml-14" data-comment-like-id={comment._id}>
+                            <CommentLike comment={comment} />
+                            <CommentDislike comment={comment} />
+                        </div>
+                    )}
                 </div>
                 <div className={` border-b-1 ${theme ? "border-slate-700" : "border-gray-200"} `}></div>
             </div>
-
         </>
     );
 };

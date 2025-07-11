@@ -10,6 +10,7 @@ export const commentApi = createApi({
   endpoints: (builder) => ({
     getAllComment: builder.query({
       query: (postId) => `/comment/post/${postId}`,
+      providesTags: ["Comment"],
     }),
 
     createComment: builder.mutation({
@@ -21,6 +22,7 @@ export const commentApi = createApi({
           "Content-Type": "application/json",
         },
       }),
+      invalidatesTags: ["Comment"],
     }),
 
     deleteComment: builder.mutation({
@@ -31,17 +33,68 @@ export const commentApi = createApi({
           "Content-Type": "application/json",
         },
       }),
+      invalidatesTags: ["Comment"],
     }),
 
     updateComment: builder.mutation({
       query: (newData) => ({
         url: `/comment/update`,
         method: "PUT",
-        body:newData,
+        body: newData,
         headers: {
           "Content-Type": "application/json",
         },
       }),
+      invalidatesTags: ["Comment"],
+    }),
+
+    // Add these new mutations
+    likeComment: builder.mutation({
+      query: ({ id, userId }) => ({
+        url: `/comment/like/${id}`,
+        method: "PUT",
+        body: { userId },
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }),
+      invalidatesTags: ["Comment"],
+    }),
+
+    unlikeComment: builder.mutation({
+      query: ({ id, userId }) => ({
+        url: `/comment/unlike/${id}`,
+        method: "PUT",
+        body: { userId },
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }),
+      invalidatesTags: ["Comment"],
+    }),
+
+    dislikeComment: builder.mutation({
+      query: ({ id, userId }) => ({
+        url: `/comment/dislike/${id}`,
+        method: "PUT",
+        body: { userId },
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }),
+      invalidatesTags: ["Comment"],
+    }),
+
+    undislikeComment: builder.mutation({
+      query: ({ id, userId }) => ({
+        url: `/comment/undislike/${id}`,
+        method: "PUT",
+        body: { userId },
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }),
+      invalidatesTags: ["Comment"],
     }),
   }),
 });
@@ -50,5 +103,9 @@ export const {
   useGetAllCommentQuery,
   useCreateCommentMutation,
   useDeleteCommentMutation,
-  useUpdateCommentMutation
+  useUpdateCommentMutation,
+  useLikeCommentMutation,
+  useUnlikeCommentMutation,
+  useDislikeCommentMutation,
+  useUndislikeCommentMutation
 } = commentApi;
