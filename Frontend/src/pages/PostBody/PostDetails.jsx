@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
@@ -33,10 +33,95 @@ const PostDetails = () => {
     const { userInfo } = useSelector((state) => state.auth);
     const [showLoader, setShowLoader] = useState(true);
     const { theme } = useSelector((state) => state.theme)
-
+    
+    // Add a ref for the content div to apply custom styles
+    const contentRef = useRef(null);
 
     const dispatch = useDispatch();
     const userId = userInfo?.user?._id;
+
+    // Add custom CSS for code blocks
+    useEffect(() => {
+        const style = document.createElement('style');
+        style.innerHTML = `
+            /* Code block styling */
+            .post-content pre {
+                background-color: ${theme ? '#1e1e1e' : '#f5f5f5'} !important;
+                border-radius: 6px !important;
+                padding: 1rem !important;
+                margin: 1.5rem 0 !important;
+                overflow-x: auto !important;
+                border: 1px solid ${theme ? '#333' : '#e0e0e0'} !important;
+                font-family: 'Fira Code', Consolas, Monaco, 'Andale Mono', monospace !important;
+            }
+            
+            .post-content pre code {
+                font-size: 0.85rem !important;
+                line-height: 1.5 !important;
+                color: ${theme ? '#e0e0e0' : '#333'} !important;
+            }
+            
+            .post-content code:not(pre code) {
+                background-color: ${theme ? '#2d2d2d' : '#f0f0f0'} !important;
+                color: ${theme ? '#e0e0e0' : '#333'} !important;
+                padding: 0.2em 0.4em !important;
+                border-radius: 3px !important;
+                font-family: 'Fira Code', Consolas, Monaco, 'Andale Mono', monospace !important;
+                font-size: 0.85rem !important;
+            }
+            
+            .post-content blockquote {
+                border-left: 4px solid ${theme ? '#4a5568' : '#e2e8f0'} !important;
+                padding-left: 1rem !important;
+                margin-left: 0 !important;
+                color: ${theme ? '#a0aec0' : '#4a5568'} !important;
+            }
+            
+            .post-content h1, 
+            .post-content h2 {
+                border-bottom: 1px solid ${theme ? '#2d3748' : '#edf2f7'} !important;
+                padding-bottom: 0.5rem !important;
+                margin-top: 2rem !important;
+            }
+            
+            .post-content a {
+                color: ${theme ? '#63b3ed' : '#3182ce'} !important;
+                text-decoration: none !important;
+            }
+            
+            .post-content a:hover {
+                text-decoration: underline !important;
+            }
+            
+            .post-content img {
+                max-width: 100% !important;
+                height: auto !important;
+                border-radius: 6px !important;
+            }
+            
+            .post-content table {
+                border-collapse: collapse !important;
+                width: 100% !important;
+                margin: 1rem 0 !important;
+            }
+            
+            .post-content th, 
+            .post-content td {
+                border: 1px solid ${theme ? '#4a5568' : '#e2e8f0'} !important;
+                padding: 0.5rem !important;
+            }
+            
+            .post-content th {
+                background-color: ${theme ? '#2d3748' : '#edf2f7'} !important;
+            }
+        `;
+        
+        document.head.appendChild(style);
+        
+        return () => {
+            document.head.removeChild(style);
+        };
+    }, [theme]);
 
     useEffect(() => {
         const delay = setTimeout(() => {
@@ -45,7 +130,6 @@ const PostDetails = () => {
 
         return () => clearTimeout(delay);
     }, []);
-
 
     useEffect(() => {
         if (data && data.getPost) {
@@ -93,10 +177,6 @@ const PostDetails = () => {
         navigate(path);
     };
 
-
-
-
-
     const handleShare = async () => {
         const shareText = `${data?.getPost?.title}\n${window.location.href}`;
 
@@ -120,95 +200,182 @@ const PostDetails = () => {
         <>
             <Navbar />
             {showLoader ? <PostDetailSkeleton /> : (
-                <div className={`${theme ? "bg-gradient-to-b from-black to-gray-800 via-black text-white" : ""}`}>
-                    <div className={`px-4 md:px-8 py-7 max-w-4xl mx-auto `}>
-                        <h1 className='text-4xl font-bold mb-4'>{data?.getPost?.title}</h1>
-                        <div className='flex items-center space-x-2 text-sm text-gray-600 mb-4'>
-                            <p>{new Date(data?.getPost?.updatedAt).toLocaleDateString()}</p>
-                            <span>|</span>
-                            <p>{new Date(data?.getPost?.updatedAt).toLocaleTimeString()}</p>
-                        </div>
-
-                        <div className={` border-b-2 mb-2 ${theme ? "border-slate-600" : "border-gray-100"}`}></div>
-
-                        <div className="flex mb-5 mt-4">
-
-                            {/* Like  */}
-                            <div className=''>
-
-                                {/* Like components */}
-                                <Like postId={postId} />
-
+                <div className={`${theme ? "bg-gradient-to-b from-black to-gray-800 via-black text-white" : "bg-gray-50"}`}>
+                    <div className={`px-4 md:px-8 py-7 max-w-4xl mx-auto`}>
+                        {/* Article Header */}
+                        <div className={`${theme ? "bg-zinc-900/60" : "bg-white"} rounded-xl p-6 md:p-8 mb-6 shadow-lg`}>
+                            <h1 className='text-3xl md:text-4xl font-bold mb-4 leading-tight'>{data?.getPost?.title}</h1>
+                            
+                            <div className={`flex items-center space-x-2 text-sm ${theme ? "text-gray-400" : "text-gray-600"} mb-4`}>
+                                <p>{new Date(data?.getPost?.updatedAt).toLocaleDateString('en-US', {
+                                    day: 'numeric',
+                                    month: 'short',
+                                    year: 'numeric'
+                                })}</p>
+                                <span>•</span>
+                                <p>{new Date(data?.getPost?.updatedAt).toLocaleTimeString('en-US', {
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                })}</p>
                             </div>
 
+                            <div className={`border-b mb-4 ${theme ? "border-zinc-700" : "border-gray-200"}`}></div>
 
-                            <button className="flex text-gray-500 flex-grow justify-end gap-6">
-
-                                {/* Bookmark  */}
-
-                                <Bookmark postId={postId} />
-
-                                <span><IoPlayCircleOutline size={21} className='cursor-pointer' title="Play" /></span>
-                                <span><IoShareOutline size={21} className='cursor-pointer' title="Share" onClick={handleShare} /></span>
-                            </button>
+                            {/* Author Info */}
+                            <div className='flex items-center gap-3 mb-4'>
+                                <img 
+                                    src={userData?.user?.profilePhoto?.url ? userData.user.profilePhoto?.url : avatar} 
+                                    className='w-10 h-10 rounded-full ring-1 ring-gray-300 cursor-pointer object-cover shadow-sm' 
+                                    alt="Author" 
+                                    onClick={() => navigate(`/profile/${data?.getPost?.userId}`)}
+                                />
+                                <div>
+                                    <p className='font-semibold cursor-pointer hover:underline' onClick={() => navigate(`/profile/${data?.getPost?.userId}`)}>
+                                        {userData?.user?.username}
+                                    </p>
+                                    {userId === data?.getPost?.userId && (
+                                        <p className='text-sm text-green-500 hover:text-green-600 cursor-pointer' onClick={() => navigate(`/profile/${userId}`)}>
+                                            Your Profile
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
                         </div>
 
-                        <div className={` border-b-2 mb-5 ${theme ? "border-slate-600" : "border-gray-100"}`}></div>
-
-                        <div className='flex  justify-start items-center gap-3 mb-3'>
-                            <img src={userData?.user?.profilePhoto?.url ? userData.user.profilePhoto?.url : avatar} className='w-10 h-10 rounded-full ring-1 ring-black cursor-pointer object-cover' alt="" />
-                            <p className='font-semibold text-md cursor-pointer' onClick={() => navigate(`/profile/${data?.getPost?.userId}`)}>{userData?.user?.username}</p>
-
-                            {/* Follow And Unfollow  */}
-
-                            {userId === data?.getPost?.userId && (<>
-                                <span className='text-gray-300'>•</span>
-                                <p className='text-green-500 font-sans hover:text-zinc-400 cursor-pointer' onClick={() => navigate(`/profile/${userId}`)}>Your Profile</p>
-                            </>)}
-
-
-                        </div>
+                        {/* Featured Image */}
                         {data?.getPost?.photo?.url && (
-                            <img
-                                src={data?.getPost?.photo?.url}
-                                loading='lazy'
-                                className='w-full rounded-lg mb-6 shadow-xl'
-                                alt=""
-                            />
+                            <div className="mb-8">
+                                <img
+                                    src={data?.getPost?.photo?.url}
+                                    loading='lazy'
+                                    className='w-full rounded-xl shadow-lg object-cover max-h-[500px]'
+                                    alt={data?.getPost?.title}
+                                />
+                            </div>
                         )}
 
+                        {/* Article Content */}
+                        <div className={`${theme ? "bg-zinc-900/60" : "bg-white"} rounded-xl p-6 md:p-8 mb-6 shadow-lg`}>
+                            <div 
+                                ref={contentRef}
+                                className={`post-content ${theme ? "text-gray-200" : "text-gray-800"} leading-relaxed mb-6`} 
+                                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(data?.getPost?.description) }} 
+                            />
 
-                        <div className={`text-lg text-gray-800 leading-relaxed mb-6 font-serif ${theme ? "text-white" : ""}`} dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(data?.getPost?.description) }} />
+                            {/* Categories */}
+                            {data?.getPost?.categories?.length > 0 && (
+                                <div className='mt-8 mb-6'>
+                                    <p className={`text-sm ${theme ? "text-gray-400" : "text-gray-600"} mb-2`}>Categories:</p>
+                                    <div className='flex flex-wrap gap-2'>
+                                        {data?.getPost?.categories.map((item, index) => (
+                                            <div key={index} className={`px-3 py-1 rounded-full text-sm ${theme ? 
+                                                "bg-zinc-800 text-gray-300 border border-zinc-700" : 
+                                                "bg-gray-100 text-gray-700 border border-gray-200"
+                                            }`}>
+                                                {item}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
 
-                        <div className='flex flex-wrap items-center space-x-2 mb-6'>
-                            {data?.getPost?.categories.map((item, index) => (
-                                <div key={index} className='bg-gray-200 rounded-md px-3 py-1 text-sm text-gray-600'>{item}</div>
-                            ))}
-                        </div>
+                            {/* Interaction Buttons */}
+                            <div className={`border-t ${theme ? "border-zinc-700" : "border-gray-200"} pt-4 mt-6`}>
+                                <div className="flex items-center">
+                                    <div className='flex items-center'>
+                                        <Like postId={postId} />
+                                    </div>
 
-                        <div className='flex items-center justify-between'>
+                                    <div className="flex flex-grow justify-end items-center gap-6">
+                                        <Bookmark postId={postId} />
+                                        
+                                        <button 
+                                            className={`flex items-center gap-2 px-3 py-1.5 rounded-md ${theme ? 
+                                                "bg-zinc-800 hover:bg-zinc-700" : 
+                                                "bg-gray-100 hover:bg-gray-200"
+                                            } transition-colors`}
+                                            onClick={handleShare}
+                                            title="Share"
+                                        >
+                                            <IoShareOutline size={18} />
+                                            <span className="text-sm hidden sm:inline">Share</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Edit/Delete Buttons */}
                             {data?.getPost?.userId === userInfo?.user?._id && (
-                                <div className='flex items-center space-x-2'>
-                                    <button onClick={() => handleNavigate(`/edit/${postId}`)} className='flex items-center px-3 py-2 text-sm text-gray-600 bg-gray-100 rounded-md'><BiEdit size={20} />Edit</button>
-                                    <button onClick={handleDelete} className='flex items-center px-3 py-2 text-sm text-gray-600 bg-gray-100 rounded-md'><MdDelete size={20} />Delete</button>
+                                <div className='flex items-center gap-3 mt-6'>
+                                    <button 
+                                        onClick={() => handleNavigate(`/edit/${postId}`)} 
+                                        className={`flex items-center gap-2 px-4 py-2 rounded-md ${theme ? 
+                                            "bg-blue-600 hover:bg-blue-700 text-white" : 
+                                            "bg-blue-100 hover:bg-blue-200 text-blue-800"
+                                        } transition-colors`}
+                                    >
+                                        <BiEdit size={18} />
+                                        <span>Edit</span>
+                                    </button>
+                                    <button 
+                                        onClick={handleDelete} 
+                                        className={`flex items-center gap-2 px-4 py-2 rounded-md ${theme ? 
+                                            "bg-red-600 hover:bg-red-700 text-white" : 
+                                            "bg-red-100 hover:bg-red-200 text-red-800"
+                                        } transition-colors`}
+                                    >
+                                        <MdDelete size={18} />
+                                        <span>Delete</span>
+                                    </button>
                                 </div>
                             )}
                         </div>
 
-                        <h3 className='text-xl font-semibold mt-8 mb-4'>Comments:</h3>
-                        {commentError ? <h2 className='text-red-400'>Comments not found!!</h2> : (
-                            <>
-                                {commentData?.comments?.map((item) => (
-                                    <Comment key={item._id} comment={item} userData={item.userId} />
-                                ))}
-                            </>
-                        )}
+                        {/* Comments Section */}
+                        <div className={`${theme ? "bg-zinc-900/60" : "bg-white"} rounded-xl p-6 md:p-8 shadow-lg`}>
+                            <h3 className='text-xl font-semibold mb-6'>Comments</h3>
+                            
+                            {commentError ? (
+                                <p className='text-red-400 mb-6'>Unable to load comments</p>
+                            ) : commentData?.comments?.length === 0 ? (
+                                <p className={`${theme ? "text-gray-400" : "text-gray-600"} mb-6`}>No comments yet. Be the first to comment!</p>
+                            ) : (
+                                <div className='space-y-4 mb-8'>
+                                    {commentData?.comments?.map((item) => (
+                                        <Comment key={item._id} comment={item} userData={item.userId} />
+                                    ))}
+                                </div>
+                            )}
 
-                        <div className='mt-8'>
-                            <h3 className='text-xl font-semibold mb-4'>Write Comment:</h3>
-                            <div className='flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4'>
-                                <textarea value={comment} onChange={(e) => setComment(e.target.value)} className='w-full md:w-2/3 px-4 py-2 bg-gray-100 rounded-md text-gray-800 placeholder-gray-500 focus:outline-none focus:ring focus:ring-blue-200' placeholder='Write your comment here...'></textarea>
-                                <button disabled={commentLoader} type='submit' onClick={commentHandler} className={`w-full md:w-auto h-12 px-6 bg-zinc-950 text-white rounded-md hover:bg-zinc-600 transition duration-300 `}>Comment</button>
+                            {/* Comment Form */}
+                            <div className='mt-6'>
+                                <h3 className={`text-lg font-medium mb-4 ${theme ? "text-gray-200" : "text-gray-800"}`}>Write a comment</h3>
+                                <div className='flex flex-col space-y-4'>
+                                    <textarea 
+                                        value={comment} 
+                                        onChange={(e) => setComment(e.target.value)} 
+                                        className={`w-full px-4 py-3 rounded-lg ${theme ? 
+                                            "bg-zinc-800 text-white border border-zinc-700 focus:border-blue-500" : 
+                                            "bg-gray-50 text-gray-800 border border-gray-300 focus:border-blue-500"
+                                        } focus:outline-none focus:ring-1 focus:ring-blue-500`} 
+                                        placeholder='Share your thoughts...'
+                                        rows={4}
+                                    ></textarea>
+                                    <div>
+                                        <button 
+                                            disabled={commentLoader} 
+                                            type='submit' 
+                                            onClick={commentHandler} 
+                                            className={`px-6 py-2.5 font-medium rounded-lg transition ${
+                                                theme 
+                                                    ? "bg-purple-700 hover:bg-purple-600 text-white" 
+                                                    : "bg-purple-600 hover:bg-purple-700 text-white"
+                                            }`}
+                                        >
+                                            {commentLoader ? 'Posting...' : 'Post Comment'}
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
