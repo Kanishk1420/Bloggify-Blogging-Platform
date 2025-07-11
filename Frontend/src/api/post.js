@@ -16,10 +16,17 @@ export const postApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ["Post"],
+  tagTypes: ["Post", "SinglePost"],
   endpoints: (builder) => ({
     getAllPost: builder.query({
       query: () => `/post/`,
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.allPost.map(({ _id }) => ({ type: "Post", id: _id })),
+              { type: "Post", id: "LIST" },
+            ]
+          : [{ type: "Post", id: "LIST" }],
     }),
 
     getSearchPost: builder.mutation({
@@ -34,6 +41,7 @@ export const postApi = createApi({
 
     getPostById: builder.query({
       query: (postId) => `/post/${postId}`,
+      providesTags: (result, error, id) => [{ type: "SinglePost", id }],
     }),
 
     uploadFile: builder.mutation({
@@ -83,6 +91,7 @@ export const postApi = createApi({
         method: "PUT",
         body: { userId },
       }),
+      invalidatesTags: (result, error, { id }) => [{ type: "SinglePost", id }],
     }),
 
     unlikePost: builder.mutation({
@@ -91,6 +100,7 @@ export const postApi = createApi({
         method: "PUT",
         body: { userId },
       }),
+      invalidatesTags: (result, error, { id }) => [{ type: "SinglePost", id }],
     }),
 
     addBookmark: builder.mutation({
@@ -120,6 +130,24 @@ export const postApi = createApi({
     getAnalytics: builder.query({
       query: () => "post/analytics",
     }),
+
+    // Add these new endpoints
+    dislikePost: builder.mutation({
+      query: ({ id, userId }) => ({
+        url: `/post/dislike/${id}`,
+        method: "PUT",
+        body: { userId },
+      }),
+      invalidatesTags: (result, error, { id }) => [{ type: "SinglePost", id }],
+    }),
+    undislikePost: builder.mutation({
+      query: ({ id, userId }) => ({
+        url: `/post/undislike/${id}`,
+        method: "PUT",
+        body: { userId },
+      }),
+      invalidatesTags: (result, error, { id }) => [{ type: "SinglePost", id }],
+    }),
   }),
 });
 
@@ -138,4 +166,6 @@ export const {
   useRemoveBookmarkMutation,
   useGetFollowingPostQuery,
   useGetAnalyticsQuery,
+  useDislikePostMutation,
+  useUndislikePostMutation,
 } = postApi;

@@ -14,6 +14,8 @@ import {
   uploadImage,
   userPost,
   writePost,
+  dislikePost,
+  undislikePost,
 } from "../controller/post.js";
 import { isAuthenticated } from "../middleware/auth.js";
 
@@ -34,6 +36,8 @@ router.delete("/:id", isAuthenticated, deletePost);
 
 router.put("/like/:id", isAuthenticated, likePost);
 router.put("/unlike/:id", isAuthenticated, unlikePost);
+router.put("/dislike/:id", isAuthenticated, dislikePost);
+router.put("/undislike/:id", isAuthenticated, undislikePost);
 
 router.put("/addbookmark/:id", isAuthenticated, addBookmark);
 router.put("/removebookmark/:id", isAuthenticated, removeBookmark);

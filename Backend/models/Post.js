@@ -40,6 +40,12 @@ const postSchema = new mongoose.Schema(
         ref: "User",
       },
     ],
+    dislikes: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
     bookmarks: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -58,4 +64,4 @@ const postSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export const Post = mongoose.model("Post", postSchema); 
+export const Post = mongoose.model("Post", postSchema);

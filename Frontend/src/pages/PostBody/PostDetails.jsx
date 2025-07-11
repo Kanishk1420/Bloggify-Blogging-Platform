@@ -14,6 +14,7 @@ import { useDeletePostMutation, useGetPostByIdQuery } from '../../api/post';
 import { useGetUserQuery } from '../../api/user';
 import Bookmark from '../../components/Post/Bookmark'
 import Like from '../../components/Post/Like'
+import Dislike from '../../components/Post/Dislike'
 import { getLikedPost, getPost } from '../../slices/PostSlice'
 import Navbar from '../../components/Navbar/Navbar';
 import Comment from '../../components/Post/Comment'
@@ -308,8 +309,9 @@ const PostDetails = () => {
                             {/* Interaction Buttons */}
                             <div className={`border-t ${theme ? "border-zinc-700" : "border-gray-200"} pt-4 mt-6`}>
                                 <div className="flex items-center">
-                                    <div className='flex items-center'>
+                                    <div className='flex items-center gap-4'>
                                         <Like postId={postId} />
+                                        <Dislike postId={postId} />
                                     </div>
 
                                     <div className="flex flex-grow justify-end items-center gap-6">

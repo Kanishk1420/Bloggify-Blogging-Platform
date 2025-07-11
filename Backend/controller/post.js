@@ -153,46 +153,31 @@ export const getAllPost = async (req, res) => {
 // Post Like
 export const likePost = async (req, res) => {
   try {
-    let user = await User.findById(req.userId);
     const { id } = req.params;
-
-    if (!user) return res.status(400).json({ message: "User not found" });
-
-    // Verify the existence of the post
-    const existingPost = await Post.findById(id);
-    if (!existingPost) {
-      return res.status(400).json({
-        success: false,
-        message: "Post does not exist",
-      });
+    const { userId } = req.body;
+    
+    const post = await Post.findById(id);
+    
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
     }
-
-    const likedPost = await Post.findByIdAndUpdate(
-      id,
-      {
-        $addToSet: { likes: user._id },
-      },
-      { new: true }
-    );
-
-    if (!likedPost) {
-      return res.status(400).json({
-        success: false,
-        message: "Failed to update likes",
-      });
+    
+    // Remove from dislikes if present
+    if (post.dislikes.includes(userId)) {
+      post.dislikes = post.dislikes.filter(id => id.toString() !== userId.toString());
     }
-
-    res.status(200).json({
-      success: true,
-      message: "Post Liked",
-      likedPost,
-    });
-  } catch (err) {
-    console.error(err); // Log any errors that occur
-    return res.status(500).json({
-      success: false,
-      message: "Internal server error",
-    });
+    
+    // Add to likes if not already liked
+    if (!post.likes.includes(userId)) {
+      post.likes.push(userId);
+    }
+    
+    await post.save();
+    
+    return res.status(200).json({ message: "Post liked successfully" });
+  } catch (error) {
+    console.error("Error liking post:", error);
+    return res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -458,5 +443,59 @@ export const getAnalytics = async (req, res) => {
     res.status(500).json({
       message: err.message,
     });
+  }
+};
+
+// Post Dislike
+export const dislikePost = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { userId } = req.body;
+    
+    const post = await Post.findById(id);
+    
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+    
+    // Remove from likes if present
+    if (post.likes.includes(userId)) {
+      post.likes = post.likes.filter(id => id.toString() !== userId.toString());
+    }
+    
+    // Add to dislikes if not already disliked
+    if (!post.dislikes.includes(userId)) {
+      post.dislikes.push(userId);
+    }
+    
+    await post.save();
+    
+    return res.status(200).json({ message: "Post disliked successfully" });
+  } catch (error) {
+    console.error("Error disliking post:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const undislikePost = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { userId } = req.body;
+    
+    const post = await Post.findById(id);
+    
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+    
+    // Remove from dislikes
+    post.dislikes = post.dislikes.filter(id => id.toString() !== userId.toString());
+    
+    await post.save();
+    
+    return res.status(200).json({ message: "Dislike removed successfully" });
+  } catch (error) {
+    console.error("Error removing dislike:", error);
+    return res.status(500).json({ message: "Server error" });
   }
 };

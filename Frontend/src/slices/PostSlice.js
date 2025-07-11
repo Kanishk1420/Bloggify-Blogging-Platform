@@ -7,6 +7,7 @@ const initialState = {
   likedPosts: localStorage.getItem("likedPosts")
     ? JSON.parse(localStorage.getItem("likedPosts"))
     : [],
+  dislikedPosts: [], // Add this line
   bookmarkedPosts: localStorage.getItem("bookmarkedPosts")
     ? JSON.parse(localStorage.getItem("bookmarkedPosts"))
     : [],
@@ -104,6 +105,26 @@ const postSlice = createSlice({
       const likedPosts = JSON.parse(localStorage.getItem("likedPosts")) || [];
       state.likedPosts = likedPosts;
     },
+
+    // Add new reducers for dislikes
+    addDislike: (state, action) => {
+      state.dislikedPosts.push({
+        userId: action.payload.userId,
+        postId: action.payload.postId,
+      });
+    },
+    removeDislike: (state, action) => {
+      state.dislikedPosts = state.dislikedPosts.filter(
+        (post) =>
+          !(
+            post.userId === action.payload.userId &&
+            post.postId === action.payload.postId
+          )
+      );
+    },
+    getDislikedPost: (state, action) => {
+      state.dislikedPosts = action.payload;
+    },
   },
 });
 
@@ -117,4 +138,7 @@ export const {
   removeBookmarkPost,
   myPosts,
   getLikedPost,
+  addDislike,
+  removeDislike,
+  getDislikedPost,
 } = postSlice.actions;
