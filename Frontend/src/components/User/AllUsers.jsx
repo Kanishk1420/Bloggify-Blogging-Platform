@@ -73,11 +73,7 @@ const AllUsers = ({ user, onFollowSuccess }) => {
                     </button>
                 ) : (
                     <button 
-                        className={`px-5 py-1.5 rounded-full text-sm font-medium transition-all ${
-                            theme 
-                                ? 'bg-blue-600 hover:bg-blue-700 text-white' 
-                                : 'bg-blue-500 hover:bg-blue-600 text-white'
-                        }`} 
+                        className={`h-8 px-3 text-md font-semibold  border border-zinc-400 rounded-full   text-white`} 
                         onClick={handleFollow}
                     >
                         <span className="flex items-center">
