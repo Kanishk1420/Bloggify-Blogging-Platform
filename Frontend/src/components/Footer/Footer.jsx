@@ -1,12 +1,9 @@
 import logo from '../../assets/logo.png'
 import { useSelector } from 'react-redux'
-
-
-
 const Footer = () => {
 
   const { theme } = useSelector((state) => state.theme)
-
+  
   return (
     <div>
       <footer className={`${theme ? "bg-zinc-950" : "bg-black"}`}>

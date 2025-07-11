@@ -8,6 +8,12 @@ const userSchema = new Schema(
       type: String,
       required: true,
       unique: true,
+      validate: {
+        validator: function (v) {
+          return /^@[a-z0-9_-]+$/.test(v); // Make sure hyphen is included
+        },
+        message: (props) => `${props.value} is not a valid username!`,
+      },
     },
 
     firstname: {

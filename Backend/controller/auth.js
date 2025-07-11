@@ -198,13 +198,20 @@ export const checkUsername = async (req, res) => {
   try {
     const { username } = req.query;
     
+    // Debug logging
+    console.log("Checking username:", username);
+    
     // If no username provided
     if (!username) {
       return res.status(400).json({ message: "Username is required" });
     }
 
-    // Check if username exists in database
-    const existingUser = await User.findOne({ username });
+    // Check if username exists in database (case-insensitive)
+    const existingUser = await User.findOne({ 
+      username: { $regex: new RegExp(`^${username}$`, 'i') } 
+    });
+    
+    console.log("Existing user found:", !!existingUser);
     
     return res.status(200).json({ 
       available: !existingUser,

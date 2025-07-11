@@ -43,8 +43,8 @@ const Register = () => {
   // Username check with debounce
   useEffect(() => {
     const checkUsernameAvailability = async () => {
-      // Don't check if username is less than 4 characters (including @)
-      if (!username || username.length <= 2) {
+      // Don't check if username doesn't meet minimum requirements
+      if (!username || username === '@' || username.replace('@', '').length < 3) {
         setIsUsernameAvailable(true);
         setUsernameMessage('');
         return;
@@ -52,11 +52,29 @@ const Register = () => {
       
       setIsCheckingUsername(true);
       try {
-        const response = await axios.get(`/api/auth/check-username?username=${username}`);
+        console.log("Checking username availability for:", username);
+        // Encode the username properly to handle special characters like hyphens
+        const encodedUsername = encodeURIComponent(username);
+        const response = await axios.get(`http://localhost:5000/api/auth/check-username?username=${encodedUsername}`);
+        console.log("Username check response:", response.data);
         setIsUsernameAvailable(response.data.available);
         setUsernameMessage(response.data.message);
       } catch (error) {
         console.error("Error checking username:", error);
+        // Check the specific error
+        if (error.response) {
+          // The server responded with a status code outside the 2xx range
+          console.error("Response data:", error.response.data);
+          console.error("Response status:", error.response.status);
+        } else if (error.request) {
+          // The request was made but no response was received
+          console.error("No response received:", error.request);
+        } else {
+          // Something happened in setting up the request
+          console.error("Error message:", error.message);
+        }
+        setIsUsernameAvailable(false);
+        setUsernameMessage("Error checking username availability");
       } finally {
         setIsCheckingUsername(false);
       }
@@ -78,13 +96,21 @@ const Register = () => {
 
   // Add the validateUsername function
   const validateUsername = (username) => {
-    if (username.length < 4) {
+    // Check if username is empty or just "@"
+    if (!username || username === '@') {
+      return { valid: false, message: "Username is required" };
+    }
+    
+    // Remove @ from length calculation
+    const nameWithoutAt = username.replace('@', '');
+    if (nameWithoutAt.length < 3) {
       return { valid: false, message: "Username must be at least 3 characters (not including @)" };
     }
     
-    const validCharsRegex = /^@[a-z0-9_]+$/;
+    // Check only allowed characters
+    const validCharsRegex = /^@[a-z0-9_-]+$/;
     if (!validCharsRegex.test(username)) {
-      return { valid: false, message: "Username can only contain letters, numbers and underscores" };
+      return { valid: false, message: "Username can only contain lowercase letters, numbers, underscores and hyphens" };
     }
     
     return { valid: true, message: "" };
@@ -128,8 +154,37 @@ const Register = () => {
 
   const handleUsernameChange = (e) => {
     let value = e.target.value.toLowerCase();
-    value = value.replace(/[^a-z0-9_]/g, ''); // Allow only lowercase letters, numbers and underscores
-    setUsername(value.startsWith('@') ? value : `@${value}`);
+    
+    // Remove any characters that aren't allowed
+    value = value.replace(/[^@a-z0-9_-]/g, '');
+    
+    // Always ensure @ is at the beginning
+    if (value.length > 0) {
+      if (value.startsWith('@')) {
+        // Keep only one @ at the beginning
+        value = '@' + value.substring(1).replace(/@/g, '');
+      } else {
+        // Add @ if missing
+        value = '@' + value.replace(/@/g, '');
+      }
+    }
+    
+    setUsername(value);
+    
+    // Only show validation messages when the user has typed something meaningful
+    if (value.length > 1) {
+      const validation = validateUsername(value);
+      if (!validation.valid) {
+        // Don't set isUsernameAvailable here - that's for API checks
+        setUsernameMessage(validation.message);
+      } else {
+        // Clear validation message if it's valid format
+        setUsernameMessage('');
+      }
+    } else {
+      // Clear validation message for very short inputs
+      setUsernameMessage('');
+    }
   }
 
   const handleEmailChange = (e) => {
@@ -148,6 +203,13 @@ const Register = () => {
   const handleTheme = () => {
     dispatch(toggleDarkMode());
   };
+
+  console.log({
+    inputUsername: username,
+    validationResult: validateUsername(username),
+    length: username.length,
+    lengthWithoutAt: username.replace('@', '').length
+  });
 
   return <>
     <div className={`min-h-screen flex flex-col ${theme ? "bg-gradient-to-b from-black to-gray-900 via-black text-white" : "bg-white text-zinc-900"}`}>
@@ -241,13 +303,18 @@ const Register = () => {
                       />
                       
                       {/* Username availability indicator */}
-                      {username.length > 2 && (
+                      {username && (
                         <div className="absolute right-4 top-3">
                           {isCheckingUsername ? (
                             <LoaderCircle size={16} className="animate-spin" />
+                          ) : !validateUsername(username).valid && username.length > 1 ? (
+                            // Only show warning for invalid format when there's meaningful input
+                            <FaTimes className="text-yellow-500" />
                           ) : isUsernameAvailable ? (
+                            // Show green check for valid and available 
                             <FaCheck className="text-green-500" />
                           ) : (
+                            // Show red X for taken
                             <FaTimes className="text-red-500" />
                           )}
                         </div>
