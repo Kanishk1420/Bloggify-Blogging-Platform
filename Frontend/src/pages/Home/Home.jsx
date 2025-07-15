@@ -105,74 +105,89 @@ const Home = () => {
                     </span>
                 </div>
             )}
-            <div className={`px-8 min-h-screen py-8 md:px-[200px] min-h-auto ${theme ? " bg-gradient-to-b from-black to-gray-900 via-black text-white" : ""} `}>
+            <div className={`px-4 md:px-6 lg:px-8 min-h-screen py-8 ${theme ? "bg-gradient-to-b from-black to-gray-900 via-black text-white" : ""}`}>
+                {/* Tab navigation */}
                 {!search && (
-                    <div className='flex justify-center items-center gap-5 text-xl font-semibold font-sans '>
-                        <h1 className={`text-xl  font-semibold cursor-pointer ${activeLink === 'explore' ? 'border-b-2 border-zinc-800  duration-300 ' : ''}`} onClick={() => setActiveLink('explore')}>Explore</h1>
-                        <h1 className={`text-xl font-semibold cursor-pointer ${activeLink === 'following' ? 'border-b-2 border-zinc-800  duration-300 ' : ''}`} onClick={() => setActiveLink('following')}>Following</h1>
+                    <div className='flex justify-center items-center gap-5 text-xl font-semibold font-sans mb-6'>
+                        <h1 className={`text-xl font-semibold cursor-pointer ${activeLink === 'explore' ? 'border-b-2 border-zinc-800 duration-300' : ''}`} onClick={() => setActiveLink('explore')}>Explore</h1>
+                        <h1 className={`text-xl font-semibold cursor-pointer ${activeLink === 'following' ? 'border-b-2 border-zinc-800 duration-300' : ''}`} onClick={() => setActiveLink('following')}>Following</h1>
                     </div>
                 )}
 
-                {error && <h1 className='text-2xl font-bold text-center mt-8'>Something went wrong</h1>}
+                {/* Main content layout - fixed to have sidebar on the right */}
+                <div className="flex flex-col md:flex-row gap-6">
+                    {/* Main content area - REMOVED DUPLICATE SIDEBAR */}
+                    <div className="flex-1 order-2 md:order-1">
+                        {/* Your existing post content here */}
+                        {error && <h1 className='text-2xl font-bold text-center mt-8'>Something went wrong</h1>}
 
-                {userInfo && (
-                    <>
-                        {!search && <Sidebar />}
-                        {searchLoader && <Loader />}
-                        {!searchLoader && searchedPosts.length === 0 && search ? (
-                            <h1 className='font-bold text-xl text-center h-[90vh] mt-8'>No Post Found</h1>
-                        ) : (
+                        {userInfo && (
                             <>
-                                {searchedPosts?.map((post) => (
-                                    <Link to={`/posts/post/${post._id}`} key={post._id}>
-                                        <HomePost post={post} />
-                                    </Link>
-                                ))}
-                            </>
-                        )}
-                        {activeLink === "following" ? (
-                            followingLoading ? (
-                                <Loader />
-                            ) : (
-                                <InfiniteScroll
-                                    dataLength={followingPosts?.length || 0}
-                                    next={fetchMoreFollowing}
-                                    hasMore={false} // Backend doesn't support pagination yet
-                                    loader={<Loader />}
-                                    endMessage={
-                                        <div className={`text-center mt-5 ${theme ? "text-slate-400" : "text-black"}`}>
-                                            {followingPosts.length > 0 ? "No more posts to show" : "Follow more users to see their posts"}
-                                        </div>
-                                    }
-                                >
-                                    {followingPosts.length === 0 ? (
-                                        <div className='text-center mt-10 font-bold text-xl'>No posts from users you follow</div>
-                                    ) : (
-                                        followingPosts.map((post) => (
+                                {/* REMOVED SIDEBAR FROM HERE */}
+                                {searchLoader && <Loader />}
+                                {!searchLoader && searchedPosts.length === 0 && search ? (
+                                    <h1 className='font-bold text-xl text-center h-[90vh] mt-8'>No Post Found</h1>
+                                ) : (
+                                    <>
+                                        {searchedPosts?.map((post) => (
                                             <Link to={`/posts/post/${post._id}`} key={post._id}>
                                                 <HomePost post={post} />
                                             </Link>
-                                        ))
-                                    )}
-                                </InfiniteScroll>
-                            )
-                        ) : (
-                            <InfiniteScroll
-                                dataLength={allPost?.length || 0}
-                                next={fetchMorePosts}
-                                hasMore={false} // Backend doesn't support pagination yet
-                                loader={<Loader />}
-                            >
-                                {!search && allPost.map((post) => (
-                                    <Link to={`/posts/post/${post._id}`} key={post._id}>
-                                        <HomePost post={post} key={post._id} />
-                                    </Link>
-                                ))}
-                            </InfiniteScroll>
+                                        ))}
+                                    </>
+                                )}
+                                {activeLink === "following" ? (
+                                    followingLoading ? (
+                                        <Loader />
+                                    ) : (
+                                        <InfiniteScroll
+                                            dataLength={followingPosts?.length || 0}
+                                            next={fetchMoreFollowing}
+                                            hasMore={false}
+                                            loader={<Loader />}
+                                            endMessage={
+                                                <div className={`text-center mt-5 ${theme ? "text-slate-400" : "text-black"}`}>
+                                                    {followingPosts.length > 0 ? "No more posts to show" : "Follow more users to see their posts"}
+                                                </div>
+                                            }
+                                        >
+                                            {followingPosts.length === 0 ? (
+                                                <div className='text-center mt-10 font-bold text-xl'>No posts from users you follow</div>
+                                            ) : (
+                                                followingPosts.map((post) => (
+                                                    <Link to={`/posts/post/${post._id}`} key={post._id}>
+                                                        <HomePost post={post} />
+                                                    </Link>
+                                                ))
+                                            )}
+                                        </InfiniteScroll>
+                                    )
+                                ) : (
+                                    <InfiniteScroll
+                                        dataLength={allPost?.length || 0}
+                                        next={fetchMorePosts}
+                                        hasMore={false}
+                                        loader={<Loader />}
+                                    >
+                                        {!search && allPost.map((post) => (
+                                            <Link to={`/posts/post/${post._id}`} key={post._id}>
+                                                <HomePost post={post} key={post._id} />
+                                            </Link>
+                                        ))}
+                                    </InfiniteScroll>
+                                )}
+                            </>
                         )}
-                    </>
-                )}
-                {!userInfo && <h1 className='text-2xl font-bold text-center mt-8'>Login to view posts</h1>}
+                        {!userInfo && <h1 className='text-2xl font-bold text-center mt-8'>Login to view posts</h1>}
+                    </div>
+
+                    {/* Sidebar - only visible when not searching */}
+                    {!search && userInfo && (
+                        <div className="md:w-80 lg:w-96 order-1 md:order-2 mb-6 md:mb-0">
+                            <Sidebar />
+                        </div>
+                    )}
+                </div>
             </div>
             <Footer />
         </>

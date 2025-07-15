@@ -1,17 +1,16 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
-// Sidebar.js
 
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useGetAllUsersQuery } from '../../api/user';
-import AllUsers from '../User/AllUsers'
-
+import AllUsers from '../User/AllUsers';
 
 const Sidebar = () => {
     const { userInfo } = useSelector((state) => state.auth);
     const [users, setUsers] = useState([]);
     const [showFollowedAllMessage, setShowFollowedAllMessage] = useState(false);
+    const { theme } = useSelector((state) => state.theme);
 
     const id = userInfo?.user?._id;
     const { data } = useGetAllUsersQuery(id);
@@ -33,27 +32,32 @@ const Sidebar = () => {
         }
     }, [users]);
 
+    // If there are no users to show, don't render the sidebar
+    if (!users || (users.length === 0 && !showFollowedAllMessage)) {
+        return null;
+    }
+
     return (
-        <div className='flex float-end flex-col gap-5 max-sm:hidden max-xl:hidden'>
+        <div className={`
+            w-full mx-auto max-w-xs md:max-w-sm lg:max-w-md
+            px-4 py-3 my-4 md:my-6
+            rounded-xl shadow-sm
+            ${theme ? 'bg-zinc-900/50 text-white' : 'bg-white text-gray-800 border border-gray-100'}
+        `}>
+            <div className="mb-3 border-b pb-2 border-gray-700/30">
+                <h2 className="font-bold text-lg">
+                    {showFollowedAllMessage ? (
+                        <span className="animate-pulse duration-300">You followed all users</span>
+                    ) : (
+                        "Who to follow"
+                    )}
+                </h2>
+            </div>
 
-            {showFollowedAllMessage && (
-                <div className='text-start font-semibold text-[19px] animate-pulse duration-300'>
-                    You followed all the users
-                </div>
-            )}
-
-            {users?.length > 0 && (
-
-                <div className='text-start font-semibold text-[19px]'>
-                    Who to follow
-                </div>
-
-            )}
-
-            <div>
+            <div className="space-y-3 divide-y divide-gray-700/20">
                 {/* All Users */}
                 {users?.map((user) => (
-                    <div key={user._id}>
+                    <div key={user._id} className="pt-3 first:pt-0">
                         <AllUsers user={user} onFollowSuccess={handleFollowSuccess} />
                     </div>
                 ))}
