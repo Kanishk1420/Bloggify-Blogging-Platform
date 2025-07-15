@@ -15,37 +15,30 @@ export const writeComment = async (req, res) => {
 
 export const updateComment = async (req, res) => {
   try {
-    const { id } = req.body; 
-
-    if (!id) {
-      return res.status(400).json({
-        success: false,
-        message: "ID is required in the request body",
-      });
-    }
-
-    const updateComment = await Comment.findByIdAndUpdate(
-      id,
-      { $set: req.body }, 
-      { new: true }
+    const { commentId, comment, userId } = req.body;
+    
+    const updatedComment = await Comment.findByIdAndUpdate(
+      commentId,
+      { comment },
+      { new: true } // Here we allow timestamps to update naturally
     );
-
-    if (!updateComment) {
-      return res.status(404).json({
-        success: false,
-        message: "Comment not found",
-      });
+    
+    if (!updatedComment) {
+      return res.status(404).json({ message: "Comment not found" });
     }
-
-    res.status(200).json({
+    
+    if (updatedComment.userId !== userId) {
+      return res.status(403).json({ message: "You can only update your own comments" });
+    }
+    
+    return res.status(200).json({
       success: true,
-      updateComment,
+      message: "Comment updated successfully",
+      comment: updatedComment
     });
-  } catch (err) {
-    return res.status(500).json({
-      success: false,
-      message: err.message,
-    });
+  } catch (error) {
+    console.error("Error updating comment:", error);
+    return res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -101,24 +94,22 @@ export const likeComment = async (req, res) => {
     const { id } = req.params;
     const { userId } = req.body;
     
-    const comment = await Comment.findById(id);
+    // Use findByIdAndUpdate with timestamps option set to false
+    const comment = await Comment.findByIdAndUpdate(
+      id,
+      {
+        $pull: { dislikes: userId }, // Remove from dislikes if present
+        $addToSet: { likes: userId }  // Add to likes if not already present
+      },
+      { 
+        new: true,         // Return updated document
+        timestamps: false  // Don't update timestamps
+      }
+    );
     
     if (!comment) {
       return res.status(404).json({ message: "Comment not found" });
     }
-    
-    // Remove from dislikes if present
-    if (comment.dislikes && comment.dislikes.includes(userId)) {
-      comment.dislikes = comment.dislikes.filter(id => id.toString() !== userId.toString());
-    }
-    
-    // Add to likes if not already liked
-    if (!comment.likes || !comment.likes.includes(userId)) {
-      if (!comment.likes) comment.likes = [];
-      comment.likes.push(userId);
-    }
-    
-    await comment.save();
     
     return res.status(200).json({ 
       success: true,
@@ -136,18 +127,15 @@ export const unlikeComment = async (req, res) => {
     const { id } = req.params;
     const { userId } = req.body;
     
-    const comment = await Comment.findById(id);
+    const comment = await Comment.findByIdAndUpdate(
+      id,
+      { $pull: { likes: userId } },
+      { new: true, timestamps: false }
+    );
     
     if (!comment) {
       return res.status(404).json({ message: "Comment not found" });
     }
-    
-    // Remove from likes
-    if (comment.likes) {
-      comment.likes = comment.likes.filter(id => id.toString() !== userId.toString());
-    }
-    
-    await comment.save();
     
     return res.status(200).json({ 
       success: true,
@@ -165,24 +153,18 @@ export const dislikeComment = async (req, res) => {
     const { id } = req.params;
     const { userId } = req.body;
     
-    const comment = await Comment.findById(id);
+    const comment = await Comment.findByIdAndUpdate(
+      id,
+      {
+        $pull: { likes: userId },
+        $addToSet: { dislikes: userId }
+      },
+      { new: true, timestamps: false }
+    );
     
     if (!comment) {
       return res.status(404).json({ message: "Comment not found" });
     }
-    
-    // Remove from likes if present
-    if (comment.likes && comment.likes.includes(userId)) {
-      comment.likes = comment.likes.filter(id => id.toString() !== userId.toString());
-    }
-    
-    // Add to dislikes if not already disliked
-    if (!comment.dislikes || !comment.dislikes.includes(userId)) {
-      if (!comment.dislikes) comment.dislikes = [];
-      comment.dislikes.push(userId);
-    }
-    
-    await comment.save();
     
     return res.status(200).json({ 
       success: true,
@@ -200,18 +182,15 @@ export const undislikeComment = async (req, res) => {
     const { id } = req.params;
     const { userId } = req.body;
     
-    const comment = await Comment.findById(id);
+    const comment = await Comment.findByIdAndUpdate(
+      id,
+      { $pull: { dislikes: userId } },
+      { new: true, timestamps: false }
+    );
     
     if (!comment) {
       return res.status(404).json({ message: "Comment not found" });
     }
-    
-    // Remove from dislikes
-    if (comment.dislikes) {
-      comment.dislikes = comment.dislikes.filter(id => id.toString() !== userId.toString());
-    }
-    
-    await comment.save();
     
     return res.status(200).json({
       success: true,

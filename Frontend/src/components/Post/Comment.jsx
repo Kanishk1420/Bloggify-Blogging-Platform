@@ -3,33 +3,41 @@ import PropTypes from 'prop-types';
 import { BiEdit } from 'react-icons/bi';
 import { MdDelete } from 'react-icons/md';
 import { useSelector } from 'react-redux';
-import {useDeleteCommentMutation, useUpdateCommentMutation} from '../../api/comment'
+import { useDeleteCommentMutation, useUpdateCommentMutation } from '../../api/comment'
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
-import {useGetUserQuery} from '../../api/user'
+import { useGetUserQuery } from '../../api/user'
 import avatar from '../../assets/avatar.jpg'
 import CommentLike from '../Comment/CommentLike';
 import CommentDislike from '../Comment/CommentDislike';
 
 const Comment = ({ comment, userData }) => {
-    const getTimeElapsed = (timestamp) => {
-        const currentDate = new Date();
-        const commentDate = new Date(timestamp);
-        const elapsedTime = Math.abs(currentDate - commentDate);
-        const seconds = Math.floor(elapsedTime / 1000);
-        const minutes = Math.floor(seconds / 60);
-        const hours = Math.floor(minutes / 60);
-        const days = Math.floor(hours / 24);
-
-        if (days > 0) {
-            return `${days} day${days > 1 ? 's' : ''} ago`;
-        } else if (hours > 0) {
-            return `${hours} hour${hours > 1 ? 's' : ''} ago`;
-        } else if (minutes > 0) {
-            return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
-        } else {
-            return `${seconds} second${seconds > 1 ? 's' : ''} ago`;
-        }
+    const getTimeInfo = (comment) => {
+        const createdAt = new Date(comment.createdAt);
+        const updatedAt = new Date(comment.updatedAt);
+        
+        // Helper to format time elapsed
+        const formatTimeElapsed = (timestamp) => {
+            const now = new Date();
+            const diff = Math.floor((now - timestamp) / 1000); // Difference in seconds
+            
+            if (diff < 60) return `${diff} seconds ago`;
+            if (diff < 3600) return `${Math.floor(diff / 60)} minutes ago`;
+            if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
+            if (diff < 604800) return `${Math.floor(diff / 86400)} days ago`;
+            if (diff < 2592000) return `${Math.floor(diff / 604800)} weeks ago`;
+            if (diff < 31536000) return `${Math.floor(diff / 2592000)} months ago`;
+            return `${Math.floor(diff / 31536000)} years ago`;
+        };
+        
+        // Check if comment has been edited (allow 1 second difference for DB operations)
+        const hasBeenEdited = (updatedAt - createdAt) > 1000;
+        
+        return {
+            postedTime: formatTimeElapsed(createdAt),
+            editedTime: hasBeenEdited ? formatTimeElapsed(updatedAt) : null,
+            hasBeenEdited
+        };
     };
 
     const { userInfo } = useSelector((state) => state.auth);
@@ -41,7 +49,7 @@ const Comment = ({ comment, userData }) => {
     const { data } = useGetUserQuery(userData);
     const { theme } = useSelector((state) => state.theme)
 
-
+    const timeInfo = getTimeInfo(comment);
 
     const deleteCommentHandler = async () => {
         try {
@@ -82,7 +90,13 @@ const Comment = ({ comment, userData }) => {
                             <p className='font-bold cursor-pointer ml-2' onClick={() => navigate(`/profile/${comment.userId}`)}>{comment.author}</p>
                         </div>
                         <div className='flex justify-center items-center space-x-4 text-sm'>
-                            <p>{getTimeElapsed(comment.updatedAt)}</p>
+                            {/* Enhanced timestamp display */}
+                            <div className='text-xs text-gray-500'>
+                                <span>{timeInfo.postedTime}</span>
+                                {timeInfo.hasBeenEdited && (
+                                    <span className='ml-1 italic'>(edited {timeInfo.editedTime})</span>
+                                )}
+                            </div>
                             <div className='flex justify-center items-center space-x-2'>
                                 {userInfo?.user?._id === comment.userId && !editMode && (
                                     <>
@@ -118,7 +132,7 @@ const Comment = ({ comment, userData }) => {
                     
                     {/* Add Like/Dislike UI here */}
                     {!editMode && (
-                        <div className="flex items-center space-x-4 mt-2 ml-14" data-comment-like-id={comment._id}>
+                        <div className="flex items-center space-x-4 mt-2 ml-14">
                             <CommentLike comment={comment} />
                             <CommentDislike comment={comment} />
                         </div>
