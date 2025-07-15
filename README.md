@@ -38,7 +38,7 @@ To get started with Stack Spot, follow these steps:
 
 1. Clone the repository:
      ```bash
-     git clone https://github.com/your-username/stack-spot.git
+     git clone https://github.com/Kanishk1420/Bloggify-Blogging-Platform.git
      ```
 
 2. Install the dependencies:
