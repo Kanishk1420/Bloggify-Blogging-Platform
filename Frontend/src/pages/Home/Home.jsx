@@ -107,33 +107,44 @@ const Home = () => {
             )}
             <div className={`px-4 md:px-6 lg:px-8 min-h-screen py-8 ${theme ? "bg-gradient-to-b from-black to-gray-900 via-black text-white" : ""}`}>
                 {/* Tab navigation */}
-                {!search && (
-                    <div className='flex justify-center items-center gap-5 text-xl font-semibold font-sans mb-6'>
-                        <h1 className={`text-xl font-semibold cursor-pointer ${activeLink === 'explore' ? 'border-b-2 border-zinc-800 duration-300' : ''}`} onClick={() => setActiveLink('explore')}>Explore</h1>
-                        <h1 className={`text-xl font-semibold cursor-pointer ${activeLink === 'following' ? 'border-b-2 border-zinc-800 duration-300' : ''}`} onClick={() => setActiveLink('following')}>Following</h1>
+                {!search && userInfo && (
+                    <div className='flex justify-start items-center gap-5 text-xl font-semibold font-sans mb-6'>
+                        <h1
+                            className={`text-xl font-semibold cursor-pointer ${activeLink === 'explore' ? 'border-b-2 border-zinc-800 duration-300' : ''}`}
+                            onClick={() => setActiveLink('explore')}
+                        >
+                            Explore
+                        </h1>
+                        <h1
+                            className={`text-xl font-semibold cursor-pointer ${activeLink === 'following' ? 'border-b-2 border-zinc-800 duration-300' : ''}`}
+                            onClick={() => setActiveLink('following')}
+                        >
+                            Following
+                        </h1>
                     </div>
                 )}
 
                 {/* Main content layout - fixed to have sidebar on the right */}
                 <div className="flex flex-col md:flex-row gap-6">
-                    {/* Main content area - REMOVED DUPLICATE SIDEBAR */}
+                    {/* Main content area - posts grid on larger screens */}
                     <div className="flex-1 order-2 md:order-1">
-                        {/* Your existing post content here */}
                         {error && <h1 className='text-2xl font-bold text-center mt-8'>Something went wrong</h1>}
 
                         {userInfo && (
                             <>
-                                {/* REMOVED SIDEBAR FROM HERE */}
                                 {searchLoader && <Loader />}
                                 {!searchLoader && searchedPosts.length === 0 && search ? (
                                     <h1 className='font-bold text-xl text-center h-[90vh] mt-8'>No Post Found</h1>
                                 ) : (
                                     <>
-                                        {searchedPosts?.map((post) => (
-                                            <Link to={`/posts/post/${post._id}`} key={post._id}>
-                                                <HomePost post={post} />
-                                            </Link>
-                                        ))}
+                                        {/* Grid layout for search results */}
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            {searchedPosts?.map((post) => (
+                                                <Link to={`/posts/post/${post._id}`} key={post._id}>
+                                                    <HomePost post={post} />
+                                                </Link>
+                                            ))}
+                                        </div>
                                     </>
                                 )}
                                 {activeLink === "following" ? (
@@ -151,14 +162,17 @@ const Home = () => {
                                                 </div>
                                             }
                                         >
+                                            {/* Grid layout for following posts */}
                                             {followingPosts.length === 0 ? (
                                                 <div className='text-center mt-10 font-bold text-xl'>No posts from users you follow</div>
                                             ) : (
-                                                followingPosts.map((post) => (
-                                                    <Link to={`/posts/post/${post._id}`} key={post._id}>
-                                                        <HomePost post={post} />
-                                                    </Link>
-                                                ))
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                    {followingPosts.map((post) => (
+                                                        <Link to={`/posts/post/${post._id}`} key={post._id}>
+                                                            <HomePost post={post} />
+                                                        </Link>
+                                                    ))}
+                                                </div>
                                             )}
                                         </InfiniteScroll>
                                     )
@@ -169,11 +183,14 @@ const Home = () => {
                                         hasMore={false}
                                         loader={<Loader />}
                                     >
-                                        {!search && allPost.map((post) => (
-                                            <Link to={`/posts/post/${post._id}`} key={post._id}>
-                                                <HomePost post={post} key={post._id} />
-                                            </Link>
-                                        ))}
+                                        {/* Grid layout for all posts */}
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            {!search && allPost.map((post) => (
+                                                <Link to={`/posts/post/${post._id}`} key={post._id}>
+                                                    <HomePost post={post} />
+                                                </Link>
+                                            ))}
+                                        </div>
                                     </InfiniteScroll>
                                 )}
                             </>
@@ -181,7 +198,7 @@ const Home = () => {
                         {!userInfo && <h1 className='text-2xl font-bold text-center mt-8'>Login to view posts</h1>}
                     </div>
 
-                    {/* Sidebar - only visible when not searching */}
+                    {/* Sidebar */}
                     {!search && userInfo && (
                         <div className="md:w-80 lg:w-96 order-1 md:order-2 mb-6 md:mb-0">
                             <Sidebar />

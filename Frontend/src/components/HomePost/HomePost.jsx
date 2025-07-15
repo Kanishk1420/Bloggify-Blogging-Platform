@@ -1,67 +1,100 @@
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
 import DOMPurify from 'dompurify';
 
 const HomePost = ({ post }) => {
-
-  const desc = DOMPurify.sanitize(post.description.slice(0, 100) + "..Read More");
+  const { theme } = useSelector((state) => state.theme);
   const [showLoader, setShowLoader] = useState(true);
+
+  // Format date in a readable format without using date-fns
+  const formattedDate = new Date(post?.createdAt || post?.updatedAt).toLocaleDateString();
+  
+  // Extract a short description (first 100 characters)
+  const desc = DOMPurify.sanitize(post.description.slice(0, 100) + "..Read More");
 
   useEffect(() => {
     const delay = setTimeout(() => {
       setShowLoader(false);
-    }, 1000);
+    }, 500); // Reduced from 1000ms to 500ms for faster loading
 
     return () => clearTimeout(delay);
   }, []);
 
   return (
-
-    <section className=''>
-      <>
-        {showLoader ? (
-
-          <div className=''> 
-
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 mt-8 max-xl:grid-cols-1 xl:max-w-[45rem]' >
-
-              <div className='h-[200px] md:h-auto bg-gray-300 animate-pulse rounded-lg'></div>
-
-              <div className='flex flex-col' >
-                <div className='h-6 w-3/4 bg-gray-300 animate-pulse rounded-md mb-2'></div>
-                <div className='h-4 w-1/2 bg-gray-300 animate-pulse rounded-md mb-4'></div>
-                <div className='flex mb-2 items-center'>
-                  <div className='h-4 w-16 bg-gray-300 animate-pulse rounded-md mr-2'></div>
-                  <div className='h-4 w-16 bg-gray-300 animate-pulse rounded-md'></div>
-                </div>
-                <div className='h-20 w-full bg-gray-300 animate-pulse rounded-md'></div>
-              </div >
-            </div >
-
-          </div>) : (<div className='grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 mt-8 max-xl:grid-cols-1 xl:max-w-[45rem] '>
-
-            <div className='h-[150px] md:h-auto'>
-              <img src={post.photo?.url} alt="" className={`w-full h-full max-xl:object-contain object-cover rounded-lg`} />
+    <div className={`
+      rounded-xl overflow-hidden mb-6 transition-all
+      ${theme 
+        ? 'text-white border border-zinc-800/30 shadow-lg shadow-indigo-900/20 hover:shadow-indigo-900/30' 
+        : 'bg-white/90 shadow-md shadow-gray-200/70 hover:shadow-gray-300/80 border border-gray-100'
+      }
+    `}>
+      {showLoader ? (
+        // Loader skeleton
+        <div className="w-full h-full p-4">
+          <div className={`h-[180px] ${theme ? 'bg-gray-700' : 'bg-gray-300'} animate-pulse rounded-lg mb-4`}></div>
+          <div className={`h-6 w-3/4 ${theme ? 'bg-gray-700' : 'bg-gray-300'} animate-pulse rounded-md mb-2`}></div>
+          <div className={`h-4 w-1/2 ${theme ? 'bg-gray-700' : 'bg-gray-300'} animate-pulse rounded-md mb-4`}></div>
+          <div className="flex justify-between">
+            <div className={`h-4 w-24 ${theme ? 'bg-gray-700' : 'bg-gray-300'} animate-pulse rounded-md`}></div>
+            <div className={`h-4 w-16 ${theme ? 'bg-gray-700' : 'bg-gray-300'} animate-pulse rounded-md`}></div>
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* Image Section - Full width with consistent height */}
+          <div className="w-full h-[200px] overflow-hidden">
+            <img 
+              src={post.photo?.url || post.image?.url} 
+              alt={post.title} 
+              className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+            />
+          </div>
+          
+          {/* Content Section - Now with backdrop-blur for better text readability */}
+          <div className={`p-4 ${theme ? 'backdrop-blur-sm bg-black/5' : ''}`}>
+            <h2 className={`text-xl font-bold mb-2 line-clamp-2 ${theme ? 'text-white' : 'text-gray-800'}`}>
+              {post.title}
+            </h2>
+            
+            <div className="flex justify-between items-center mb-3 text-sm">
+              <p className={`font-medium ${theme ? 'text-gray-200' : 'text-gray-700'}`}>
+                {post.username || post.userId?.username}
+              </p>
+              <p className={`${theme ? 'text-gray-300' : 'text-gray-500'}`}>
+                {formattedDate}
+              </p>
             </div>
-
-            <div className='flex flex-col'>
-              <h1 className='text-xl font-bold md:text-2xl'>{post.title}</h1>
-              <div className='flex mb-2 text-sm font-semibold text-gray-500 justify-between items-center md:mb-4'>
-                <p>{post.username}</p>
-                <div className='flex space-x-2'>
-                  {/* Format date and time */}
-                  <p>{new Date(post.updatedAt).toLocaleDateString()}</p>
-                  <p>{new Date(post.updatedAt).toLocaleTimeString()}</p>
-                </div>
+            
+            <div className={`text-sm ${theme ? 'text-gray-200' : 'text-gray-600'}`}>
+              <p dangerouslySetInnerHTML={{ __html: desc }} />
+            </div>
+            
+            {/* Tags - if available */}
+            {post.tags && post.tags.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-3">
+                {post.tags.map((tag, index) => (
+                  <span 
+                    key={index}
+                    className={`
+                      px-2 py-1 rounded-full text-xs font-medium
+                      ${theme 
+                        ? 'bg-indigo-900/20 backdrop-blur-sm text-gray-200' 
+                        : 'bg-gray-100 text-gray-700'
+                      }
+                    `}
+                  >
+                    #{tag}
+                  </span>
+                ))}
               </div>
-              {/* Add max-width for tablet devices */}
-              <p className='text-sm md:text-base max-w-xl' dangerouslySetInnerHTML={{ __html: desc }} />
-            </div>
-          </div>)}
-      </>
-
-    </section>
+            )}
+          </div>
+        </>
+      )}
+    </div>
   );
 };
 
@@ -71,9 +104,15 @@ HomePost.propTypes = {
     photo: PropTypes.shape({
       url: PropTypes.string
     }),
+    image: PropTypes.shape({
+      url: PropTypes.string
+    }),
     title: PropTypes.string,
     username: PropTypes.string,
-    updatedAt: PropTypes.string
+    userId: PropTypes.object,
+    createdAt: PropTypes.string,
+    updatedAt: PropTypes.string,
+    tags: PropTypes.array
   }).isRequired
 };
 

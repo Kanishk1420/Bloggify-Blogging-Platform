@@ -177,7 +177,7 @@ const Profile = () => {
               </>
             ) : (
               <>
-                <h1 className='text-xl font-bold mt-5'>Bookmarks</h1>
+                <h1 className='text-xl font-bold mt-8'></h1>
                 <MyBookmark userId={userId} />
               </>
             )}
