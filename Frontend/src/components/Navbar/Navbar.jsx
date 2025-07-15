@@ -5,7 +5,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import MobileMenu from '../MobileNav/MobileMenu.jsx';
 import { TfiPencilAlt } from "react-icons/tfi";
 import avatar from '../../assets/avatar.jpg'
-import logo from '../../assets/logo.png'
+import darkLogo from '../../assets/Bloggify white.png'  
+import lightLogo from '../../assets/Bloggify.png'
 import { BsMoonStarsFill } from "react-icons/bs";
 import { MdSunny } from "react-icons/md";
 import { toggleDarkMode } from '../../slices/Theme.js';
@@ -14,13 +15,17 @@ import { toggleDarkMode } from '../../slices/Theme.js';
 
 const Navbar = () => {
     const [search, setSearch] = useState('');
-    const [menuState, setMenuState] = useState('closed'); // Replace nav state with menuState
+    const [menuState, setMenuState] = useState('closed');
     const navigate = useNavigate();
     const { userInfo } = useSelector((state) => state.auth);
     const { theme } = useSelector((state) => state.theme);
     const dispatch = useDispatch();
     const profilePhoto = userInfo?.user?.profilePhoto?.url;
     const menuRef = useRef(null);
+    
+    // Select the appropriate logo based on theme
+    const currentLogo = theme ? darkLogo : lightLogo;
+    
     const toggleNav = () => {
         if (menuState === 'closed' || menuState === 'closing') {
             setMenuState('opening');
@@ -110,10 +115,14 @@ const Navbar = () => {
         <>
 
             <div className={`flex items-center justify-between px-4 md:px-[100px] lg:px-[200px] py-4 ${theme ? "bg-zinc-950 text-white" : "bg-white"}`}>
-                {/* Logo - Left side */}
+                {/* Logo - Left side with conditional rendering */}
                 <div className="flex-shrink-0">
                     <Link to='/'>
-                        <img src={logo} className='w-11 h-11 rounded-full object-cover' alt="Logo" />
+                        <img 
+                            src={currentLogo} 
+                            className='h-10 w-auto object-contain' 
+                            alt="Bloggify Logo" 
+                        />
                     </Link>
                 </div>
 

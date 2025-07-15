@@ -10,7 +10,9 @@ import { FaRegEye, FaEyeSlash, FaCheck, FaTimes } from "react-icons/fa";
 import { MdSunny } from "react-icons/md";
 import { BsMoonStarsFill } from "react-icons/bs";
 import { LoaderCircle } from 'lucide-react';
-import logo from '../../assets/logo.png';
+// Import both logo variants
+import darkLogo from '../../assets/Bloggify white.png';  
+import lightLogo from '../../assets/Bloggify.png';
 import { useRegisterMutation } from '../../api/auth';
 import axios from 'axios';
 import { validateEmailDomain } from "../../utils/emailValidator";
@@ -211,11 +213,18 @@ const Register = () => {
     lengthWithoutAt: username.replace('@', '').length
   });
 
+  // Select the appropriate logo based on theme
+  const currentLogo = theme ? darkLogo : lightLogo;
+
   return <>
     <div className={`min-h-screen flex flex-col ${theme ? "bg-gradient-to-b from-black to-gray-900 via-black text-white" : "bg-white text-zinc-900"}`}>
       <div className='flex items-center justify-between px-6 md:px-[200px] py-4'>
         <Link to='/'>
-          <img src={logo} className='w-11 h-11 mt-1 rounded-full object-cover' alt="Logo" />
+          <img 
+            src={currentLogo} 
+            className='h-10 w-auto object-contain' 
+            alt="Bloggify Logo" 
+          />
         </Link>
         
         <div className="flex items-center space-x-4">

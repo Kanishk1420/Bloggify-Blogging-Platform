@@ -4,7 +4,9 @@ import { FaEyeSlash, FaRegEye } from "react-icons/fa";
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import logo from '../../assets/logo.png';
+// Import both logo variants
+import darkLogo from '../../assets/Bloggify white.png';  
+import lightLogo from '../../assets/Bloggify.png';
 import { LoaderCircle } from 'lucide-react';
 import { useResetPasswordMutation, useSendOtpMutation } from '../../api/auth';
 import { setCredentials } from '../../slices/AuthSlice';
@@ -28,6 +30,9 @@ const ResetPassword = () => {
     
     // Theme from Redux store
     const { theme } = useSelector((state) => state.theme);
+    
+    // Select the appropriate logo based on theme
+    const currentLogo = theme ? darkLogo : lightLogo;
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -121,7 +126,11 @@ const ResetPassword = () => {
             <div className={`min-h-screen flex flex-col ${theme ? "bg-gradient-to-b from-black to-gray-900 via-black text-white" : "bg-white text-zinc-900"}`}>
                 <div className='flex items-center justify-between px-6 md:px-[200px] py-4'>
                     <Link to='/'>
-                        <img src={logo} className='w-11 h-11 mt-1 rounded-full object-cover' alt="Logo" />
+                        <img 
+                            src={currentLogo} 
+                            className='h-10 w-auto object-contain' 
+                            alt="Bloggify Logo" 
+                        />
                     </Link>
                     
                     <div className="flex items-center space-x-4">
