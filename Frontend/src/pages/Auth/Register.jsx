@@ -233,10 +233,10 @@ const Register = () => {
             onClick={handleTheme} 
             className="flex items-center justify-center w-9 h-9 rounded-full hover:bg-opacity-80"
           >
-            {theme ? <BsMoonStarsFill className='text-white text-lg' /> : <MdSunny className='text-xl' />}
+            {theme ? <BsMoonStarsFill className='text-white text-lg' /> : <MdSunny className='text-[#1576D8] text-xl' />}
           </button>
           
-          <h3 className={theme ? 'text-white' : 'text-zinc-900'}>
+          <h3 className={theme ? 'text-white' : 'text-[#1576D8]'}>
             <Link to='/login'>Login</Link>
           </h3>
         </div>
@@ -393,25 +393,44 @@ const Register = () => {
                   </div>
                 </div>
                 <div className="flex flex-col gap-2">
-                  <button type="submit"
-                    className={`border transition-colors focus:ring-2 p-0.5 border-transparent ${
-      theme 
-        ? "bg-slate-100 text-black hover:bg-slate-300" 
-        : "bg-[#1576D8] text-white hover:bg-[#1465C0]"
-
-    } rounded-lg`}
-
+                  {/* Primary Register Button */}
+                  <button 
+                    type="submit"
+                    className={`w-full rounded-full py-3 px-6 font-medium text-base ${
+                      theme
+                        ? "bg-slate-100 text-black hover:bg-slate-200"
+                        : "bg-[#1576D8] text-white hover:bg-[#1465C0]"
+                    }`}
                   >
-                    <div className="flex items-center justify-center gap-1 font-medium py-1 px-2.5 text-base">
-                      <h2>Register</h2>
-                      <LoaderCircle size={16} className={`animate-spin ${loading ? 'block' : 'hidden'}`} />
+                    <div className="flex items-center justify-center gap-2">
+                      {loading ? (
+                        <LoaderCircle size={20} className="animate-spin" />
+                      ) : (
+                        "Register"
+                      )}
                     </div>
                   </button>
+
+                  {/* OR divider */}
+                  <div className="flex items-center my-4">
+                    <div className="flex-grow border-t border-gray-300"></div>
+                    <span className={`px-4 text-sm ${theme ? "text-gray-400" : "text-gray-500"}`}>OR</span>
+                    <div className="flex-grow border-t border-gray-300"></div>
+                  </div>
+
+                  {/* Secondary Login Button */}
+                  <Link 
+                    to="/login" 
+                    className={`block w-full text-center rounded-full py-3 px-6 font-medium text-base border ${
+                      theme
+                        ? "border-slate-300 text-white hover:bg-slate-800"
+                        : "border-[#1576D8] text-[#1576D8] hover:bg-gray-50"
+                    }`}
+                  >
+                    Sign In
+                  </Link>
                 </div>
               </form>
-              <div className={`mt-4 text-center ${theme ? "text-white" : "text-gray-700"} mx-10`}>Have an account?
-  <Link className={`${theme ? "text-gray-300" : "text-[#1576D8]"} underline hover:opacity-80 px-2`} to="/login">Login here</Link>
-</div>
             </div>
           </div>
         </div>

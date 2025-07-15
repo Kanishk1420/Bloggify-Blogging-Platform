@@ -39,10 +39,10 @@ const MobileMenu = () => {
       
       {!userInfo && <>
         <Link to='/login'>
-          <h3 className={`${theme ? 'text-white' : 'text-gray-800'} hover:text-gray-500 cursor-pointer`}>Login</h3>
+          <h3 className={`${theme ? 'text-white' : 'text-[#1576D8]'} hover:opacity-80 cursor-pointer`}>Login</h3>
         </Link>
         <Link to='/register'>
-          <h3 className={`${theme ? 'text-white' : 'text-gray-800'} hover:text-gray-500 cursor-pointer`}>Register</h3>
+          <h3 className={`${theme ? 'text-white' : 'text-[#1576D8]'} hover:opacity-80 cursor-pointer`}>Register</h3>
         </Link>
       </>}
       {userInfo && <>

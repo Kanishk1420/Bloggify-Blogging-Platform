@@ -194,7 +194,7 @@ const Navbar = () => {
 
                             {/* Theme Toggle Button */}
                             <button onClick={handleTheme} className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full">
-                                {theme ? <BsMoonStarsFill className='text-white' /> : <MdSunny />}
+                                {theme ? <BsMoonStarsFill className='text-white' /> : <MdSunny className='text-[#1576D8]' />}
                             </button>
                             
                             {/* Profile Menu */}
@@ -223,8 +223,8 @@ const Navbar = () => {
                     
                     {!userInfo && (
                         <div className="flex space-x-4">
-                            <h3><Link to='/login'>Login</Link></h3>
-                            <h3><Link to='/register'>Register</Link></h3>
+                            <h3 className={theme ? 'text-white' : 'text-[#1576D8]'}><Link to='/login'>Login</Link></h3>
+                            <h3 className={theme ? 'text-white' : 'text-[#1576D8]'}><Link to='/register'>Register</Link></h3>
                         </div>
                     )}
                 </div>

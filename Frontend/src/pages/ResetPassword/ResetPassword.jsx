@@ -139,10 +139,10 @@ const ResetPassword = () => {
                             onClick={handleTheme} 
                             className="flex items-center justify-center w-9 h-9 rounded-full hover:bg-opacity-80"
                         >
-                            {theme ? <BsMoonStarsFill className='text-white text-lg' /> : <MdSunny className='text-xl' />}
+                            {theme ? <BsMoonStarsFill className='text-white text-lg' /> : <MdSunny className='text-[#1576D8] text-xl' />}
                         </button>
                         
-                        <h3 className={theme ? 'text-white' : 'text-zinc-900'}>
+                        <h3 className={theme ? 'text-white' : 'text-[#1576D8]'}>
                             <Link to='/login'>Login</Link>
                         </h3>
                     </div>
@@ -207,7 +207,7 @@ const ResetPassword = () => {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
                                         <div>
                                             <div className="mb-2">
-                                                <label className="text-sm font-medium" htmlFor="newPassword">New Password:</label>
+                                                <label className={`text-sm font-medium ${theme ? "text-white" : "text-gray-700"}`} htmlFor="newPassword">New Password:</label>
                                             </div>
                                             <div className="relative">
                                                 {showNewPassword ?
@@ -217,7 +217,11 @@ const ResetPassword = () => {
                                                 <input
                                                     value={newPassword}
                                                     onChange={(e) => setNewPassword(e.target.value)}
-                                                    className="block w-full border bg-black text-white border-slate-800 focus:border-cyan-500 placeholder-gray-400 focus:ring-cyan-500 p-2.5 text-sm rounded-lg"
+                                                    className={`block w-full border ${
+                                                        theme 
+                                                            ? "bg-black border-slate-800 text-white" 
+                                                            : "bg-white border-gray-300 text-gray-900"
+                                                    } focus:border-cyan-500 placeholder-gray-400 focus:ring-cyan-500 p-2.5 text-sm rounded-lg`}
                                                     id="newPassword"
                                                     type={showNewPassword ? "text" : "password"}
                                                     name="newPassword"
@@ -230,7 +234,7 @@ const ResetPassword = () => {
 
                                         <div>
                                             <div className="mb-2">
-                                                <label className="text-sm font-medium" htmlFor="confirmPassword">Confirm Password:</label>
+                                                <label className={`text-sm font-medium ${theme ? "text-white" : "text-gray-700"}`} htmlFor="confirmPassword">Confirm Password:</label>
                                             </div>
                                             <div className="relative">
                                                 {showConfirmPassword ?
@@ -240,7 +244,11 @@ const ResetPassword = () => {
                                                 <input
                                                     value={confirmPassword}
                                                     onChange={(e) => setConfirmPassword(e.target.value)}
-                                                    className="block w-full border bg-black text-white border-slate-800 focus:border-cyan-500 placeholder-gray-400 focus:ring-cyan-500 p-2.5 text-sm rounded-lg"
+                                                    className={`block w-full border ${
+                                                        theme 
+                                                            ? "bg-black border-slate-800 text-white" 
+                                                            : "bg-white border-gray-300 text-gray-900"
+                                                    } focus:border-cyan-500 placeholder-gray-400 focus:ring-cyan-500 p-2.5 text-sm rounded-lg`}
                                                     id="confirmPassword"
                                                     type={showConfirmPassword ? "text" : "password"}
                                                     name="confirmPassword"
@@ -254,19 +262,36 @@ const ResetPassword = () => {
 
                                     {/* Submit Button */}
                                     <div className="flex flex-col gap-2 mt-4">
-                                        <button type="submit"
-                                            className="border transition-colors focus:ring-2 p-0.5 border-transparent bg-slate-100 text-black hover:bg-slate-300 rounded-lg">
-                                            <div className="flex items-center justify-center gap-1 font-medium py-1 px-2.5 text-base">
-                                                <h2>Reset Password</h2>
-                                                <LoaderCircle size={16} className={`animate-spin ${loading ? 'block' : 'hidden'}`} />
+                                        <button 
+                                            type="submit"
+                                            className={`w-full rounded-full py-3 px-6 font-medium text-base ${
+                                                theme
+                                                    ? "bg-slate-100 text-black hover:bg-slate-200"
+                                                    : "bg-[#1576D8] text-white hover:bg-[#1465C0]"
+                                            }`}
+                                        >
+                                            <div className="flex items-center justify-center gap-2">
+                                                {loading ? (
+                                                    <LoaderCircle size={20} className="animate-spin" />
+                                                ) : (
+                                                    "Reset Password"
+                                                )}
                                             </div>
                                         </button>
                                     </div>
                                 </form>
                                 
-                                <div className="mt-4 text-center mx-10">
-                                    <span className={theme ? "text-white" : "text-gray-800"}>Remember your password?</span>
-                                    <Link className="text-gray-300 underline hover:text-gray-400 px-2" to="/login">Login here</Link>
+                                {/* Better formatted login reminder text */}
+                                <div className="mt-6 text-center">
+                                    <span className={`${theme ? "text-white" : "text-gray-700"}`}>
+                                        Remember your password? {" "}
+                                        <Link 
+                                            className={`${theme ? "text-gray-300" : "text-[#1576D8]"} hover:underline font-medium`} 
+                                            to="/login"
+                                        >
+                                            Login here
+                                        </Link>
+                                    </span>
                                 </div>
                             </div>
                         </div>
