@@ -72,6 +72,21 @@ const Footer = () => {
                   </svg>
                 </a>
               </li>
+
+              {/* Added LinkedIn Icon */}
+              <li>
+                <a
+                  href="https://www.linkedin.com/in/kanishk-gupta-3ab129303/"
+                  rel="noreferrer"
+                  target="_blank"
+                  className="text-gray-700 transition hover:text-gray-700/75"
+                >
+                  <span className="sr-only">LinkedIn</span>
+                  <svg className="h-5 w-5 sm:h-6 sm:w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452z" />
+                  </svg>
+                </a>
+              </li>
             </ul>
             
             <p className="text-slate-500 font-semibold text-center mt-4 text-xs sm:text-sm">&copy; Bloggify {new Date().getFullYear()}</p>
