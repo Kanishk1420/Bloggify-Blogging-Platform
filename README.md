@@ -2,7 +2,7 @@
 
 # Bloggify - A Modern Platform for Developers to Write, Learn, and Share
 
-![Bloggify Logo](Frontend/public/logo.svg)
+![Bloggify Logo](Frontend/src/assets/Bloggify.png)
 
 Bloggify is a full-stack blogging platform designed specifically for developers to share their knowledge, experiences, and insights. With a modern UI and robust features, it offers a seamless experience for both content creators and readers.
 
