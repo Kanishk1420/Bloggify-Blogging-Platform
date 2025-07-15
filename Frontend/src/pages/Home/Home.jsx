@@ -26,45 +26,47 @@ const Home = () => {
     const [loading, setLoading] = useState(0)
     const { userInfo } = useSelector((state) => state.auth);
     const [getSearchPost, { isLoading: searchLoader }] = useGetSearchPostMutation();
-    const { data: followingData } = useGetFollowingPostQuery();
+    const { data: followingData, isLoading: followingLoading } = useGetFollowingPostQuery();
 
     const [activePage, setActivePage] = useState(1);
     const [postLength, setPostLength] = useState(0);
     const [showAllPosts, setShowAllPosts] = useState(false);
 
-    const fetchMoreFollowing = () => {
-        const followingPost = followingData?.followingPost;
-        if (followingPost) {
-            setActivePage(activePage + 1);
-            setFollowingPosts([...followingPosts, ...followingPost]);
-            setPostLength(followingPost.length);
+    // Fix: Properly handle following posts data
+    useEffect(() => {
+        if (followingData?.followingPost) {
+            console.log("Following posts loaded:", followingData.followingPost.length);
+            setFollowingPosts(followingData.followingPost);
         }
+    }, [followingData]);
+
+    // Fix: Handle all posts data separately
+    useEffect(() => {
+        if (data?.allPost) {
+            setAllPosts(data.allPost);
+        }
+    }, [data]);
+
+    // Loading indicator effect
+    useEffect(() => {
+        if (isLoading || followingLoading) {
+            setLoading(10);
+            setTimeout(() => setLoading(50), 300);
+            setTimeout(() => setLoading(100), 600);
+        }
+    }, [isLoading, followingLoading]);
+
+    const fetchMoreFollowing = () => {
+        // This would be implemented if pagination was supported on the backend
+        console.log("Fetching more following posts...");
+        // For now, we're just using what we have
     };
 
     const fetchMorePosts = () => {
-        const allPosts = data?.allPost;
-        if (allPosts) {
-            setActivePage(activePage + 1);
-            setAllPosts([...allPost, ...allPosts]);
-            setPostLength(allPosts.length);
-        }
+        // This would be implemented if pagination was supported on the backend
+        console.log("Fetching more posts...");
+        // For now, we're just using what we have
     };
-
-    useEffect(() => {
-        if (followingData) {
-            setLoading(10);
-            fetchMorePosts();
-            setLoading(50);
-            fetchMorePosts();
-            setLoading(100);
-        } else {
-            setLoading(10);
-            fetchMorePosts();
-            setLoading(50);
-            fetchMorePosts();
-            setLoading(100);
-        }
-    }, [followingData, data?.allPost]);
 
     useEffect(() => {
         const fetchSearch = async () => {
@@ -90,13 +92,13 @@ const Home = () => {
     return (
         <>
             <Navbar />
-            {isLoading && (
+            {(isLoading || followingLoading) && (
                 <div>
                     <span
                         role="progressbar"
                         aria-labelledby="ProgressLabel"
                         aria-valuenow={loading}
-                        className={`block rounded-full  relative overflow-hidden ${theme ? "bg-slate-700" : "bg-red-500"}`}
+                        className={`block rounded-full relative overflow-hidden ${theme ? "bg-slate-700" : "bg-red-500"}`}
                         style={{ height: '3px' }}
                     >
                         <span className="block absolute inset-0 bg-indigo-600" style={{ width: `${loading}%`, transition: 'width 0.3s ease-in-out' }}></span>
@@ -121,7 +123,6 @@ const Home = () => {
                             <h1 className='font-bold text-xl text-center h-[90vh] mt-8'>No Post Found</h1>
                         ) : (
                             <>
-
                                 {searchedPosts?.map((post) => (
                                     <Link to={`/posts/post/${post._id}`} key={post._id}>
                                         <HomePost post={post} />
@@ -130,34 +131,39 @@ const Home = () => {
                             </>
                         )}
                         {activeLink === "following" ? (
-                            <InfiniteScroll
-                                dataLength={followingPosts?.length || 0}
-                                hasMore={followingPosts.length < postLength}
-                                next={fetchMoreFollowing}
-                                endMessage={
-                                    <div className={`text-center mt-5 ${theme ? "text-slate-400" : "text-black"}`}>
-                                        Follow more users :)
-                                    </div>
-                                }
-                            >
-                                {followingPosts.length === 0 ? <div className='text-center mt-10 font-bold text-xl'>No post found</div> : (
-                                    <>
-                                        {followingPosts?.map((post) => (
+                            followingLoading ? (
+                                <Loader />
+                            ) : (
+                                <InfiniteScroll
+                                    dataLength={followingPosts?.length || 0}
+                                    next={fetchMoreFollowing}
+                                    hasMore={false} // Backend doesn't support pagination yet
+                                    loader={<Loader />}
+                                    endMessage={
+                                        <div className={`text-center mt-5 ${theme ? "text-slate-400" : "text-black"}`}>
+                                            {followingPosts.length > 0 ? "No more posts to show" : "Follow more users to see their posts"}
+                                        </div>
+                                    }
+                                >
+                                    {followingPosts.length === 0 ? (
+                                        <div className='text-center mt-10 font-bold text-xl'>No posts from users you follow</div>
+                                    ) : (
+                                        followingPosts.map((post) => (
                                             <Link to={`/posts/post/${post._id}`} key={post._id}>
                                                 <HomePost post={post} />
                                             </Link>
-                                        ))}
-                                    </>
-                                )}
-                            </InfiniteScroll>
+                                        ))
+                                    )}
+                                </InfiniteScroll>
+                            )
                         ) : (
                             <InfiniteScroll
                                 dataLength={allPost?.length || 0}
-                                hasMore={allPost.length < postLength}
                                 next={fetchMorePosts}
+                                hasMore={false} // Backend doesn't support pagination yet
                                 loader={<Loader />}
                             >
-                                {!search && data && data?.allPost.map((post) => (
+                                {!search && allPost.map((post) => (
                                     <Link to={`/posts/post/${post._id}`} key={post._id}>
                                         <HomePost post={post} key={post._id} />
                                     </Link>

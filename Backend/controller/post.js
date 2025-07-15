@@ -385,19 +385,37 @@ export const uploadImage = async (req, res) => {
 export const getFollowingPost = async (req, res) => {
   try {
     const user = await User.findById(req.userId);
-
-    const post = await Post.find({
-      userId: {
-        $in: user.following,
-      },
-    });
-
+    
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+    
+    // Check if user is following anyone
+    if (!user.following || user.following.length === 0) {
+      return res.status(200).json({
+        success: true,
+        followingPost: [], // Return empty array instead of error
+        message: "Not following any users"
+      });
+    }
+    
+    const posts = await Post.find({
+      userId: { $in: user.following }
+    }).sort({ createdAt: -1 }); // Sort by newest first
+    
     res.status(200).json({
       success: true,
-      followingPost: post,
+      followingPost: posts
     });
   } catch (err) {
-    console.log(err);
+    console.error("Error fetching following posts:", err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch following posts"
+    });
   }
 };
 
