@@ -96,15 +96,23 @@ const Login = () => {
 
                   <div>
                     <div className="mb-2">
-                      <label className="text-sm font-medium text-white" htmlFor="email">Email:</label>
+                      <label className={`text-sm font-medium ${theme ? "text-white" : "text-gray-700"}`} htmlFor="email">Email:</label>
                     </div>
                     <div className="flex w-full rounded-lg pt-1">
                       <div className="relative w-full">
                         <input
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
-                          className="block w-full border bg-black border-slate-800 text-white focus:border-cyan-500 placeholder-gray-400 focus:ring-cyan-500 p-2.5 text-sm rounded-lg"
-                          id="email" type="email" name="email" placeholder="email@example.com" required
+                          className={`block w-full border ${
+                            theme 
+                              ? "bg-black border-slate-800 text-white" 
+                              : "bg-white border-gray-300 text-gray-900"
+                          } focus:border-cyan-500 placeholder-gray-400 focus:ring-cyan-500 p-2.5 text-sm rounded-lg`}
+                          id="email" 
+                          type="email" 
+                          name="email" 
+                          placeholder="email@example.com" 
+                          required
                         />
                       </div>
                     </div>
@@ -112,7 +120,7 @@ const Login = () => {
 
                   <div>
                     <div className="mb-2">
-                      <label className="text-sm font-medium text-white" htmlFor="password">Password</label>
+                      <label className={`text-sm font-medium ${theme ? "text-white" : "text-gray-700"}`} htmlFor="password">Password</label>
                     </div>
                     <div className="flex w-full rounded-lg pt-1">
                       <div className="relative w-full">
@@ -123,7 +131,11 @@ const Login = () => {
                         <input
                           value={password} 
                           onChange={(e) => setPassword(e.target.value)} 
-                          className="block w-full border bg-black border-slate-800 text-white focus:border-cyan-500 placeholder-gray-400 focus:ring-cyan-500 p-2.5 text-sm rounded-lg"
+                          className={`block w-full border ${
+                            theme 
+                              ? "bg-black border-slate-800 text-white" 
+                              : "bg-white border-gray-300 text-gray-900"
+                          } focus:border-cyan-500 placeholder-gray-400 focus:ring-cyan-500 p-2.5 text-sm rounded-lg`}
                           id="password" 
                           type={showPassword ? "text" : "password"}
                           name="password" 
@@ -136,7 +148,12 @@ const Login = () => {
 
                   <div className="flex flex-col gap-2">
                     <button type="submit"
-                      className="border transition-colors focus:ring-2 p-0.5 border-transparent bg-slate-100 text-black hover:bg-slate-300 rounded-lg">
+                      className={`border transition-colors focus:ring-2 p-0.5 border-transparent ${
+                        theme 
+                          ? "bg-slate-100 text-black hover:bg-slate-300" 
+                          : "bg-[#1576D8] text-white hover:bg-[#1465C0]"
+                      } rounded-lg`}
+                    >
                       <div className="flex items-center justify-center gap-1 font-medium py-1 px-2.5 text-base">
                         <h2>Login</h2>
                         <LoaderCircle size={16} className={`animate-spin ${loading ? 'block' : 'hidden'}`} />
@@ -145,9 +162,9 @@ const Login = () => {
                   </div>
                 </form>
 
-                <div className="mt-4 text-center text-white mx-10">
+                <div className={`mt-4 text-center ${theme ? "text-white" : "text-gray-700"} mx-10`}>
                   Don&apos;t have an account?
-                  <Link className="text-gray-300 underline hover:text-gray-400 px-2" to="/register">Register here</Link>
+                  <Link className={`${theme ? "text-gray-300" : "text-[#1576D8]"} underline hover:opacity-80 px-2`} to="/register">Register here</Link>
                 </div>
               </div>
             </div>

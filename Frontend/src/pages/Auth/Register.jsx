@@ -254,13 +254,17 @@ const Register = () => {
                   {/* Left Div */}
                   <div className="w-1/2 pr-2">
                     <div className="mb-2">
-                      <label className="text-sm font-medium text-white" htmlFor="firstname">Firstname:</label>
+                      <label className={`text-sm font-medium ${theme ? "text-white" : "text-gray-700"}`} htmlFor="firstname">Firstname:</label>
                     </div>
                     <div className="relative">
                       <input
                         value={firstname}
                         onChange={(e) => setFirstname(e.target.value)}
-                        className="block w-full border bg-black border-slate-800 text-white focus:border-cyan-500 placeholder-gray-400 focus:ring-cyan-500 p-2.5 text-sm rounded-lg"
+                        className={`block w-full border ${
+                          theme 
+                            ? "bg-black border-slate-800 text-white" 
+                            : "bg-white border-gray-300 text-gray-900"
+                        } focus:border-cyan-500 placeholder-gray-400 focus:ring-cyan-500 p-2.5 text-sm rounded-lg`}
                         type="text"
                         name="firstname"
                         placeholder="Firstname"
@@ -274,13 +278,17 @@ const Register = () => {
                   {/* Right Div */}
                   <div className="w-1/2 pl-2">
                     <div className="mb-2">
-                      <label className="text-sm font-medium text-white" htmlFor="lastname">Lastname:</label>
+                      <label className={`text-sm font-medium ${theme ? "text-white" : "text-gray-700"}`} htmlFor="lastname">Lastname:</label>
                     </div>
                     <div className="relative">
                       <input
                         value={lastname}
                         onChange={(e) => setLastname(e.target.value)}
-                        className="block w-full border bg-black border-slate-800 text-white focus:border-cyan-500 placeholder-gray-400 focus:ring-cyan-500 p-2.5 text-sm rounded-lg"
+                        className={`block w-full border ${
+                          theme 
+                            ? "bg-black border-slate-800 text-white" 
+                            : "bg-white border-gray-300 text-gray-900"
+                        } focus:border-cyan-500 placeholder-gray-400 focus:ring-cyan-500 p-2.5 text-sm rounded-lg`}
                         type="text"
                         name="lastname"
                         placeholder="Lastname"
@@ -296,7 +304,7 @@ const Register = () => {
 
                 <div>
                   <div className="mb-2">
-                    <label className="text-sm font-medium text-white" htmlFor="username">Username:</label>
+                    <label className={`text-sm font-medium ${theme ? "text-white" : "text-gray-700"}`} htmlFor="username">Username:</label>
                   </div>
                   <div className="flex w-full rounded-lg pt-1">
                     <div className="relative w-full">
@@ -343,7 +351,7 @@ const Register = () => {
 
                 <div>
                   <div className="mb-2">
-                    <label className="text-sm font-medium text-white" htmlFor="email">Email:</label>
+                    <label className={`text-sm font-medium ${theme ? "text-white" : "text-gray-700"}`} htmlFor="email">Email:</label>
                   </div>
                   <div className="flex w-full rounded-lg pt-1">
                     <div className="relative w-full">
@@ -362,43 +370,48 @@ const Register = () => {
                 <div>
 
                   <div className="mb-2">
-                    <label className="text-sm font-medium text-white" htmlFor="password">Password</label>
+                    <label className={`text-sm font-medium ${theme ? "text-white" : "text-gray-700"}`} htmlFor="password">Password</label>
                   </div>
                   <div className="flex w-full rounded-lg pt-1">
                     <div className="relative w-full">
                       {showPassword ? <FaRegEye onClick={handleShowPassword} className='absolute right-4 top-3 cursor-pointer' /> : <FaEyeSlash className='absolute right-4 top-3 cursor-pointer' onClick={handleShowPassword} />}
                       <input
-                        value={password} onChange={(e) => setPassword(e.target.value)} className="block w-full border bg-black border-slate-800 text-white focus:border-cyan-500  placeholder-gray-400 focus:ring-cyan-500 p-2.5 text-sm rounded-lg"
-                        id="password" type={showPassword ? "text" : "password"}
-                        name="password" required maxLength={16}
-
+                        value={password} 
+                        onChange={(e) => setPassword(e.target.value)} 
+                        className={`block w-full border ${
+                          theme 
+                            ? "bg-black border-slate-800 text-white" 
+                            : "bg-white border-gray-300 text-gray-900"
+                        } focus:border-cyan-500 placeholder-gray-400 focus:ring-cyan-500 p-2.5 text-sm rounded-lg`}
+                        id="password" 
+                        type={showPassword ? "text" : "password"}
+                        name="password" 
+                        required 
+                        maxLength={16}
                       />
-
                     </div>
                   </div>
-                  {/* <p className="mt-2 cursor-pointer text-blue-500 hover:text-blue-600">Forgot password?</p> */}
                 </div>
                 <div className="flex flex-col gap-2">
                   <button type="submit"
-                    className="border transition-colors focus:ring-2 p-0.5 border-transparent bg-slate-100 text-black hover:bg-slate-300  rounded-lg">
+                    className={`border transition-colors focus:ring-2 p-0.5 border-transparent ${
+      theme 
+        ? "bg-slate-100 text-black hover:bg-slate-300" 
+        : "bg-[#1576D8] text-white hover:bg-[#1465C0]"
+
+    } rounded-lg`}
+
+                  >
                     <div className="flex items-center justify-center gap-1 font-medium py-1 px-2.5 text-base">
                       <h2>Register</h2>
                       <LoaderCircle size={16} className={`animate-spin ${loading ? 'block' : 'hidden'}`} />
                     </div>
                   </button>
-                  {/* <button type="button"
-                    className="transition-colors focus:ring-2 p-0.5 bg-white hover:bg-gray-100 text-gray-900 border border-gray-200 rounded-lg">
-                    <span className="flex items-center justify-center gap-1 font-medium py-1 px-2.5 text-base">
-                      <span className='px-2'> <FaGoogle /></span>
-                      Sign in with Google
-                    </span>
-                  </button> */}
-
                 </div>
               </form>
-              <div className="mt-4 text-center text-white mx-10">Have an account?
-                <Link className="text-gray-300 underline hover:text-gray-400 px-2" to="/login">Login here</Link>
-              </div>
+              <div className={`mt-4 text-center ${theme ? "text-white" : "text-gray-700"} mx-10`}>Have an account?
+  <Link className={`${theme ? "text-gray-300" : "text-[#1576D8]"} underline hover:opacity-80 px-2`} to="/login">Login here</Link>
+</div>
             </div>
           </div>
         </div>
