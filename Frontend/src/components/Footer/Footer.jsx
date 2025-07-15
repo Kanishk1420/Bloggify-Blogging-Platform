@@ -28,11 +28,11 @@ const Footer = () => {
         <div className="mx-auto w-full max-w-5xl px-4 py-8 sm:py-12 lg:py-16">
           <div className="flex flex-col items-center">
             <div className="flex justify-center mb-2">
-              {/* Updated logo styling to match example images */}
+              {/* Updated logo styling with proper responsive sizing */}
               <img 
                 src={logo} 
                 alt="Bloggify" 
-                className="md:h-16 w-auto object-contain" 
+                className="h-10 md:h-16 w-auto object-contain" 
               />
             </div>
 
