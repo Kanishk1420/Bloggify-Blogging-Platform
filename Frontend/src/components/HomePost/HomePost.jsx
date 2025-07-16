@@ -75,7 +75,7 @@ const HomePost = ({ post }) => {
               </p>
             </div>
             
-            <div className={`text-sm ${theme ? 'text-gray-200' : 'text-gray-600'}`}>
+            <div className={`text-xs ${theme ? 'text-gray-200' : 'text-gray-700'}`}>
               <p dangerouslySetInnerHTML={{ __html: desc }} />
             </div>
             
