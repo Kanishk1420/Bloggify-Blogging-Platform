@@ -164,10 +164,37 @@ const Profile = () => {
       <div className={`px-4  pb-80 overflow-y-auto ${theme ? " bg-gradient-to-b from-black to-gray-900 via-black text-white" : ""}  `}>
         <div className='flex md:flex-row justify-center flex-col-reverse '>
           <div className='md:w-2/3 md:px-4 mt-4'>
+            {/* Updated tab navigation with blue color for light mode */}
             {userInfo?.user?._id === userId && (
-              <div className='flex justify-start items-center gap-6'>
-                <h1 className={`text-xl  font-semibold cursor-pointer ${activeLink === 'posts' ? 'border-b-2 border-zinc-800  duration-300 ' : ''}`} onClick={() => setActiveLink('posts')}>Your posts</h1>
-                <h1 className={`text-xl font-semibold cursor-pointer ${activeLink === 'bookmarks' ? 'border-b-2 border-zinc-800  duration-300 ' : ''}`} onClick={() => setActiveLink('bookmarks')}>Bookmarks</h1>
+              <div className='flex justify-start items-center gap-6 mb-4'>
+                <h1
+                  className={`text-xl font-semibold cursor-pointer ${
+                    activeLink === 'posts' 
+                    ? theme 
+                        ? 'border-b-2 border-white text-white' 
+                        : 'border-b-2 border-[#1576D8] text-[#1576D8]' 
+                    : theme 
+                        ? 'text-gray-300 hover:text-white' 
+                        : 'text-gray-600 hover:text-[#1576D8]'
+                  }`}
+                  onClick={() => setActiveLink('posts')}
+                >
+                  Your posts
+                </h1>
+                <h1
+                  className={`text-xl font-semibold cursor-pointer ${
+                    activeLink === 'bookmarks' 
+                    ? theme 
+                        ? 'border-b-2 border-white text-white' 
+                        : 'border-b-2 border-[#1576D8] text-[#1576D8]' 
+                    : theme 
+                        ? 'text-gray-300 hover:text-white' 
+                        : 'text-gray-600 hover:text-[#1576D8]'
+                  }`}
+                  onClick={() => setActiveLink('bookmarks')}
+                >
+                  Bookmarks
+                </h1>
               </div>
             )}
             {activeLink === 'posts' ? (

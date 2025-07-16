@@ -106,17 +106,33 @@ const Home = () => {
                 </div>
             )}
             <div className={`px-4 md:px-6 lg:px-8 min-h-screen py-8 ${theme ? "bg-gradient-to-b from-black to-gray-900 via-black text-white" : ""}`}>
-                {/* Tab navigation */}
+                {/* Tab navigation - Updated with blue color for light mode */}
                 {!search && userInfo && (
-                    <div className='flex justify-start items-center gap-5 text-xl font-semibold font-sans mb-6'>
+                    <div className='flex justify-start items-center gap-5 mb-6'>
                         <h1
-                            className={`text-xl font-semibold cursor-pointer ${activeLink === 'explore' ? 'border-b-2 border-zinc-800 duration-300' : ''}`}
+                            className={`text-xl font-semibold cursor-pointer ${
+                                activeLink === 'explore' 
+                                ? theme 
+                                    ? 'border-b-2 border-white text-white' 
+                                    : 'border-b-2 border-[#1576D8] text-[#1576D8]' 
+                                : theme 
+                                    ? 'text-gray-300 hover:text-white' 
+                                    : 'text-gray-600 hover:text-[#1576D8]'
+                            }`}
                             onClick={() => setActiveLink('explore')}
                         >
                             Explore
                         </h1>
                         <h1
-                            className={`text-xl font-semibold cursor-pointer ${activeLink === 'following' ? 'border-b-2 border-zinc-800 duration-300' : ''}`}
+                            className={`text-xl font-semibold cursor-pointer ${
+                                activeLink === 'following' 
+                                ? theme 
+                                    ? 'border-b-2 border-white text-white' 
+                                    : 'border-b-2 border-[#1576D8] text-[#1576D8]' 
+                                : theme 
+                                    ? 'text-gray-300 hover:text-white' 
+                                    : 'text-gray-600 hover:text-[#1576D8]'
+                            }`}
                             onClick={() => setActiveLink('following')}
                         >
                             Following

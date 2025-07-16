@@ -15,7 +15,7 @@ import CreatePost from './pages/PostAction/CreatePost'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ResetPassword from './pages/ResetPassword/ResetPassword'
-import ThemeInitializer from './components/ThemeInitializer' // Add this import
+import ThemeInitializer from './components/ThemeInitializer'
 
 const App = () => {
   const { theme } = useSelector((state) => state.theme);

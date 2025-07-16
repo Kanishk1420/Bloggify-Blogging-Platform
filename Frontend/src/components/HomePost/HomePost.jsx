@@ -55,13 +55,20 @@ const HomePost = ({ post }) => {
           
           {/* Content Section - Now with backdrop-blur for better text readability */}
           <div className={`p-4 ${theme ? 'backdrop-blur-sm bg-black/5' : ''}`}>
-            <h2 className={`text-xl font-bold mb-2 line-clamp-2 ${theme ? 'text-white' : 'text-gray-800'}`}>
+            <h2 className={`text-xl font-semibold mb-2 line-clamp-2 post-card-title ${
+  theme ? 'text-white' : 'text-[#1e3a8a]'
+}`}>
               {post.title}
             </h2>
             
             <div className="flex justify-between items-center mb-3 text-sm">
-              <p className={`font-medium ${theme ? 'text-gray-200' : 'text-gray-700'}`}>
-                {post.username || post.userId?.username}
+              <p className={`font-medium ${theme ? 'text-gray-200' : 'text-black'}`}>
+                {post.firstname && post.lastname 
+                  ? `${post.firstname} ${post.lastname}`
+                  : post.userId?.firstname && post.userId?.lastname
+                    ? `${post.userId.firstname} ${post.userId.lastname}`
+                    : post.username || post.userId?.username  // Fallback to username if name not available
+                }
               </p>
               <p className={`${theme ? 'text-gray-300' : 'text-gray-500'}`}>
                 {formattedDate}
@@ -108,6 +115,8 @@ HomePost.propTypes = {
       url: PropTypes.string
     }),
     title: PropTypes.string,
+    firstname: PropTypes.string,
+    lastname: PropTypes.string,
     username: PropTypes.string,
     userId: PropTypes.object,
     createdAt: PropTypes.string,
