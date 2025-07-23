@@ -118,7 +118,7 @@ const Navbar = () => {
       >
         {/* Logo - Left side with conditional rendering */}
         <div className="flex-shrink-0">
-          <Link to="/">
+          <Link to="/home">
             <img
               src={currentLogo}
               className="h-10 w-auto object-contain"

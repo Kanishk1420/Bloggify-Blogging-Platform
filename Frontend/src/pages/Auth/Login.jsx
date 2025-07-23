@@ -44,7 +44,11 @@ const Login = () => {
       toast.success(res?.message || 'Logged in successfully');
       dispatch(setCredentials(res))
       setLoading(false)
-      navigate('/')
+      
+      // Redirect to the path stored in sessionStorage or default to '/home'
+      const redirectPath = sessionStorage.getItem("redirectAfterLogin") || "/home";
+      sessionStorage.removeItem("redirectAfterLogin"); // Clear it after use
+      navigate(redirectPath);
     } catch (err) {
       setLoading(false)
       toast.error(err?.data?.message)

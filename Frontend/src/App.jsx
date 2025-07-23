@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import Home from './pages/Home/Home'
+import Landing from './pages/Landing/Landing' // Add this import
 import Login from './pages/Auth/Login'
 import Register from './pages/Auth/Register'
 import PostDetails from './pages/PostBody/PostDetails'
@@ -26,7 +27,8 @@ const App = () => {
       <Router>
         <ToastContainer autoClose={3000} />
         <Routes>
-          <Route exact path="/" element={<Home />} />
+          <Route exact path="/" element={<Landing />} />
+          <Route path="/home" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/posts/post/:id" element={<PostDetails />} />
