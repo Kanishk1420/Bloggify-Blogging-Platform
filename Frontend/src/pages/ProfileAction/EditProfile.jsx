@@ -689,7 +689,7 @@ const EditProfile = () => {
                           className={`py-2 px-4 text-sm font-medium rounded-lg ${
                             theme
                               ? "bg-zinc-800 text-white hover:bg-zinc-700"
-                              : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                              : "bg-gray-200 text-gray-800 hover:bg-[#1576D8] hover:text-white"
                           } transition-all duration-200`}
                         >
                           Change photo
