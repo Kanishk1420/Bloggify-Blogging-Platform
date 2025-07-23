@@ -40,8 +40,12 @@ const Userfollowing = () => {
     const following = data?.following || [];
 
     return (
-        <div className="flex  flex-col min-h-[200px] max-h-[500px] rounded-xl ">
-            <h2 className={`text-xl font-bold mb-4 px-4 pt-2 sticky top-0  ${theme ? "bg-zinc-950" : "bg-white"} z-10`}>
+        <div className={`flex flex-col min-h-[200px] max-h-[500px] rounded-xl overflow-hidden ${
+            theme ? "bg-zinc-950 border border-zinc-800" : "bg-white border border-blue-100 shadow-sm"
+        }`}>
+            <h2 className={`text-xl font-bold mb-4 px-4 pt-4 sticky top-0 ${
+                theme ? "bg-zinc-950 text-white" : "bg-white text-gray-700"
+            } z-10 border-b ${theme ? "border-zinc-800" : "border-blue-50"} pb-3`}>
                 Following
                 <span className="text-gray-500 text-sm ml-2">({following.length})</span>
             </h2>
@@ -53,34 +57,52 @@ const Userfollowing = () => {
             ) : (
                 <div
                     ref={scrollContainerRef}
-                    className="overflow-y-auto px-4 pb-4 flex-grow black-scrollbar"
+                    className="overflow-y-auto px-4 pb-4 flex-grow scrollbar-thin scrollbar-thumb-rounded-full scrollbar-track-transparent scrollbar-thumb-gray-300 hover:scrollbar-thumb-gray-400"
                 >
                     {following.map((followingUser) => (
                         <div
-                            className={`flex items-center justify-between gap-3 p-3 mb-2 rounded-lg ${theme ? "hover:bg-white/5" : "hover:bg-gray-400"} transition cursor-pointer`}
+                            className={`flex items-center justify-between gap-3 p-3 mb-2 rounded-lg ${
+
+                                theme
+                                    ? "hover:bg-zinc-900 border border-zinc-800/50"
+                                    : "hover:bg-blue-50/80 border border-blue-50"
+                            } transition-all duration-200 cursor-pointer`}
                             key={followingUser._id}
                             onClick={() => navigateToProfile(followingUser._id)}
                         >
                             <div className="flex items-center gap-3">
                                 <img
                                     src={followingUser.profilePhoto?.url ?? avatar}
-                                    className="w-12 h-12 object-cover rounded-full border border-gray-200"
+                                    className={`w-12 h-12 object-cover rounded-full ${
+
+                                        theme
+                                            ? "border border-zinc-700"
+                                            : "border-2 border-blue-100"
+                                    } shadow-sm`}
                                     alt={`${followingUser.username}'s profile`}
                                     loading="lazy"
                                 />
                                 <div>
-                                    <p className="font-semibold">{followingUser.username}</p>
+                                    <p className={`font-semibold ${theme ? "text-white" : "text-gray-800"}`}>
+                                        {followingUser.username}
+                                    </p>
                                     {followingUser.fullName && (
-                                        <p className="text-sm text-gray-500">{followingUser.fullName}</p>
+                                        <p className="text-sm text-gray-500">
+                                            {followingUser.fullName}
+                                        </p>
                                     )}
                                 </div>
                             </div>
                             <button
-                                className={`text-sm ${theme ? "bg-zinc-900 hover:bg-zinc-900" : "bg-gray-100 hover:bg-gray-200"} px-3 py-1 rounded-full transition`}
+                                className={`text-sm px-4 py-1.5 rounded-full transition-all ${
+
+                                    theme
+                                        ? "bg-zinc-800 hover:bg-zinc-700 text-gray-300"
+                                        : "bg-blue-50 hover:bg-blue-100 text-blue-600"
+                                } font-medium`}
                                 onClick={(e) => {
                                     navigateToProfile(followingUser._id);
                                     e.stopPropagation();
-                                    // Add your follow/unfollow handler here
                                 }}
                             >
                                 View
