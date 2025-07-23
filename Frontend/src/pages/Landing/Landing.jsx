@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -44,25 +45,50 @@ const ImageSlider = ({ theme }) => {
 
   return (
     <div className="relative w-full h-[450px] flex justify-center items-center overflow-hidden">
-      {images.map((image, index) => (
-        <img
-          key={index}
-          src={image.src}
-          alt={image.alt}
-          className={`absolute max-w-[90%] max-h-[450px] transition-opacity duration-800 ease-in-out
-            ${index === currentIndex ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
-        />
-      ))}
+      {images.map((image, index) => {
+        // Calculate positions for sliding effect
+        const position = index - currentIndex;
+        
+        return (
+          <div
+            key={index}
+            className={`absolute w-full h-full flex justify-center items-center
+              transition-all duration-700 ease-in-out will-change-transform will-change-opacity
+              ${Math.abs(position) > 1 ? 'opacity-0' : position === 0 ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
+            style={{
+              transform: `translateX(${position * 100}%)`,
+              transition: 'transform 700ms ease-in-out, opacity 700ms ease-in-out'
+            }}
+          >
+            <img
+              src={image.src}
+              alt={image.alt}
+              className="max-w-[90%] max-h-[450px] object-contain"
+              style={{
+                filter: theme ? 'drop-shadow(0 4px 6px rgba(255, 255, 255, 0.1))' : 'none',
+                opacity: 0
+              }}
+              // Preload images for smoother transitions
+              onLoad={(e) => {
+                e.target.style.transition = 'opacity 300ms ease-in-out';
+                e.target.style.opacity = 1;
+              }}
+            />
+          </div>
+        );
+      })}
       
       {/* Dots indicator */}
       <div className="absolute bottom-0 flex justify-center w-full pb-2 z-20">
         {images.map((_, index) => (
-          <div
+          <button
             key={index}
-            className={`w-2 h-2 mx-0.5 rounded-full transition-colors 
+            onClick={() => setCurrentIndex(index)}
+            className={`w-2 h-2 mx-0.5 rounded-full transition-colors focus:outline-none
               ${index === currentIndex 
                 ? (theme ? 'bg-indigo-400' : 'bg-[#2563EB]') 
                 : (theme ? 'bg-gray-600' : 'bg-gray-300')}`}
+            aria-label={`Go to slide ${index + 1}`}
           />
         ))}
       </div>
