@@ -13,6 +13,7 @@ import { setCredentials } from '../../slices/AuthSlice';
 import { BsMoonStarsFill } from 'react-icons/bs';
 import { MdSunny } from 'react-icons/md';
 import { toggleDarkMode } from '../../slices/Theme';
+import PageTransition from '../../components/PageTransition/PageTransition';
 
 const ResetPassword = () => {
     const [email, setEmail] = useState('');
@@ -122,7 +123,7 @@ const ResetPassword = () => {
     };
 
     return (
-        <>
+        <PageTransition type="fadeInUp">
             <div className={`min-h-screen flex flex-col ${theme ? "bg-gradient-to-b from-black to-gray-900 via-black text-white" : "bg-white text-zinc-900"}`}>
                 <div className='flex items-center justify-between px-6 md:px-[200px] py-4'>
                     <Link to='/'>
@@ -298,7 +299,7 @@ const ResetPassword = () => {
                     </div>
                 </div>
             </div>
-        </>
+        </PageTransition>
     );
 };
 

@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import avatar from "../../assets/avatar.jpg";
 import Navbar from "../../components/Navbar/Navbar";
 import Footer from "../../components/Footer/Footer";
+import PageTransition from '../../components/PageTransition/PageTransition';
 import { useGetAnalyticsQuery, useGetUserPostQuery } from "../../api/post";
 import { useUserFollowerListQuery } from "../../api/user";
 
@@ -45,6 +46,7 @@ const Dashboard = () => {
 
   const renderNoPostsMessage = () => {
     return (
+      
       <div className="flex flex-col items-center justify-center p-8 rounded-lg bg-opacity-10 backdrop-blur-sm border border-gray-700/30">
         <p className="text-lg font-medium mb-2">No posts yet</p>
         <p className="text-sm opacity-70">
@@ -70,6 +72,7 @@ const Dashboard = () => {
 
   return (
     <>
+    <PageTransition type="slide">
       <Navbar />
       <div
         className={`min-h-screen pb-20 ${
@@ -412,6 +415,7 @@ const Dashboard = () => {
         </div>
       </div>
       <Footer />
+      </PageTransition>
     </>
   );
 };

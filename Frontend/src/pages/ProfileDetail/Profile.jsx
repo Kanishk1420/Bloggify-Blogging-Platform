@@ -15,6 +15,7 @@ import MyBookmark from './MyBookmark';
 import Loader from '../../components/Loader/Loader';
 import Userfollowing from './Userfollowing';
 import UserFollowers from './UserFollowers'
+import PageTransition from '../../components/PageTransition/PageTransition';
 
 
 
@@ -143,6 +144,7 @@ const Profile = () => {
   }, [showModal]);
 
   return (
+    <PageTransition type="slide">
     <section className='modal-content'>
       <Navbar />
 
@@ -401,6 +403,7 @@ const Profile = () => {
       )}
       <Footer />
     </section>
+    </PageTransition>
   );
 };
 

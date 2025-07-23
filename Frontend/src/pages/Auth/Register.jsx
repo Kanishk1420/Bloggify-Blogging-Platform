@@ -16,6 +16,7 @@ import lightLogo from '../../assets/Bloggify.png';
 import { useRegisterMutation } from '../../api/auth';
 import axios from 'axios';
 import { validateEmailDomain } from "../../utils/emailValidator";
+import PageTransition from '../../components/PageTransition/PageTransition';
 
 const Register = () => {
   // Existing state variables
@@ -216,227 +217,229 @@ const Register = () => {
   // Select the appropriate logo based on theme
   const currentLogo = theme ? darkLogo : lightLogo;
 
-  return <>
-    <div className={`min-h-screen flex flex-col ${theme ? "bg-gradient-to-b from-black to-gray-900 via-black text-white" : "bg-white text-zinc-900"}`}>
-      <div className='flex items-center justify-between px-6 md:px-[200px] py-4'>
-        <Link to='/'>
-          <img 
-            src={currentLogo} 
-            className='h-10 w-auto object-contain' 
-            alt="Bloggify Logo" 
-          />
-        </Link>
-        
-        <div className="flex items-center space-x-4">
-          {/* Theme Toggle Button */}
-          <button 
-            onClick={handleTheme} 
-            className="flex items-center justify-center w-9 h-9 rounded-full hover:bg-opacity-80"
-          >
-            {theme ? <BsMoonStarsFill className='text-white text-lg' /> : <MdSunny className='text-[#1576D8] text-xl' />}
-          </button>
+  return (
+    <PageTransition type="fadeInUp">
+      <div className={`min-h-screen flex flex-col ${theme ? "bg-gradient-to-b from-black to-gray-900 via-black text-white" : "bg-white text-zinc-900"}`}>
+        <div className='flex items-center justify-between px-6 md:px-[200px] py-4'>
+          <Link to='/'>
+            <img 
+              src={currentLogo} 
+              className='h-10 w-auto object-contain' 
+              alt="Bloggify Logo" 
+            />
+          </Link>
           
-          <h3 className={theme ? 'text-white' : 'text-[#1576D8]'}>
-            <Link to='/login'>Login</Link>
-          </h3>
+          <div className="flex items-center space-x-4">
+            {/* Theme Toggle Button */}
+            <button 
+              onClick={handleTheme} 
+              className="flex items-center justify-center w-9 h-9 rounded-full hover:bg-opacity-80"
+            >
+              {theme ? <BsMoonStarsFill className='text-white text-lg' /> : <MdSunny className='text-[#1576D8] text-xl' />}
+            </button>
+            
+            <h3 className={theme ? 'text-white' : 'text-[#1576D8]'}>
+              <Link to='/login'>Login</Link>
+            </h3>
+          </div>
         </div>
-      </div>
-      
-      <div className="flex-grow pb-10 flex items-center justify-center">
-        <div className={`rounded-lg border ${theme ? "border-slate-800 bg-black/70 text-white" : "border-gray-200 bg-white text-zinc-900"} shadow-md max-w-md w-full`}>
-          <div className="flex h-full flex-col justify-center gap-4 p-6">
-            <div className="left-0 right-0 inline-block border-gray-200 px-2 py-2.5 sm:px-4">
-              <form className="flex flex-col gap-4 pb-4" onSubmit={handleSubmit}>
-                <h1 className="mb-4 text-2xl font-bold ">Register</h1>
+        
+        <div className="flex-grow pb-10 flex items-center justify-center">
+          <div className={`rounded-lg border ${theme ? "border-slate-800 bg-black/70 text-white" : "border-gray-200 bg-white text-zinc-900"} shadow-md max-w-md w-full`}>
+            <div className="flex h-full flex-col justify-center gap-4 p-6">
+              <div className="left-0 right-0 inline-block border-gray-200 px-2 py-2.5 sm:px-4">
+                <form className="flex flex-col gap-4 pb-4" onSubmit={handleSubmit}>
+                  <h1 className="mb-4 text-2xl font-bold ">Register</h1>
 
 
-                <div className="flex w-full">
-                  {/* Left Div */}
-                  <div className="w-1/2 pr-2">
+                  <div className="flex w-full">
+                    {/* Left Div */}
+                    <div className="w-1/2 pr-2">
+                      <div className="mb-2">
+                        <label className={`text-sm font-medium ${theme ? "text-white" : "text-gray-700"}`} htmlFor="firstname">Firstname:</label>
+                      </div>
+                      <div className="relative">
+                        <input
+                          value={firstname}
+                          onChange={(e) => setFirstname(e.target.value)}
+                          className={`block w-full border ${
+                            theme 
+                              ? "bg-black border-slate-800 text-white" 
+                              : "bg-white border-gray-300 text-gray-900"
+                          } focus:border-cyan-500 placeholder-gray-400 focus:ring-cyan-500 p-2.5 text-sm rounded-lg`}
+                          type="text"
+                          name="firstname"
+                          placeholder="Firstname"
+                          maxLength={10}
+                          required
+                        />
+                      </div>
+                      <span className='text-xs float-end mt-2 text-gray-400'>{firstname.length}/10</span>
+                    </div>
+
+                    {/* Right Div */}
+                    <div className="w-1/2 pl-2">
+                      <div className="mb-2">
+                        <label className={`text-sm font-medium ${theme ? "text-white" : "text-gray-700"}`} htmlFor="lastname">Lastname:</label>
+                      </div>
+                      <div className="relative">
+                        <input
+                          value={lastname}
+                          onChange={(e) => setLastname(e.target.value)}
+                          className={`block w-full border ${
+                            theme 
+                              ? "bg-black border-slate-800 text-white" 
+                              : "bg-white border-gray-300 text-gray-900"
+                          } focus:border-cyan-500 placeholder-gray-400 focus:ring-cyan-500 p-2.5 text-sm rounded-lg`}
+                          type="text"
+                          name="lastname"
+                          placeholder="Lastname"
+                          maxLength={10}
+                          required
+                        />
+                        <span className='text-xs float-end mt-2 text-gray-400'>{lastname.length}/10</span>
+                      </div>
+                    </div>
+                  </div>
+
+
+
+                  <div>
                     <div className="mb-2">
-                      <label className={`text-sm font-medium ${theme ? "text-white" : "text-gray-700"}`} htmlFor="firstname">Firstname:</label>
+                      <label className={`text-sm font-medium ${theme ? "text-white" : "text-gray-700"}`} htmlFor="username">Username:</label>
                     </div>
-                    <div className="relative">
-                      <input
-                        value={firstname}
-                        onChange={(e) => setFirstname(e.target.value)}
-                        className={`block w-full border ${
-                          theme 
-                            ? "bg-black border-slate-800 text-white" 
-                            : "bg-white border-gray-300 text-gray-900"
-                        } focus:border-cyan-500 placeholder-gray-400 focus:ring-cyan-500 p-2.5 text-sm rounded-lg`}
-                        type="text"
-                        name="firstname"
-                        placeholder="Firstname"
-                        maxLength={10}
-                        required
-                      />
-                    </div>
-                    <span className='text-xs float-end mt-2 text-gray-400'>{firstname.length}/10</span>
-                  </div>
-
-                  {/* Right Div */}
-                  <div className="w-1/2 pl-2">
-                    <div className="mb-2">
-                      <label className={`text-sm font-medium ${theme ? "text-white" : "text-gray-700"}`} htmlFor="lastname">Lastname:</label>
-                    </div>
-                    <div className="relative">
-                      <input
-                        value={lastname}
-                        onChange={(e) => setLastname(e.target.value)}
-                        className={`block w-full border ${
-                          theme 
-                            ? "bg-black border-slate-800 text-white" 
-                            : "bg-white border-gray-300 text-gray-900"
-                        } focus:border-cyan-500 placeholder-gray-400 focus:ring-cyan-500 p-2.5 text-sm rounded-lg`}
-                        type="text"
-                        name="lastname"
-                        placeholder="Lastname"
-                        maxLength={10}
-                        required
-                      />
-                      <span className='text-xs float-end mt-2 text-gray-400'>{lastname.length}/10</span>
-                    </div>
-                  </div>
-                </div>
-
-
-
-                <div>
-                  <div className="mb-2">
-                    <label className={`text-sm font-medium ${theme ? "text-white" : "text-gray-700"}`} htmlFor="username">Username:</label>
-                  </div>
-                  <div className="flex w-full rounded-lg pt-1">
-                    <div className="relative w-full">
-                      <input
-                        value={username} 
-                        onChange={handleUsernameChange} 
-                        className={`block w-full border ${theme ? "bg-black border-slate-800 text-white" : "bg-white border-gray-300 text-gray-900"} focus:border-cyan-500 placeholder-gray-400 focus:ring-cyan-500 p-2.5 text-sm rounded-lg ${!isUsernameAvailable && username.length > 2 ? "border-red-500" : isUsernameAvailable && username.length > 2 ? "border-green-500" : ""}`}
-                        type="text" 
-                        name="username" 
-                        placeholder='@exampleuser' 
-                        required 
-                        maxLength={15}
-                      />
-                      
-                      {/* Username availability indicator */}
-                      {username && (
-                        <div className="absolute right-4 top-3">
-                          {isCheckingUsername ? (
-                            <LoaderCircle size={16} className="animate-spin" />
-                          ) : !validateUsername(username).valid && username.length > 1 ? (
-                            // Only show warning for invalid format when there's meaningful input
-                            <FaTimes className="text-yellow-500" />
-                          ) : isUsernameAvailable ? (
-                            // Show green check for valid and available 
-                            <FaCheck className="text-green-500" />
-                          ) : (
-                            // Show red X for taken
-                            <FaTimes className="text-red-500" />
+                    <div className="flex w-full rounded-lg pt-1">
+                      <div className="relative w-full">
+                        <input
+                          value={username} 
+                          onChange={handleUsernameChange} 
+                          className={`block w-full border ${theme ? "bg-black border-slate-800 text-white" : "bg-white border-gray-300 text-gray-900"} focus:border-cyan-500 placeholder-gray-400 focus:ring-cyan-500 p-2.5 text-sm rounded-lg ${!isUsernameAvailable && username.length > 2 ? "border-red-500" : isUsernameAvailable && username.length > 2 ? "border-green-500" : ""}`}
+                          type="text" 
+                          name="username" 
+                          placeholder='@exampleuser' 
+                          required 
+                          maxLength={15}
+                        />
+                        
+                        {/* Username availability indicator */}
+                        {username && (
+                          <div className="absolute right-4 top-3">
+                            {isCheckingUsername ? (
+                              <LoaderCircle size={16} className="animate-spin" />
+                            ) : !validateUsername(username).valid && username.length > 1 ? (
+                              // Only show warning for invalid format when there's meaningful input
+                              <FaTimes className="text-yellow-500" />
+                            ) : isUsernameAvailable ? (
+                              // Show green check for valid and available 
+                              <FaCheck className="text-green-500" />
+                            ) : (
+                              // Show red X for taken
+                              <FaTimes className="text-red-500" />
+                            )}
+                          </div>
+                        )}
+                        
+                        <div className="flex justify-between mt-1">
+                          <span className='text-xs text-gray-400'>{username.length}/15</span>
+                          {usernameMessage && (
+                            <span className={`text-xs ${isUsernameAvailable ? 'text-green-500' : 'text-red-500'}`}>
+                              {usernameMessage}
+                            </span>
                           )}
                         </div>
-                      )}
-                      
-                      <div className="flex justify-between mt-1">
-                        <span className='text-xs text-gray-400'>{username.length}/15</span>
-                        {usernameMessage && (
-                          <span className={`text-xs ${isUsernameAvailable ? 'text-green-500' : 'text-red-500'}`}>
-                            {usernameMessage}
-                          </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="mb-2">
+                      <label className={`text-sm font-medium ${theme ? "text-white" : "text-gray-700"}`} htmlFor="email">Email:</label>
+                    </div>
+                    <div className="flex w-full rounded-lg pt-1">
+                      <div className="relative w-full">
+                        <input
+                          value={email} onChange={handleEmailChange} className={`block w-full border ${theme ? "bg-black border-slate-800 text-white" : "bg-white border-gray-300 text-gray-900"} focus:border-cyan-500  placeholder-gray-400 focus:ring-cyan-500 p-2.5 text-sm rounded-lg ${!isEmailValid ? "border-red-500" : ""}`}
+                          id="email" type="email" name="email" placeholder="email@example.com" required
+                        />
+                        {!isEmailValid && (
+                          <p className="mt-1 text-xs text-red-500">
+                            {emailErrorMessage}
+                          </p>
                         )}
                       </div>
                     </div>
                   </div>
-                </div>
+                  <div>
 
-                <div>
-                  <div className="mb-2">
-                    <label className={`text-sm font-medium ${theme ? "text-white" : "text-gray-700"}`} htmlFor="email">Email:</label>
-                  </div>
-                  <div className="flex w-full rounded-lg pt-1">
-                    <div className="relative w-full">
-                      <input
-                        value={email} onChange={handleEmailChange} className={`block w-full border ${theme ? "bg-black border-slate-800 text-white" : "bg-white border-gray-300 text-gray-900"} focus:border-cyan-500  placeholder-gray-400 focus:ring-cyan-500 p-2.5 text-sm rounded-lg ${!isEmailValid ? "border-red-500" : ""}`}
-                        id="email" type="email" name="email" placeholder="email@example.com" required
-                      />
-                      {!isEmailValid && (
-                        <p className="mt-1 text-xs text-red-500">
-                          {emailErrorMessage}
-                        </p>
-                      )}
+                    <div className="mb-2">
+                      <label className={`text-sm font-medium ${theme ? "text-white" : "text-gray-700"}`} htmlFor="password">Password</label>
+                    </div>
+                    <div className="flex w-full rounded-lg pt-1">
+                      <div className="relative w-full">
+                        {showPassword ? <FaRegEye onClick={handleShowPassword} className='absolute right-4 top-3 cursor-pointer' /> : <FaEyeSlash className='absolute right-4 top-3 cursor-pointer' onClick={handleShowPassword} />}
+                        <input
+                          value={password} 
+                          onChange={(e) => setPassword(e.target.value)} 
+                          className={`block w-full border ${
+                            theme 
+                              ? "bg-black border-slate-800 text-white" 
+                              : "bg-white border-gray-300 text-gray-900"
+                          } focus:border-cyan-500 placeholder-gray-400 focus:ring-cyan-500 p-2.5 text-sm rounded-lg`}
+                          id="password" 
+                          type={showPassword ? "text" : "password"}
+                          name="password" 
+                          required 
+                          maxLength={16}
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div>
+                  <div className="flex flex-col gap-2">
+                    {/* Primary Register Button */}
+                    <button 
+                      type="submit"
+                      className={`w-full rounded-full py-3 px-6 font-medium text-base ${
+                        theme
+                          ? "bg-slate-100 text-black hover:bg-slate-200"
+                          : "bg-[#1576D8] text-white hover:bg-[#1465C0]"
+                      }`}
+                    >
+                      <div className="flex items-center justify-center gap-2">
+                        {loading ? (
+                          <LoaderCircle size={20} className="animate-spin" />
+                        ) : (
+                          "Register"
+                        )}
+                      </div>
+                    </button>
 
-                  <div className="mb-2">
-                    <label className={`text-sm font-medium ${theme ? "text-white" : "text-gray-700"}`} htmlFor="password">Password</label>
-                  </div>
-                  <div className="flex w-full rounded-lg pt-1">
-                    <div className="relative w-full">
-                      {showPassword ? <FaRegEye onClick={handleShowPassword} className='absolute right-4 top-3 cursor-pointer' /> : <FaEyeSlash className='absolute right-4 top-3 cursor-pointer' onClick={handleShowPassword} />}
-                      <input
-                        value={password} 
-                        onChange={(e) => setPassword(e.target.value)} 
-                        className={`block w-full border ${
-                          theme 
-                            ? "bg-black border-slate-800 text-white" 
-                            : "bg-white border-gray-300 text-gray-900"
-                        } focus:border-cyan-500 placeholder-gray-400 focus:ring-cyan-500 p-2.5 text-sm rounded-lg`}
-                        id="password" 
-                        type={showPassword ? "text" : "password"}
-                        name="password" 
-                        required 
-                        maxLength={16}
-                      />
+                    {/* OR divider */}
+                    <div className="flex items-center my-4">
+                      <div className="flex-grow border-t border-gray-300"></div>
+                      <span className={`px-4 text-sm ${theme ? "text-gray-400" : "text-gray-500"}`}>OR</span>
+                      <div className="flex-grow border-t border-gray-300"></div>
                     </div>
-                  </div>
-                </div>
-                <div className="flex flex-col gap-2">
-                  {/* Primary Register Button */}
-                  <button 
-                    type="submit"
-                    className={`w-full rounded-full py-3 px-6 font-medium text-base ${
-                      theme
-                        ? "bg-slate-100 text-black hover:bg-slate-200"
-                        : "bg-[#1576D8] text-white hover:bg-[#1465C0]"
-                    }`}
-                  >
-                    <div className="flex items-center justify-center gap-2">
-                      {loading ? (
-                        <LoaderCircle size={20} className="animate-spin" />
-                      ) : (
-                        "Register"
-                      )}
-                    </div>
-                  </button>
 
-                  {/* OR divider */}
-                  <div className="flex items-center my-4">
-                    <div className="flex-grow border-t border-gray-300"></div>
-                    <span className={`px-4 text-sm ${theme ? "text-gray-400" : "text-gray-500"}`}>OR</span>
-                    <div className="flex-grow border-t border-gray-300"></div>
+                    {/* Secondary Login Button */}
+                    <Link 
+                      to="/login" 
+                      className={`block w-full text-center rounded-full py-3 px-6 font-medium text-base border ${
+                        theme
+                          ? "border-slate-300 text-white hover:bg-slate-800"
+                          : "border-[#1576D8] text-[#1576D8] hover:bg-gray-50"
+                      }`}
+                    >
+                      Sign In
+                    </Link>
                   </div>
-
-                  {/* Secondary Login Button */}
-                  <Link 
-                    to="/login" 
-                    className={`block w-full text-center rounded-full py-3 px-6 font-medium text-base border ${
-                      theme
-                        ? "border-slate-300 text-white hover:bg-slate-800"
-                        : "border-[#1576D8] text-[#1576D8] hover:bg-gray-50"
-                    }`}
-                  >
-                    Sign In
-                  </Link>
-                </div>
-              </form>
+                </form>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  </>
+    </PageTransition>
+  );
 };
 
 

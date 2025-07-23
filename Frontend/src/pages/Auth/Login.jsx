@@ -13,6 +13,7 @@ import darkLogo from '../../assets/Bloggify white.png';
 import lightLogo from '../../assets/Bloggify.png';
 import { useLoginMutation } from '../../api/auth';
 import { LoaderCircle } from 'lucide-react';
+import PageTransition from '../../components/PageTransition/PageTransition';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -65,7 +66,7 @@ const Login = () => {
   };
 
   return (
-    <>
+    <PageTransition type="fadeInUp">
       <div className={`min-h-screen flex flex-col ${theme ? "bg-gradient-to-b from-black to-gray-900 via-black text-white" : "bg-white text-zinc-900"}`}>
         <div className='flex items-center justify-between px-6 md:px-[200px] py-4'>
           <Link to='/'>
@@ -194,7 +195,7 @@ const Login = () => {
           </div>
         </div>
       </div>
-    </>
+    </PageTransition>
   );
 };
 
