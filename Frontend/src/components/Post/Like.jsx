@@ -37,10 +37,6 @@ const Like = ({ postId }) => {
             );
             
             setIsLiked(userHasLiked);
-            
-            // CRITICAL FIX: Don't dispatch inside this effect
-            // This was causing the infinite loop by updating Redux state
-            // which triggered re-renders and called this effect again
         }
     }, [data, userId, postId]); // Remove likedPosts from dependencies
 
