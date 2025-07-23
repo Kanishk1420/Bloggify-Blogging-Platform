@@ -41,8 +41,11 @@ const Sidebar = () => {
         <div className={`
             w-full mx-auto max-w-xs md:max-w-sm lg:max-w-md
             px-4 py-3 my-4 md:my-6
-            rounded-xl shadow-sm
-            ${theme ? 'bg-zinc-900/50 text-white' : 'bg-white text-gray-800 border border-gray-100'}
+            rounded-xl 
+            ${theme 
+                ? 'bg-zinc-900/50 text-white shadow-sm' 
+                : 'bg-white text-gray-800 border border-gray-100 shadow-lg shadow-gray-400/50'
+            }
         `}>
             <div className="mb-3 border-b pb-2 border-gray-700/30">
                 <h2 className="font-bold text-lg">

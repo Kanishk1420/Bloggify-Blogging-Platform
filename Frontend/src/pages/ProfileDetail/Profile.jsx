@@ -229,11 +229,15 @@ const Profile = () => {
                       theme ? "bg-gray-700" : "bg-gray-300"
                     }`}></div>
                   ) : (
-                    <img 
-                      src={userData?.profilePhoto?.url ?? avatar} 
-                      alt='profile' 
-                      className="w-24 h-24 rounded-full object-cover border-4 border-white dark:border-zinc-900 shadow-md" 
-                    />
+                    <div className={`w-24 h-24 rounded-full overflow-hidden border-4 ${
+                      theme ? "border-zinc-900 bg-zinc-900" : "border-white bg-white"
+                    } shadow-md`}>
+                      <img 
+                        src={userData?.profilePhoto?.url ?? avatar} 
+                        alt='profile' 
+                        className="w-full h-full object-cover" 
+                      />
+                    </div>
                   )}
                 </div>
                 
