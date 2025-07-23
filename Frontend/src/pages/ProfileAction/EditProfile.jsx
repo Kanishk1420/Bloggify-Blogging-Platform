@@ -523,11 +523,15 @@ const EditProfile = () => {
         role="progressbar"
         aria-labelledby="ProgressLabel"
         aria-valuenow={loading}
-        className="block rounded-full bg-slate-700 relative overflow-hidden"
+        className={`block rounded-full relative overflow-hidden ${
+          theme ? "bg-slate-800" : "bg-gray-100"
+        }`}
         style={{ height: "3px" }}
       >
         <span
-          className="block absolute inset-0 bg-indigo-600"
+          className={`block absolute inset-0 ${
+            theme ? "bg-indigo-600" : "bg-blue-500"
+          }`}
           style={{ width: `${loading}%`, transition: "width 0.3s ease-in-out" }}
         ></span>
       </span>
@@ -1032,7 +1036,8 @@ const EditProfile = () => {
                         !formChanged && !hasChanges()
                           ? "bg-gray-400 cursor-not-allowed text-white"
                           : theme
-                          ? "w-full md:w-auto px-8 py-3 rounded-lg font-medium transition bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white":"w-full md:w-auto px-8 py-3 rounded-lg font-medium transition bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white"
+                          ? "w-full md:w-auto px-8 py-3 rounded-lg font-medium transition bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white"
+                          : "w-full md:w-auto px-8 py-3 rounded-lg font-medium transition bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white"
                       } transition-colors`}
                     >
                       {loading > 0 ? (

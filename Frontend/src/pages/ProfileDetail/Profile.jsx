@@ -261,7 +261,16 @@ const Profile = () => {
                     {/* Action Buttons */}
                     <div className="flex justify-center mb-4">
                       {userInfo?.user?._id === userId ? (
-                         <button className='btn-donate mt-3 btn-custom' onClick={() => navigate(`/profile/edit/${userInfo?.user?._id}`)}>Edit profile</button>
+                        <button 
+                          className={`btn-donate mt-3 btn-custom ${
+                            theme 
+                              ? '' // Keep dark mode styling unchanged 
+                              : '!bg-gray-300 hover:!bg-[#1576D8] hover:text-white hover:shadow-[#1576D8]/20'
+                          }`} 
+                          onClick={() => navigate(`/profile/edit/${userInfo?.user?._id}`)}
+                        >
+                          Edit profile
+                        </button>
                       ) : (
                         <div>
                           {isFollowerData?.followers?.find((user) => user._id === userInfo?.user?._id) ? (
