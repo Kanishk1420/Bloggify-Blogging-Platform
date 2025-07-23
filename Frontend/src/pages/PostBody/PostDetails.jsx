@@ -435,7 +435,7 @@ const PostDetails = () => {
                         : "bg-blue-100 hover:bg-blue-200 text-blue-800"
                     } transition-colors`}
                   >
-                    <BiEdit size={18} />
+                    <BiEdit size={18} className={theme ? "" : "text-blue-600"} />
                     <span>Edit</span>
                   </button>
                   <button
@@ -446,7 +446,7 @@ const PostDetails = () => {
                         : "bg-red-100 hover:bg-red-200 text-red-800"
                     } transition-colors`}
                   >
-                    <MdDelete size={18} />
+                    <MdDelete size={18} className={theme ? "" : "text-red-600"} />
                     <span>Delete</span>
                   </button>
                 </div>
