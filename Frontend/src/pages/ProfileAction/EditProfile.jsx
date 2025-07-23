@@ -521,31 +521,6 @@ const EditProfile = () => {
   // Add this RTK query hook for the delete operation
   const [deleteUser] = userApi.useDeleteUserMutation();
 
-  // Add this effect to handle delete confirmation
-  useEffect(() => {
-    if (isDeleting) {
-      const handleDelete = async () => {
-        try {
-          setLoading(10);
-          const response = await deleteUser(userId).unwrap();
-          toast.success("Account deleted successfully.");
-          setLoading(100);
-
-          // Navigate to home or login page after deletion
-          setTimeout(() => {
-            navigate("/");
-          }, 500);
-        } catch (err) {
-          console.error("Delete error:", err);
-          toast.error(err?.data?.message || "Failed to delete account");
-          setLoading(0);
-        }
-      };
-
-      handleDelete();
-    }
-  }, [isDeleting, deleteUser, userId, navigate]);
-
   // Handle account deletion
   const handleDeleteAccount = async () => {
     if (deleteConfirmText !== "DELETE") return;
@@ -577,7 +552,7 @@ const EditProfile = () => {
         setLoading(100);
       }, 1000);
     } catch (err) {
-      console.error("Delete account error:", err);
+      console.error("Delete error:", err);
       toast.error(
         err?.data?.message || "Failed to delete account. Please try again."
       );
