@@ -324,7 +324,7 @@ const PostDetails = () => {
                       navigate(`/profile/${data?.getPost?.userId}`)
                     }
                   >
-                    {userData?.user?.username}
+                    {userData?.user?.firstname} {userData?.user?.lastname}
                   </p>
                   {userId === data?.getPost?.userId && (
                     <p

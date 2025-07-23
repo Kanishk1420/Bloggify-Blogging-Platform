@@ -86,7 +86,11 @@ const Comment = ({ comment, userData }) => {
                     <div className='flex items-center justify-between'>
                         <div className='flex items-center'>
                             <img src={data?.user?.profilePhoto?.url ?? avatar} alt="" className='w-10 h-10 object-cover rounded-full mt-2' />
-                            <p className='font-bold cursor-pointer ml-2' onClick={() => navigate(`/profile/${comment.userId}`)}>{comment.author}</p>
+                            <div className='ml-2'>
+                                <p className='font-bold cursor-pointer' onClick={() => navigate(`/profile/${comment.userId}`)}>
+                                    {data?.user?.firstname} {data?.user?.lastname}
+                                </p>
+                            </div>
                         </div>
                         <div className='flex justify-center items-center space-x-4 text-sm'>
                             {/* Enhanced timestamp display */}
@@ -137,11 +141,12 @@ const Comment = ({ comment, userData }) => {
                         </div>
                     }
                     
-                    {!editMode && <p className='mx-14'>{comment.comment}</p>}
+                    {/* Reduced margin on comment text */}
+                    {!editMode && <p className='ml-12 -mt-2'>{comment.comment}</p>}
                     
-                    {/* Add Like/Dislike UI here */}
+                    {/* Adjusted margin on like/dislike buttons */}
                     {!editMode && (
-                        <div className="flex items-center space-x-4 mt-2 ml-14">
+                        <div className="flex items-center space-x-4 mt-2 ml-12">
                             <CommentLike comment={comment} />
                             <CommentDislike comment={comment} />
                         </div>

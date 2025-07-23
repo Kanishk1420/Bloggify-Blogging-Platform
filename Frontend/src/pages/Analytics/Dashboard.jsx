@@ -306,18 +306,32 @@ const Dashboard = () => {
                             alt={followingUser.username || "Follower"}
                           />
                           <div className="ml-3">
-                            <p className="font-medium">
-                              {followingUser.username}
-                            </p>
+                            {/* Show full name first as primary information */}
                             {followingUser.firstname &&
-                              followingUser.lastname && (
+                            followingUser.lastname ? (
+                              <p className="font-medium">
+                                {followingUser.firstname}{" "}
+                                {followingUser.lastname}
+                              </p>
+                            ) : (
+                              <p className="font-medium">
+                                {followingUser.username}
+                              </p>
+                            )}
+
+                            {/* Show username as secondary information */}
+                            {followingUser.username &&
+                              (followingUser.firstname ||
+                                followingUser.lastname) && (
                                 <p
                                   className={`text-xs ${
                                     theme ? "text-gray-400" : "text-gray-500"
                                   }`}
                                 >
-                                  {followingUser.firstname}{" "}
-                                  {followingUser.lastname}
+                                  @
+                                  {followingUser.username.startsWith("@")
+                                    ? followingUser.username.substring(1)
+                                    : followingUser.username}
                                 </p>
                               )}
                           </div>

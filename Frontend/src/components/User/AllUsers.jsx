@@ -38,8 +38,8 @@ const AllUsers = ({ user, onFollowSuccess }) => {
                     <h3 className={`font-medium truncate max-w-[120px] ${theme ? "text-white" : "text-gray-900"}`}>
                         {user.firstname} {user.lastname}
                     </h3>
-                    <p className={`text-xs truncate max-w-[120px] ${theme ? "text-gray-400" : "text-gray-600"}`}>
-                        @{user.username}
+                    <p className="text-sm text-gray-500">
+                        {user.username.startsWith('@') ? user.username : `@${user.username}`}
                     </p>
                 </div>
             </Link>
