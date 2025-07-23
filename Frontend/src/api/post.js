@@ -16,7 +16,7 @@ export const postApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ["Post", "SinglePost"],
+  tagTypes: ["Post", "Analytics"], // Make sure Analytics is included in tagTypes
   endpoints: (builder) => ({
     getAllPost: builder.query({
       query: () => `/post/?populate=true`, // Make sure this matches your backend API
@@ -105,22 +105,20 @@ export const postApi = createApi({
 
     addBookmark: builder.mutation({
       query: (id) => ({
-        url: `/post/addbookmark/${id}`,
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        url: `/post/bookmark/${id}`,
+        method: "POST",
       }),
+      // Invalidate both Post and Analytics tags
+      invalidatesTags: ["Post", "Analytics"],
     }),
 
     removeBookmark: builder.mutation({
       query: (id) => ({
-        url: `/post/removebookmark/${id}`,
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        url: `/post/bookmark/remove/${id}`,
+        method: "DELETE",
       }),
+      // Invalidate both Post and Analytics tags
+      invalidatesTags: ["Post", "Analytics"],
     }),
 
     getFollowingPost: builder.query({
@@ -128,7 +126,9 @@ export const postApi = createApi({
     }),
 
     getAnalytics: builder.query({
-      query: () => "post/analytics",
+      query: () => "/post/analytics",
+      // Provide the Analytics tag
+      providesTags: ["Analytics"],
     }),
 
     // Add these new endpoints

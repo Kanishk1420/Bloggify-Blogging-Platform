@@ -39,8 +39,8 @@ router.put("/unlike/:id", isAuthenticated, unlikePost);
 router.put("/dislike/:id", isAuthenticated, dislikePost);
 router.put("/undislike/:id", isAuthenticated, undislikePost);
 
-router.put("/addbookmark/:id", isAuthenticated, addBookmark);
-router.put("/removebookmark/:id", isAuthenticated, removeBookmark);
+router.post("/bookmark/:id", isAuthenticated, addBookmark);
+router.delete("/bookmark/remove/:id", isAuthenticated, removeBookmark);
 
 //Image Upload
 
