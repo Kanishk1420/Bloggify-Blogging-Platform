@@ -98,12 +98,12 @@ const AllUsersList = ({ users: initialUsers }) => {
                 alt={user.username}
                 className="w-12 h-12 rounded-full object-cover border border-gray-200 shadow-sm"
               />
-              <div>
-                <h3 className={`font-semibold ${theme ? "text-white" : "text-gray-900"}`}>
+              <div className="user-details">
+                <p className={`font-bold ${theme ? "text-white" : "text-gray-900"}`}>
                   {user.firstname} {user.lastname}
-                </h3>
+                </p>
                 <p className={`text-sm ${theme ? "text-gray-400" : "text-gray-600"}`}>
-                  @{user.username}
+                  {user.username.startsWith('@') ? user.username : `@${user.username}`}
                 </p>
               </div>
             </div>

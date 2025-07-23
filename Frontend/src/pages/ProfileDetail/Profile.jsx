@@ -283,7 +283,7 @@ const Profile = () => {
                                   ? "bg-gray-500 cursor-not-allowed"
                                   : theme
                                     ? "bg-gray-200 hover:bg-gray-300 text-black" 
-                                    : "bg-zinc-800 hover:bg-zinc-700 text-white"
+                                    : "bg-zinc-900 hover:bg-zinc-700 text-white"
                               }`}
                             >
                               {/* Button content remains the same */}
