@@ -107,7 +107,10 @@ const Navbar = () => {
 
   // Redirect to login if not authenticated and trying to access a protected route
   useEffect(() => {
-    if (!userInfo && !["/", "/login", "/register", "/reset-password"].includes(path)) {
+    if (
+      !userInfo &&
+      !["/", "/login", "/register", "/reset-password"].includes(path)
+    ) {
       navigate("/");
     }
   }, [userInfo, path, navigate]);
@@ -239,17 +242,17 @@ const Navbar = () => {
                 </button>
 
                 <div
-                  className={`absolute right-0 mt-2 w-48 z-50 transform transition-all duration-300 origin-top-right
-                                        ${
-                                          menuState === "closed"
-                                            ? "opacity-0 scale-95 pointer-events-none"
-                                            : menuState === "open"
-                                            ? "opacity-100 scale-100"
-                                            : menuState === "opening"
-                                            ? "opacity-100 scale-100"
-                                            : "opacity-0 scale-95"
-                                        }
-                                    `}
+                  className={`absolute right-0 mt-2 z-50 transform transition-all duration-300 origin-top-right
+    ${
+      menuState === "closed"
+        ? "opacity-0 scale-95 pointer-events-none"
+        : menuState === "open"
+        ? "opacity-100 scale-100"
+        : menuState === "opening"
+        ? "opacity-100 scale-100"
+        : "opacity-0 scale-95"
+    }
+  `}
                 >
                   {(menuState === "open" ||
                     menuState === "opening" ||
