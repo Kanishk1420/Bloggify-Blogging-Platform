@@ -262,6 +262,36 @@ const Landing = () => {
     checkAuthAndProceed(destination);
   };
 
+  // Extract and count categories from all posts
+  const getPopularCategories = () => {
+    if (!data?.allPost || !Array.isArray(data.allPost)) return [];
+    
+    // Create a map to count category occurrences
+    const categoryCount = {};
+    
+    // Loop through all posts and count categories
+    data.allPost.forEach(post => {
+      if (post.categories && Array.isArray(post.categories)) {
+        post.categories.forEach(category => {
+          if (category) {
+            categoryCount[category] = (categoryCount[category] || 0) + 1;
+          }
+        });
+      }
+    });
+    
+    // Convert to array and sort by count (descending)
+    const sortedCategories = Object.keys(categoryCount)
+      .map(category => ({ name: category, count: categoryCount[category] }))
+      .sort((a, b) => b.count - a.count);
+    
+    // Return top 5 categories (or fewer if there aren't 5)
+    return sortedCategories.slice(0, 5);
+  };
+
+  // Get popular categories
+  const popularCategories = getPopularCategories();
+
   return (
     <>
       {/* Theme toggle button in top-right corner */}
@@ -302,28 +332,61 @@ const Landing = () => {
                 content from our community of passionate writers and industry experts.
               </p>
               
-              {/* Get Started Button */}
+              {/* Updated Get Started Button with Gradient Style */}
               <div className="mb-8">
                 <button 
                   onClick={() => checkAuthAndProceed('/home')}
-                  className={`w-full sm:w-auto flex items-center justify-center px-8 py-4 text-lg font-medium rounded-lg transition-all transform hover:scale-[1.03] ${
-                    theme 
-                      ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/30' 
-                      : 'bg-[#2563EB] hover:bg-[#1D4ED8] text-white shadow-lg shadow-blue-500/30'
-                  }`}
+                  className="w-full md:w-auto px-8 py-3 rounded-lg font-medium transition flex items-center justify-center bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white"
                 >
-                  Get Started
+                  <span>Get Started</span>
                   <FaArrowRight className="ml-2" />
                 </button>
               </div>
               
-              {/* Popular Tags */}
+              {/* Popular Tags - Dynamic with Purple Styling */}
               <div>
                 <span className={`${theme ? 'text-gray-300' : 'text-slate-600'} font-medium mr-4`}>Popular Tags:</span>
                 <div className="inline-flex flex-wrap gap-3 mt-3">
-                  <span className="bg-blue-100 text-blue-600 px-5 py-1.5 rounded-full text-base italic font-medium">Design</span>
-                  <span className="bg-blue-100 text-blue-600 px-5 py-1.5 rounded-full text-base italic font-medium">Development</span>
-                  <span className="bg-blue-100 text-blue-600 px-5 py-1.5 rounded-full text-base italic font-medium">Technology</span>
+                  {popularCategories.length > 0 ? (
+                    popularCategories.map((category, index) => (
+                      <span 
+                        key={index} 
+                        className={`px-4 py-1.5 rounded-full text-base font-medium transition-colors ${
+                          theme 
+                            ? "bg-purple-900/50 text-purple-300 border border-purple-800/50 hover:bg-purple-800/40" 
+                            : "bg-purple-100 text-purple-700 border border-purple-200 hover:bg-purple-50"
+                        }`}
+                        onClick={() => checkAuthAndProceed(`/?category=${encodeURIComponent(category.name)}`)}
+                      >
+                        {category.name}
+                      </span>
+                    ))
+                  ) : (
+                    // Fallback to default categories if no data is available
+                    <>
+                      <span className={`px-4 py-1.5 rounded-full text-base font-medium transition-colors ${
+                        theme 
+                          ? "bg-purple-900/50 text-purple-300 border border-purple-800/50 hover:bg-purple-800/40" 
+                          : "bg-purple-100 text-purple-700 border border-purple-200 hover:bg-purple-50"
+                      }`}>
+                        Design
+                      </span>
+                      <span className={`px-4 py-1.5 rounded-full text-base font-medium transition-colors ${
+                        theme 
+                          ? "bg-purple-900/50 text-purple-300 border border-purple-800/50 hover:bg-purple-800/40" 
+                          : "bg-purple-100 text-purple-700 border border-purple-200 hover:bg-purple-50"
+                      }`}>
+                        Development
+                      </span>
+                      <span className={`px-4 py-1.5 rounded-full text-base font-medium transition-colors ${
+                        theme 
+                          ? "bg-purple-900/50 text-purple-300 border border-purple-800/50 hover:bg-purple-800/40" 
+                          : "bg-purple-100 text-purple-700 border border-purple-200 hover:bg-purple-50"
+                      }`}>
+                        Technology
+                      </span>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
@@ -342,7 +405,7 @@ const Landing = () => {
             : 'bg-gray-50'
         }`}>
           <div className="container mx-auto px-4 md:px-6 lg:px-8">
-            <h2 className={`text-3xl font-bold mb-10 text-center ${theme ? 'text-white' : 'text-[#1576D8]'}`}>
+            <h2 className={`text-3xl font-bold mb-10 text-center ${theme ? 'text-white' : 'text-gray-600'}`}>
               Latest Articles
             </h2>
             
