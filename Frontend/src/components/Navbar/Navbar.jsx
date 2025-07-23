@@ -105,9 +105,12 @@ const Navbar = () => {
     };
   }, [menuState]);
 
-  if (!userInfo) {
-    return navigate("/login");
-  }
+  // Redirect to login if not authenticated and trying to access a protected route
+  useEffect(() => {
+    if (!userInfo && !["/", "/login", "/register", "/reset-password"].includes(path)) {
+      navigate("/");
+    }
+  }, [userInfo, path, navigate]);
 
   return (
     <>
