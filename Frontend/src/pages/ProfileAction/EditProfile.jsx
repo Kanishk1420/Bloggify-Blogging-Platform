@@ -6,7 +6,11 @@ import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import avatar from "../../assets/avatar.jpg";
 import { userApi } from "../../api/user";
-import { useGetUserQuery, useUpdateUserMutation, useDeleteUserMutation } from "../../api/user";
+import {
+  useGetUserQuery,
+  useUpdateUserMutation,
+  useDeleteUserMutation,
+} from "../../api/user";
 import { setCredentials } from "../../slices/AuthSlice";
 import Navbar from "../../components/Navbar/Navbar";
 import Footer from "../../components/Footer/Footer";
@@ -85,11 +89,6 @@ const EditProfile = () => {
       console.log("USERNAME FROM API:", user.username);
       console.log("USERNAME FROM REDUX:", userInfo?.user?.username);
       console.log("CURRENT USERNAME STATE:", username);
-
-      // Preserve form values with priority from:
-      // 1. Form's current state if editing
-      // 2. Redux state as backup
-      // 3. API data as last resort
 
       setUserId(user._id || "");
 
@@ -550,41 +549,58 @@ const EditProfile = () => {
   // Handle account deletion
   const handleDeleteAccount = async () => {
     if (deleteConfirmText !== "DELETE") return;
-    
+
     try {
       setIsDeleting(true);
       setLoading(20);
-      
+
       // Make the API call to delete user
       const response = await deleteUser(userId).unwrap();
-      
+
       // Display success message
       toast.success("Your account has been permanently deleted");
       setLoading(80);
-      
+
       // Clear user data from Redux store
       dispatch(setCredentials(null));
-      
+
       // Clear localStorage
       localStorage.removeItem("userInfo");
       localStorage.removeItem("darkMode");
       localStorage.removeItem("likedPosts");
       localStorage.removeItem("bookmarkedPosts");
       localStorage.removeItem("postData");
-      
+
       // Redirect to homepage after a short delay
       setTimeout(() => {
-        navigate('/');
+        navigate("/");
         setLoading(100);
       }, 1000);
     } catch (err) {
       console.error("Delete account error:", err);
-      toast.error(err?.data?.message || "Failed to delete account. Please try again.");
+      toast.error(
+        err?.data?.message || "Failed to delete account. Please try again."
+      );
       setIsDeleting(false);
       setShowDeleteModal(false);
       setLoading(0);
     }
   };
+
+  // Add this effect to manage body scroll locking
+  useEffect(() => {
+    // When delete modal is shown, prevent background scrolling
+    if (showDeleteModal) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+    
+    // Cleanup function to ensure scroll is restored when component unmounts
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, [showDeleteModal]);
 
   return (
     <>
@@ -1087,8 +1103,9 @@ const EditProfile = () => {
                     </div>
                   </div>
 
-                  {/* Form Actions */}
-                  <div className="flex justify-between items-center pt-6 border-t border-gray-700/30">
+                  {/* Form Actions - Improved Layout */}
+                  <div className="flex flex-wrap justify-between items-center gap-4 pt-6 border-t border-gray-700/30">
+                    {/* Left: Cancel Button */}
                     <button
                       type="button"
                       onClick={() => navigate(`/profile/${id}`)}
@@ -1101,60 +1118,64 @@ const EditProfile = () => {
                       Cancel
                     </button>
 
-                    <button
-                      type="submit"
-                      disabled={!formChanged && !hasChanges()}
-                      className={`px-6 py-2.5 rounded-lg text-sm font-medium ${
-                        !formChanged && !hasChanges()
-                          ? "bg-gray-400 cursor-not-allowed text-white"
-                          : theme
-                          ? "w-full md:w-auto px-8 py-3 rounded-lg font-medium transition bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white"
-                          : "w-full md:w-auto px-8 py-3 rounded-lg font-medium transition bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white"
-                      } transition-colors`}
-                    >
-                      {loading > 0 ? (
-                        <span className="flex items-center">
-                          <svg
-                            className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                          >
-                            <circle
-                              className="opacity-25"
-                              cx="12"
-                              cy="12"
-                              r="10"
-                              stroke="currentColor"
-                              strokeWidth="4"
-                            ></circle>
-                            <path
-                              className="opacity-75"
-                              fill="currentColor"
-                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014.708 14H2c0 4.418 3.582 8 8 8v-2c-3.314 0-6-2.686-6-6zM20 12c0-4.418-3.582-8-8-8v2c3.314 0 6 2.686 6 6 0 1.385-.468 2.657-1.25 3.682l1.562 1.562A7.962 7.962 0 0020 12z"
-                            ></path>
-                          </svg>
-                          Saving...
-                        </span>
-                      ) : !formChanged && !hasChanges() ? (
-                        "No Changes"
-                      ) : (
-                        "Save Changes"
-                      )}
-                    </button>
+                    {/* Right: Action Buttons Container */}
+                    <div className="flex gap-4">
+                      {/* Delete Account Button */}
+                      <button
+                        type="button"
+                        onClick={() => setShowDeleteModal(true)}
+                        className={`px-6 py-2.5 rounded-lg text-sm font-medium ${
+                          theme
+                            ? "bg-red-900/40 text-red-200 hover:bg-red-900/60"
+                            : "bg-red-100 text-red-700 hover:bg-red-200"
+                        } transition-colors`}
+                      >
+                        Delete Account
+                      </button>
 
-                    {/* Add the Delete Account button */}
-                    <button
-                      type="button"
-                      onClick={() => setShowDeleteModal(true)}
-                      className={`px-6 py-2.5 rounded-lg text-sm font-medium 
-    ${theme
-      ? "bg-red-900/40 text-red-200 hover:bg-red-900/60"
-      : "bg-red-100 text-red-700 hover:bg-red-200"
-    } transition-colors ml-auto mr-4`}
-                    >
-                      Delete Account
-                    </button>
+                      {/* Save Changes Button */}
+                      <button
+                        type="submit"
+                        disabled={!formChanged && !hasChanges()}
+                        className={`px-6 py-2.5 rounded-lg text-sm font-medium ${
+                          !formChanged && !hasChanges()
+                            ? "bg-gray-400 cursor-not-allowed text-white"
+                            : theme
+                            ? "bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white"
+                            : "bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white"
+                        } transition-colors`}
+                      >
+                        {loading > 0 ? (
+                          <span className="flex items-center">
+                            <svg
+                              className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                            >
+                              <circle
+                                className="opacity-25"
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                stroke="currentColor"
+                                strokeWidth="4"
+                              ></circle>
+                              <path
+                                className="opacity-75"
+                                fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014.708 14H2c0 4.418 3.582 8 8 8v-2c-3.314 0-6-2.686-6-6zM20 12c0-4.418-3.582-8-8-8v2c3.314 0 6 2.686 6 6 0 1.385-.468 2.657-1.25 3.682l1.562 1.562A7.962 7.962 0 0020 12z"
+                              ></path>
+                            </svg>
+                            Saving...
+                          </span>
+                        ) : !formChanged && !hasChanges() ? (
+                          "No Changes"
+                        ) : (
+                          "Save Changes"
+                        )}
+                      </button>
+                    </div>
                   </div>
                 </form>
               </div>
@@ -1167,26 +1188,60 @@ const EditProfile = () => {
 
       {/* Delete Account Confirmation Modal */}
       {showDeleteModal && (
-        <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 ${theme ? "bg-black/80" : "bg-gray-900/50"}`}>
-          <div className={`w-full max-w-md p-6 rounded-lg shadow-lg ${theme ? "bg-zinc-800 text-white" : "bg-white text-gray-900"}`}>
+        <div
+          className={`fixed inset-0 z-50 flex items-center justify-center p-4 ${
+            theme ? "bg-black/80" : "bg-gray-900/50"
+          }`}
+        >
+          <div
+            className={`w-full max-w-md p-6 rounded-lg shadow-lg ${
+              theme ? "bg-zinc-800 text-white" : "bg-white text-gray-900"
+            }`}
+          >
             {/* Warning Icon */}
             <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-6">
-              <svg className="h-8 w-8 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              <svg
+                className="h-8 w-8 text-red-600"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                />
               </svg>
             </div>
 
-            <h3 className={`text-xl font-bold mb-2 text-center ${theme ? "text-red-400" : "text-red-600"}`}>
+            <h3
+              className={`text-xl font-bold mb-2 text-center ${
+                theme ? "text-red-400" : "text-red-600"
+              }`}
+            >
               Delete Account Permanently
             </h3>
-            
-            <p className={`text-center mb-6 ${theme ? "text-gray-300" : "text-gray-600"}`}>
-              This action <span className="font-bold">cannot be undone</span>. All your posts, comments, and profile data will be permanently deleted.
+
+            <p
+              className={`text-center mb-6 ${
+                theme ? "text-gray-300" : "text-gray-600"
+              }`}
+            >
+              This action <span className="font-bold">cannot be undone</span>.
+              All your posts, comments, and profile data will be permanently
+              deleted.
             </p>
-            
+
             <div className="mb-6">
-              <label className={`block mb-2 text-sm font-medium ${theme ? "text-gray-300" : "text-gray-700"}`}>
-                Type <span className="font-mono font-bold">DELETE</span> to confirm:
+              <label
+                className={`block mb-2 text-sm font-medium ${
+                  theme ? "text-gray-300" : "text-gray-700"
+                }`}
+              >
+                Type <span className="font-mono font-bold">DELETE</span> to
+                confirm:
               </label>
               <input
                 type="text"
@@ -1201,7 +1256,7 @@ const EditProfile = () => {
                 autoComplete="off"
               />
             </div>
-            
+
             <div className="flex gap-4">
               <button
                 onClick={() => {
@@ -1229,9 +1284,25 @@ const EditProfile = () => {
               >
                 {isDeleting ? (
                   <span className="flex items-center justify-center">
-                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014.708 14H2c0 4.418 3.582 8 8 8v-2c-3.314 0-6-2.686-6-6zM20 12c0-4.418-3.582-8-8-8v2c3.314 0 6 2.686 6 6 0 1.385-.468 2.657-1.25 3.682l1.562 1.562A7.962 7.962 0 0020 12z"></path>
+                    <svg
+                      className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014.708 14H2c0 4.418 3.582 8 8 8v-2c-3.314 0-6-2.686-6-6zM20 12c0-4.418-3.582-8-8-8v2c3.314 0 6 2.686 6 6 0 1.385-.468 2.657-1.25 3.682l1.562 1.562A7.962 7.962 0 0020 12z"
+                      ></path>
                     </svg>
                     Deleting...
                   </span>
