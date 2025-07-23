@@ -19,7 +19,7 @@ export const postApi = createApi({
   tagTypes: ["Post", "SinglePost"],
   endpoints: (builder) => ({
     getAllPost: builder.query({
-      query: () => `/post/`,
+      query: () => `/post/?populate=true`, // Make sure this matches your backend API
       providesTags: (result) =>
         result
           ? [

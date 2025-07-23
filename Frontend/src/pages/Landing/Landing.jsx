@@ -16,16 +16,9 @@ import blogSVG from "../../assets/undraw_blog_1ca8.svg";
 import blogPostSVG from "../../assets/undraw_blog-post_f68f.svg";
 import fashionBloggingSVG from "../../assets/undraw_fashion-blogging_wfoz.svg";
 import publishSVG from "../../assets/undraw_publish-article_u3z6.svg";
+import defaultAvatar from "../../assets/avatar.jpg";
 
-// Helper function to get user's initials
-const getUserInitials = (post) => {
-  if (post?.userId?.firstname) {
-    return post.userId.firstname[0].toUpperCase();
-  } else if (post?.firstname) {
-    return post.firstname[0].toUpperCase();
-  }
-  return 'U';
-};
+
 
 // Image Slider/Carousel Component
 const ImageSlider = ({ theme }) => {
@@ -90,6 +83,92 @@ const BlogCard = ({ post, theme }) => {
     month: 'short'
   });
 
+  // Function to get profile photo URL from various possible locations
+  const getProfilePhotoUrl = () => {
+    // Direct check for user profile in post object (common case)
+    if (post?.userId && typeof post.userId === 'object') {
+      // Check for profilePhoto as URL object
+      if (post.userId.profilePhoto?.url) return post.userId.profilePhoto.url;
+      // Check for profilePhoto as direct string URL
+      if (typeof post.userId.profilePhoto === 'string') return post.userId.profilePhoto;
+    }
+    
+    // Special handling for user photos when userId isn't populated
+    if (typeof post?.userId === 'string') {
+      if (post?.profilePhoto?.url) return post.profilePhoto.url;
+      if (typeof post?.profilePhoto === 'string') return post.profilePhoto;
+      if (post?.avatar) return post.avatar;
+      if (post?.defaultAvatar) return post.defaultAvatar;
+    }
+    
+    // Handle legacy or alternative data structures
+    if (post?.author?.avatar) return post.author.avatar;
+    
+    // Custom default avatar - replace with actual path to your 3D avatar image
+    return defaultAvatar;
+  };
+
+  // Get the author name from various possible locations
+  const getAuthorName = () => {
+    // If userId is populated with firstname/lastname
+    if (post?.userId && typeof post.userId === 'object' && post.userId.firstname) {
+      return `${post.userId.firstname} ${post.userId.lastname || ''}`;
+    }
+    // If post has firstname/lastname directly
+    else if (post?.firstname) {
+      return `${post.firstname} ${post.lastname || ''}`;
+    }
+    // If userId is populated with username
+    else if (post?.userId && typeof post.userId === 'object' && post.userId.username) {
+      return post.userId.username;
+    }
+    // If post has username directly
+    else if (post?.username) {
+      return post.username;
+    }
+    // Default
+    return "Anonymous";
+  };
+
+  // Get user initial for avatar fallback
+  const getUserInitial = () => {
+    // If userId is populated with firstname
+    if (post?.userId && typeof post.userId === 'object' && post.userId.firstname) {
+      return post.userId.firstname[0].toUpperCase();
+    }
+    // If post has firstname directly
+    else if (post?.firstname) {
+      return post.firstname[0].toUpperCase();
+    }
+    // If userId is populated with username
+    else if (post?.userId && typeof post.userId === 'object' && post.userId.username) {
+      const username = post.userId.username.replace(/^@/, ''); // Remove @ if present
+      return username[0].toUpperCase();
+    }
+    // If post has username directly
+    else if (post?.username) {
+      const username = post.username.replace(/^@/, ''); // Remove @ if present
+      return username[0].toUpperCase();
+    }
+    // Default
+    return "U";
+  };
+
+  const profilePhotoUrl = getProfilePhotoUrl();
+  const authorName = getAuthorName();
+  const userInitial = getUserInitial();
+
+  // Add this to your BlogCard component temporarily for debugging
+  useEffect(() => {
+    console.log('Post user data:', {
+      id: post._id,
+      userId: post.userId,
+      hasDirectProfilePhoto: !!post.profilePhoto,
+      photoUrlFound: getProfilePhotoUrl(),
+      fullPost: post
+    });
+  }, [post]);
+
   return (
     <div className={`h-full flex flex-col rounded-lg overflow-hidden transition-all transform hover:-translate-y-1
       ${theme 
@@ -98,13 +177,12 @@ const BlogCard = ({ post, theme }) => {
       }`}>
       
       {/* Image Section */}
-      <div className="relative pt-[56.25%]"> {/* 16:9 aspect ratio */}
+      <div className="relative pt-[56.25%]">
         <img
           src={post?.photo?.url || post?.image?.url || "https://via.placeholder.com/800x450?text=Blog+Image"}
           alt={post?.title || "Blog post"}
           className="absolute top-0 left-0 w-full h-full object-cover"
           onError={(e) => {
-            // Fallback for missing images
             e.target.src = "https://via.placeholder.com/800x450?text=Blog+Image";
           }}
         />
@@ -128,13 +206,20 @@ const BlogCard = ({ post, theme }) => {
           <div className="flex items-center">
             {/* Enhanced Profile Image with Better Fallback Strategy */}
             <div className="relative w-8 h-8 rounded-full mr-2 overflow-hidden">
-              {post?.userId?.profilePhoto?.url ? (
+              {profilePhotoUrl ? (
                 <img 
-                  src={post.userId.profilePhoto.url}
-                  alt={post?.userId?.firstname || "Author"} 
+                  src={profilePhotoUrl}
+                  alt={authorName}
                   className="w-full h-full object-cover"
                   onError={(e) => {
                     e.target.onerror = null; // Prevent infinite loop
+                    
+                    // Try to load from URL directly if possible
+                    if (typeof post?.userId === 'string' && post?.profilePhoto) {
+                      e.target.src = post.profilePhoto;
+                      return;
+                    }
+                    
                     // Create a canvas element for a more reliable fallback
                     const canvas = document.createElement('canvas');
                     canvas.width = 32;
@@ -150,7 +235,7 @@ const BlogCard = ({ post, theme }) => {
                     ctx.font = 'bold 16px Arial';
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
-                    ctx.fillText(getUserInitials(post), canvas.width/2, canvas.height/2);
+                    ctx.fillText(userInitial, canvas.width/2, canvas.height/2);
                     
                     // Set the canvas as the image source
                     e.target.src = canvas.toDataURL('image/png');
@@ -161,19 +246,14 @@ const BlogCard = ({ post, theme }) => {
                   theme ? 'bg-indigo-600' : 'bg-blue-500'
                 }`}>
                   <span className="text-white text-sm font-semibold">
-                    {getUserInitials(post)}
+                    {userInitial}
                   </span>
                 </div>
               )}
             </div>
             <div>
               <p className={`text-sm font-medium ${theme ? 'text-gray-200' : 'text-gray-800'}`}>
-                {post?.userId?.firstname && post?.userId?.lastname 
-                  ? `${post.userId.firstname} ${post.userId.lastname}`
-                  : post?.firstname && post?.lastname
-                    ? `${post.firstname} ${post.lastname}`
-                    : post?.username || post?.userId?.username || "Anonymous"
-                }
+                {authorName}
               </p>
               <div className="flex items-center text-xs">
                 <span className={`inline-block w-2 h-2 rounded-full mr-1 ${theme ? 'bg-green-400' : 'bg-green-500'}`}></span>
@@ -202,17 +282,25 @@ BlogCard.propTypes = {
     image: PropTypes.shape({
       url: PropTypes.string
     }),
-    profilePhoto: PropTypes.shape({
-      url: PropTypes.string
-    }),
-    userId: PropTypes.shape({
-      profilePhoto: PropTypes.shape({
+    profilePhoto: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.shape({
         url: PropTypes.string
-      }),
-      firstname: PropTypes.string,
-      lastname: PropTypes.string,
-      username: PropTypes.string
-    }),
+      })
+    ]),
+    avatar: PropTypes.string,
+    defaultAvatar: PropTypes.string,
+    userId: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.shape({
+        profilePhoto: PropTypes.shape({
+          url: PropTypes.string
+        }),
+        firstname: PropTypes.string,
+        lastname: PropTypes.string,
+        username: PropTypes.string
+      })
+    ]),
     author: PropTypes.shape({
       avatar: PropTypes.string
     }),
@@ -401,7 +489,7 @@ const Landing = () => {
         {/* Blog Posts Section */}
         <div className={`py-16 ${
           theme 
-            ? 'bg-gradient-to-b from-black to-gray-900 via-black' 
+            ? 'bg-gradient-to-b from-black via-black to-gray-900' 
             : 'bg-gray-50'
         }`}>
           <div className="container mx-auto px-4 md:px-6 lg:px-8">

@@ -133,7 +133,9 @@ export const getPost = async (req, res) => {
 
 export const getAllPost = async (req, res) => {
   try {
-    const allPost = await Post.find().populate("likes bookmarks");
+    const allPost = await Post.find()
+      .populate("userId", "firstname lastname username profilePhoto") // Add this line
+      .populate("likes bookmarks");
 
     if (!allPost || allPost.length === 0) {
       return res.status(404).json({ message: "No post found" });
