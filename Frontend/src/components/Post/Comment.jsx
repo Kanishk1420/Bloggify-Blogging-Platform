@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { BiEdit } from 'react-icons/bi';
-import { MdDelete } from 'react-icons/md';
+import { FaEdit, FaTrash } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
 import { useDeleteCommentMutation, useUpdateCommentMutation } from '../../api/comment'
 import { toast } from 'react-toastify';
@@ -97,11 +96,21 @@ const Comment = ({ comment, userData }) => {
                                     <span className='ml-1 italic'>(edited {timeInfo.editedTime})</span>
                                 )}
                             </div>
-                            <div className='flex justify-center items-center space-x-2'>
+                            <div className="flex gap-2">
                                 {userInfo?.user?._id === comment.userId && !editMode && (
                                     <>
-                                        <p className='cursor-pointer' onClick={() => setEditMode(true)}><BiEdit size={20} /></p>
-                                        <p onClick={deleteCommentHandler} className='cursor-pointer'><MdDelete size={20} /></p>
+                                        <button 
+                                            onClick={() => setEditMode(true)}
+                                            className={`${theme ? "text-white" : "text-[#1576D8]"} hover:opacity-80`}
+                                        >
+                                            <FaEdit size={16} />
+                                        </button>
+                                        <button 
+                                            onClick={deleteCommentHandler}
+                                            className={`${theme ? "text-red-400" : "text-red-500"} hover:opacity-80`}
+                                        >
+                                            <FaTrash size={16} />
+                                        </button>
                                     </>
                                 )}
                             </div>

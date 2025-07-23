@@ -4,7 +4,7 @@ import { useAddBookmarkMutation , useRemoveBookmarkMutation  } from '../../api/p
 import {addBookmarkPost, removeBookmarkPost} from '../../slices/PostSlice.js'
 import { useSelector, useDispatch } from 'react-redux'
 import { BsBookmark } from 'react-icons/bs';
-import { FaBookmark } from 'react-icons/fa';
+import { FaBookmark, FaRegBookmark } from 'react-icons/fa';
 import { toast } from 'react-toastify'
 
 const Bookmark = ({ postId }) => {
@@ -39,12 +39,23 @@ const Bookmark = ({ postId }) => {
         }
     };
 
+    const isBookmarked = bookmarkedPosts?.some((post) => post.postId === postId);
 
     return (
-        <div>
-            {bookmarkedPosts?.some((post) => post.postId === postId) ? (<FaBookmark size={21} className='cursor-pointer' color={`${theme ? "white" : "black"} `} onClick={handleRemoveBookmark} />
-            ) : (<BsBookmark size={21} className='cursor-pointer' onClick={handleBookmark} />)}
-        </div>
+        <button 
+          onClick={isBookmarked ? handleRemoveBookmark : handleBookmark}
+          className={`flex items-center gap-1 ${
+            theme 
+              ? "text-white hover:text-gray-300" 
+              : "text-[#1576D8] hover:text-blue-700"
+          }`}
+        >
+          {isBookmarked ? (
+            <FaBookmark className={`${theme ? "text-white" : "text-[#1576D8]"}`} size={21} />
+          ) : (
+            <FaRegBookmark className={`${theme ? "text-white" : "text-[#1576D8]"}`} size={21} />
+          )}
+        </button>
     )
 
 }
