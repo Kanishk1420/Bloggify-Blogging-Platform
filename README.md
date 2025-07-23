@@ -17,8 +17,10 @@ Bloggify is a full-stack blogging platform designed specifically for developers 
 ### 👥 User System
 - Complete user authentication system
 - Personalized user profiles with customizable images
+- **Secure Profile Deletion**: Multi-step account deletion with data cleanup
 - Follow/unfollow functionality to connect with other developers
-- User analytics dashboard to track post performance
+- **Enhanced Analytics Dashboard**: Comprehensive tracking of likes, dislikes, bookmarks, and followers
+- **Smart Authentication Flow**: Seamless redirection based on user login status
 
 ### 💡 Engagement Features
 - Like/dislike posts and comments
@@ -29,13 +31,18 @@ Bloggify is a full-stack blogging platform designed specifically for developers 
 ### 🎨 User Experience
 - Responsive design for all devices (mobile, tablet, desktop)
 - Dark/light theme toggle for comfortable reading
+- **Landing Page**: Professional introduction page with animated content carousel
 - Modern card-based UI for content display
+- **Smooth Page Transitions**: Framer Motion powered animations between routes
 - Infinite scrolling for seamless content consumption
+- **Interactive UI Elements**: Hover effects, loading states, and micro-interactions
 
 ### 🔍 Discovery
 - Advanced search functionality
+- **Dynamic Popular Tags**: Auto-generated tags based on actual post categories
 - "Who to follow" recommendations
 - Trending posts and popular tags sections
+- **Professional Landing Page**: Showcases platform features for new users
 - Feed filtering by following, popular, or recent
 
 ## 🛠️ Technologies Used
@@ -44,10 +51,12 @@ Bloggify is a full-stack blogging platform designed specifically for developers 
 - **React** - Component-based UI library
 - **Redux Toolkit** - State management with built-in best practices
 - **RTK Query** - Data fetching and caching
+- **Framer Motion** - Animation library for smooth page transitions
 - **Tailwind CSS** - Utility-first CSS framework
 - **DOMPurify** - Sanitization for user-generated content
 - **React Router** - Declarative routing for React
 - **React Toastify** - Toast notifications
+- **React Icons** - Comprehensive icon library
 
 ### Backend
 - **Node.js** - JavaScript runtime
@@ -61,23 +70,68 @@ Bloggify is a full-stack blogging platform designed specifically for developers 
 
 ## 🖥️ Recent Improvements (July 2025)
 
-### UI Enhancements
-- Completely redesigned post cards with improved image display
-- Fixed responsive layout issues for sidebar on mobile and tablet devices
-- Enhanced user discovery page with better follow/unfollow button interactions
-- Implemented consistent card UI across home, profile, and bookmarks pages
-- Added loading skeletons for better UX during data fetching
+### ✨ New Major Features
 
-### Bug Fixes
-- Fixed following feed not displaying posts from followed users
-- Corrected state management in follow/unfollow functionality
-- Improved image handling with fallbacks for missing images
-- Enhanced dark mode compatibility throughout the application
+#### 🎭 Landing Page Implementation
+- **Professional Introduction Page**: Created a stunning landing page with hero section, image slider, and featured posts
+- **Dynamic Content Carousel**: Auto-rotating SVG illustrations showcasing blogging concepts
+- **Authentication Flow**: Smart redirection system - unauthenticated users see landing page, authenticated users access main feed
+- **Popular Tags System**: Dynamic tag generation based on actual blog post categories with purple/violet styling
+- **Smooth Page Transitions**: Implemented Framer Motion animations for seamless navigation between pages
 
-### Performance Optimization
-- Reduced loading times with optimized image rendering
-- Improved state updates to prevent unnecessary re-renders
-- Enhanced API integration with proper error handling
+#### 🎨 Enhanced User Experience
+- **Page Transitions**: Added smooth fade, slide, and scale animations for all page navigations
+- **Theme Integration**: Complete dark/light mode support across all new components
+- **Responsive Design**: Mobile-first approach ensuring perfect display on all device sizes
+- **Interactive Elements**: Hover effects, smooth transitions, and micro-interactions throughout
+
+#### 🔐 Advanced Profile Management
+- **Profile Deletion Feature**: Secure account deletion with confirmation dialog requiring typing "DELETE"
+- **Data Cleanup**: Complete removal of user posts, comments, followers, and all associated data
+- **Scroll Lock Modal**: Background scrolling prevention during critical operations
+- **Enhanced Security**: Multi-step confirmation process for destructive actions
+
+#### 📊 Improved Analytics Dashboard
+- **Total Dislikes Tracking**: Added comprehensive dislike analytics alongside existing metrics
+- **Four-Column Layout**: Redesigned dashboard with Followers, Likes, Dislikes, and Bookmarks in a single row
+- **Real-time Updates**: Automatic refresh of analytics when user interactions occur
+- **Consistent Styling**: Unified card design with gradients and icons for all metrics
+
+### 🐛 Critical Bug Fixes
+
+#### Authentication & Navigation
+- **Logout Redirection**: Fixed logout to redirect to landing page instead of login page
+- **Registration Flow**: Corrected new user registration to redirect to main feed (/home)
+- **Navbar Logic**: Resolved infinite redirect loops and "Maximum update depth exceeded" errors
+- **Mobile Dropdown**: Fixed navbar dropdown overflow and positioning issues on mobile devices
+
+#### Content Management
+- **Bookmark System**: Fixed 404 errors in bookmark add/remove operations by aligning frontend/backend routes
+- **Comment Updates**: Resolved comment editing issues with proper state management and real-time updates
+- **Profile Images**: Fixed profile picture loading in blog cards with intelligent fallback system
+- **Search Functionality**: Corrected "Explore Posts" buttons to redirect to main feed instead of landing page
+
+#### UI/UX Improvements
+- **Button Consistency**: Standardized button styling across edit profile and other forms
+- **Light Mode Fixes**: Resolved dark theme elements appearing incorrectly in light mode
+- **Responsive Cards**: Fixed blog card layouts and image display across all screen sizes
+- **Modal Interactions**: Enhanced modal dialogs with click-outside-to-close and proper focus management
+
+### 🔧 Technical Enhancements
+
+#### State Management
+- **Redux Integration**: Improved state synchronization across components
+- **RTK Query Optimization**: Enhanced data fetching with proper cache invalidation
+- **Local Storage Management**: Better handling of user preferences and session data
+
+#### Performance Optimization
+- **Image Loading**: Implemented lazy loading and optimized image rendering
+- **Bundle Optimization**: Reduced JavaScript bundle size through code splitting
+- **Memory Management**: Prevented memory leaks in subscription-based components
+
+#### Code Quality
+- **PropTypes Validation**: Added comprehensive prop validation to prevent runtime errors
+- **Error Boundaries**: Implemented proper error handling throughout the application
 
 ## 🚀 Setup Guide
 
@@ -114,6 +168,7 @@ Bloggify is a full-stack blogging platform designed specifically for developers 
    ```bash
    cd ../Frontend
    npm install
+   npm install framer-motion
    ```
    
    Create a `.env` file in the Frontend directory with:
@@ -138,6 +193,8 @@ Bloggify is a full-stack blogging platform designed specifically for developers 
 5. Access the application:
    - Frontend: http://localhost:5173
    - Backend API: http://localhost:5000/api
+   - Landing Page: http://localhost:5173/ (for new users)
+   - Main Feed: http://localhost:5173/home (for authenticated users)
 
 ## 📚 API Documentation & Backend Details
 
@@ -230,10 +287,10 @@ PORT=5000
 - **Unlike Post**: `PUT /api/post/unlike/:id`
   - Removes user's like from a post
   
-- **Add Bookmark**: `PUT /api/post/addbookmark/:id`
+- **Add Bookmark**: `POST /api/post/bookmark/:id`
   - Bookmarks a post for later reading
   
-- **Remove Bookmark**: `PUT /api/post/removebookmark/:id`
+- **Remove Bookmark**: `DELETE /api/post/bookmark/remove/:id`
   - Removes a post from bookmarks
   
 - **Image Upload**: `POST /api/post/upload`
