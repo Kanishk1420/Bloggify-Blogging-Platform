@@ -1,7 +1,8 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
 import { useSelector } from 'react-redux'
+import { AnimatePresence } from "framer-motion";
 import Home from './pages/Home/Home'
-import Landing from './pages/Landing/Landing' // Add this import
+import Landing from './pages/Landing/Landing'
 import Login from './pages/Auth/Login'
 import Register from './pages/Auth/Register'
 import PostDetails from './pages/PostBody/PostDetails'
@@ -18,15 +19,18 @@ import 'react-toastify/dist/ReactToastify.css';
 import ResetPassword from './pages/ResetPassword/ResetPassword'
 import ThemeInitializer from './components/ThemeInitializer'
 
-const App = () => {
+// Create the AnimatedRoutes component that will handle transitions
+const AnimatedRoutes = () => {
+  const location = useLocation();
   const { theme } = useSelector((state) => state.theme);
   
   return (
     <div className={`min-h-screen ${theme ? "bg-zinc-950" : "bg-white"}`}>
-      <ThemeInitializer /> 
-      <Router>
-        <ToastContainer autoClose={3000} />
-        <Routes>
+      <ThemeInitializer />
+      <ToastContainer autoClose={3000} />
+      
+      <AnimatePresence mode="wait">
+        <Routes location={location} key={location.pathname}>
           <Route exact path="/" element={<Landing />} />
           <Route path="/home" element={<Home />} />
           <Route path="/login" element={<Login />} />
@@ -42,9 +46,17 @@ const App = () => {
           <Route path="*" element={<Notfound />} />
           <Route path='/write' element={<CreatePost />} />
         </Routes>
-      </Router>
+      </AnimatePresence>
     </div>
-  )
-}
+  );
+};
 
-export default App
+const App = () => {
+  return (
+    <Router>
+      <AnimatedRoutes />
+    </Router>
+  );
+};
+
+export default App;
