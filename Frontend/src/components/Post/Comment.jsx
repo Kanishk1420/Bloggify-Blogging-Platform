@@ -44,6 +44,7 @@ const Comment = ({ comment, userData }) => {
     const [updateComment] = useUpdateCommentMutation();
     const [editMode, setEditMode] = useState(false);
     const [editedComment, setEditedComment] = useState(comment.comment);
+    const [localComment, setLocalComment] = useState(comment);
     const navigate = useNavigate();
     const { data } = useGetUserQuery(userData);
     const { theme } = useSelector((state) => state.theme)
@@ -63,14 +64,28 @@ const Comment = ({ comment, userData }) => {
 
     const handleUpdateComment = async () => {
         try {
-            const id = comment._id;
-            await updateComment({ id: id, comment: editedComment, author: userInfo?.user?.id });
+            await updateComment({ 
+                commentId: comment._id,
+                comment: editedComment, 
+                userId: userInfo?.user?._id || userInfo?.updatedUser?._id
+            }).unwrap();
+            
+            // Update UI immediately
             setEditMode(false);
+            
+            // Update local state instead of mutating props
+            if (comment.comment !== editedComment) {
+                setLocalComment({
+                    ...comment,
+                    comment: editedComment,
+                    updatedAt: new Date().toISOString()
+                });
+            }
+            
             toast.success("Comment updated successfully!");
-            window.location.reload();
         } catch (err) {
             console.log(err);
-            toast.error(err?.message || "Try again later!!");
+            toast.error(err?.data?.message || err?.message || "Try again later!");
         }
     };
 
@@ -133,22 +148,28 @@ const Comment = ({ comment, userData }) => {
                                 <button
                                     type='submit'
                                     onClick={handleUpdateComment}
-                                    className='w-full md:w-auto h-auto px-6 bg-black rounded-md hover:bg-gray-800 transition duration-300'
+                                    disabled={editedComment === comment.comment}
+                                    className={`w-full md:w-auto px-6 py-2.5 rounded-md font-medium transition duration-300 ${
+                                        theme 
+                                          ? 'bg-zinc-800 hover:bg-zinc-700 text-white'  // Dark theme
+                                          : 'bg-blue-500 hover:bg-blue-600 text-white'  // Light theme - lighter blue
+                                    } ${editedComment === comment.comment ? 'opacity-50 cursor-not-allowed' : ''}`}
+
                                 >
-                                    Update
+                                    {editedComment === comment.comment ? "No Changes" : "Update"}
                                 </button>
                             </div>
                         </div>
                     }
                     
                     {/* Reduced margin on comment text */}
-                    {!editMode && <p className='ml-12 -mt-2'>{comment.comment}</p>}
+                    {!editMode && <p className='ml-12 -mt-2'>{localComment.comment}</p>}
                     
                     {/* Adjusted margin on like/dislike buttons */}
                     {!editMode && (
                         <div className="flex items-center space-x-4 mt-2 ml-12">
-                            <CommentLike comment={comment} />
-                            <CommentDislike comment={comment} />
+                            <CommentLike comment={localComment} />
+                            <CommentDislike comment={localComment} />
                         </div>
                     )}
                 </div>
