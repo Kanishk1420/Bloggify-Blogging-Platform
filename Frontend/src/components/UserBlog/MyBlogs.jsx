@@ -95,20 +95,25 @@ const MyBlogs = ({ userId }) => {
                             
                             {/* Content Section */}
                             <div className={`p-4 ${theme ? 'backdrop-blur-sm bg-black/5' : ''}`}>
-                                <h2 className={`text-xl font-bold mb-2 line-clamp-2 ${theme ? 'text-white' : 'text-gray-800'}`}>
+                                <h2 className={`text-xl font-semibold mb-2 line-clamp-2 ${
+                                    theme ? 'text-white' : 'text-[#1e3a8a]'
+                                }`}>
                                     {post.title}
                                 </h2>
                                 
                                 <div className="flex justify-between items-center mb-3 text-sm">
-                                    <p className={`font-medium ${theme ? 'text-gray-200' : 'text-gray-700'}`}>
+                                    <p className={`font-medium ${theme ? 'text-gray-200' : 'text-black'}`}>
                                         {`${post.firstname} ${post.lastname}`}
                                     </p>
-                                    <div className={`${theme ? 'text-gray-300' : 'text-gray-500'}`}>
-                                        <p>{new Date(post.updatedAt).toLocaleDateString()}</p>
-                                    </div>
+                                    <p className={`${theme ? 'text-gray-300' : 'text-gray-500'}`}>
+                                        {new Date(post.updatedAt).toLocaleDateString('en-US', {
+                                            month: 'short',
+                                            day: 'numeric'
+                                        })}
+                                    </p>
                                 </div>
                                 
-                                <div className={`text-sm ${theme ? 'text-gray-200' : 'text-gray-600'}`}>
+                                <div className={`text-xs ${theme ? 'text-gray-200' : 'text-gray-700'}`}>
                                     <p dangerouslySetInnerHTML={{ 
                                         __html: DOMPurify.sanitize(post.description.slice(0, 100) + "..Read More") 
                                     }} />
@@ -117,14 +122,14 @@ const MyBlogs = ({ userId }) => {
                                 {/* Tags - if available */}
                                 {post.tags && post.tags.length > 0 && (
                                     <div className="flex flex-wrap gap-2 mt-3">
-                                        {post.tags.map((tag, index) => (
+                                        {post.tags.slice(0, 3).map((tag, index) => (
                                             <span 
                                                 key={index}
                                                 className={`
                                                     px-2 py-1 rounded-full text-xs font-medium
                                                     ${theme 
                                                         ? 'bg-indigo-900/20 backdrop-blur-sm text-gray-200' 
-                                                        : 'bg-gray-100 text-gray-700'
+                                                        : 'bg-gray-100 text-[#1576D8]'
                                                     }
                                                 `}
                                             >
