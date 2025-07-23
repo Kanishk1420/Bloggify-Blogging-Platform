@@ -147,7 +147,9 @@ const Register = () => {
       dispatch(setCredentials(res));
       toast.success(res?.message || 'Registered successfully');
       setLoading(false);
-      navigate('/');
+      
+      // Change this from '/' to '/home' to match login behavior
+      navigate('/home');
     } catch (err) {
       setLoading(false);
       toast.error(err?.data?.message);

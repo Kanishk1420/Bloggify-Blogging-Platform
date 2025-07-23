@@ -18,29 +18,23 @@ const MobileMenu = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/auth/logout', {
+      await fetch('http://localhost:5000/api/auth/logout', {
         method: 'GET',
         credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json'
-        }
       });
-
-      if (response.ok) {
-        // Clear Redux auth state
-        dispatch(logout());
-        
-        // Clear any local storage items
-        localStorage.removeItem("userInfo");
-        localStorage.removeItem("likedPosts");
-        localStorage.removeItem("bookmarkedPosts");
-        localStorage.removeItem("postData");
-        
-        // Navigate to landing page instead of login
-        navigate('/');
-      }
+      
+      // Clear Redux state
+      dispatch(logout());
+      
+      // Clear any local storage items
+      localStorage.removeItem("userInfo");
+      localStorage.removeItem("likedPosts");
+      localStorage.removeItem("bookmarkedPosts");
+      
+      // Change this from '/login' to '/'
+      navigate('/');
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error('Logout failed:', error);
     }
   }
 

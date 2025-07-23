@@ -210,7 +210,7 @@ const MyBookmark = () => {
           </h3>
           <p className="mb-4">You haven&apos;t bookmarked any posts yet.</p>
           <button
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/home")}
             className="px-4 py-2 bg-indigo-600 text-white rounded-full font-medium hover:bg-indigo-700 transition-colors"
           >
             Explore Posts
