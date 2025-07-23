@@ -423,16 +423,6 @@ export const getFollowingPost = async (req, res) => {
 
 export const getAnalytics = async (req, res) => {
   try {
-
-    const getUser = await User.findById(req.userId);
-
-    if (!getUser) {
-      return res.status(401).json({
-        success: false,
-        message: "User not found"
-      });
-    }
-
     const userPosts = await Post.find({ userId: req.userId });
 
     if (!userPosts || userPosts.length === 0) {
@@ -444,15 +434,18 @@ export const getAnalytics = async (req, res) => {
 
     let likes = 0;
     let bookmarks = 0;
+    let dislikes = 0;  // Add this line
 
     userPosts.forEach(post => {
       likes += post.likes.length;
       bookmarks += post.bookmarks.length;
+      dislikes += post.dislikes.length;  // Add this line
     });
 
     const analytics = {
       totalLikes: likes,
-      totalBookmarks: bookmarks
+      totalBookmarks: bookmarks,
+      totalDislikes: dislikes  // Add this line
     };
 
     res.status(200).json({

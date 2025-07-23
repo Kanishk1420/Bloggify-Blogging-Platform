@@ -292,7 +292,7 @@ const PostDetails = () => {
                             : "bg-purple-50 text-purple-700 border border-purple-100"
                         }`}
                       >
-                        #{item}
+                        {item}
                       </div>
                     ))}
                   </div>
