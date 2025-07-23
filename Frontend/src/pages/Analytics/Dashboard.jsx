@@ -18,15 +18,9 @@ const Dashboard = () => {
     // Check both token and isAuthenticated flag
     const authCheck = setTimeout(() => {
       if (!userInfo?.token && !userInfo?.user) {
-        console.log("Authentication required, redirecting to login");
         // Store the intended destination for redirect after login
         sessionStorage.setItem("redirectAfterLogin", "/dashboard");
         navigate("/login");
-      } else {
-        console.log(
-          "User authenticated for dashboard:",
-          userInfo?.user?.username
-        );
       }
     }, 100);
 
@@ -62,11 +56,6 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    console.log("Dashboard rendered, auth state:", {
-      hasToken: !!userInfo?.token,
-      userId: userInfo?.user?._id,
-      isAuthenticated: !!userInfo,
-    });
   }, [userInfo]);
 
   return (

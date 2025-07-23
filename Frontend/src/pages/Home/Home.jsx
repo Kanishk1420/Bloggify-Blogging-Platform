@@ -35,7 +35,6 @@ const Home = () => {
     // Fix: Properly handle following posts data
     useEffect(() => {
         if (followingData?.followingPost) {
-            console.log("Following posts loaded:", followingData.followingPost.length);
             setFollowingPosts(followingData.followingPost);
         }
     }, [followingData]);
@@ -57,15 +56,9 @@ const Home = () => {
     }, [isLoading, followingLoading]);
 
     const fetchMoreFollowing = () => {
-        // This would be implemented if pagination was supported on the backend
-        console.log("Fetching more following posts...");
-        // For now, we're just using what we have
     };
 
     const fetchMorePosts = () => {
-        // This would be implemented if pagination was supported on the backend
-        console.log("Fetching more posts...");
-        // For now, we're just using what we have
     };
 
     useEffect(() => {

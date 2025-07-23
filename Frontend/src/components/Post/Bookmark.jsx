@@ -24,7 +24,7 @@ const Bookmark = ({ postId }) => {
             await dispatch(addBookmarkPost(postId))
         } catch (err) {
             toast.error(err?.message || "Failed to bookmark the post");
-            console.log(err);
+            
         }
     };
 
@@ -35,7 +35,7 @@ const Bookmark = ({ postId }) => {
             await dispatch(removeBookmarkPost(postId))
         } catch (err) {
             toast.error(err?.message || "Failed to remove bookmark");
-            console.log(err);
+            
         }
     };
 

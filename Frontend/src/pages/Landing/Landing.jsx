@@ -186,15 +186,8 @@ const BlogCard = ({ post, theme }) => {
   const authorName = getAuthorName();
   const userInitial = getUserInitial();
 
-  // Add this to your BlogCard component temporarily for debugging
+
   useEffect(() => {
-    console.log('Post user data:', {
-      id: post._id,
-      userId: post.userId,
-      hasDirectProfilePhoto: !!post.profilePhoto,
-      photoUrlFound: getProfilePhotoUrl(),
-      fullPost: post
-    });
   }, [post]);
 
   // Update the BlogCard component to include motion animations

@@ -83,18 +83,11 @@ const EditProfile = () => {
     // First, check if we have API data
     if (data && data.user) {
       const user = data.user;
-      console.log("Loading from API:", user);
-
-      // Track username specifically
-      console.log("USERNAME FROM API:", user.username);
-      console.log("USERNAME FROM REDUX:", userInfo?.user?.username);
-      console.log("CURRENT USERNAME STATE:", username);
 
       setUserId(user._id || "");
 
       // For username, keep any changes in progress
       if (username && username !== user.username && isEditing) {
-        console.log("Preserving edited username:", username);
         // Don't override username if user is currently editing
       } else {
         // Otherwise use API/Redux data
@@ -119,7 +112,6 @@ const EditProfile = () => {
     // Fallback to Redux if API data isn't available
     else if (userInfo?.user) {
       const user = userInfo.user;
-      console.log("Loading from Redux:", user);
 
       setUserId(user._id || "");
       setUsername(user.username || "");
@@ -139,15 +131,6 @@ const EditProfile = () => {
   useEffect(() => {
     if (data && data.user) {
       const user = data.user;
-
-      // Add this detailed debugging
-      console.log("DETAILED API RESPONSE:", {
-        fullData: data,
-        bioField: data.user.bio,
-        bioType: typeof data.user.bio,
-      });
-
-      // Rest of your code...
     }
   }, [data, userInfo]);
 
@@ -270,18 +253,8 @@ const EditProfile = () => {
       // Check if username is being updated
       let usernameUpdated = false;
       if (username !== originalUsername) {
-        console.log(
-          "Username change detected:",
-          originalUsername,
-          "→",
-          username
-        );
         usernameUpdated = await handleUsernameUpdate(username);
         setLoading(30);
-
-        if (!usernameUpdated) {
-          console.log("Username update failed, continuing with other updates");
-        }
       }
 
       // Create FormData for file upload
@@ -290,7 +263,6 @@ const EditProfile = () => {
       // Only add the file if one was selected
       if (file) {
         formData.append("profilePhoto", file); // CHANGE FROM 'profilePicture' to 'profilePhoto'
-        console.log("Adding profile photo to request");
       }
 
       // Add other user data to FormData
@@ -307,20 +279,10 @@ const EditProfile = () => {
       if (password) {
         formData.append("password", password);
       }
-
-      console.log("Submitting profile data with FormData");
       setLoading(50);
-
-      // Debug code to check FormData contents
-      console.log("FormData field names:");
-      for (const pair of formData.entries()) {
-        console.log(pair[0], pair[1]);
-      }
 
       // Update user with FormData
       const updatedUserResponse = await updateUser(formData).unwrap();
-
-      console.log("API Response:", updatedUserResponse);
       setLoading(80);
 
       const userData = updatedUserResponse.user || updatedUserResponse;
@@ -339,8 +301,6 @@ const EditProfile = () => {
           profilePhoto: userData.profilePhoto || userInfo.user.profilePhoto,
         },
       };
-
-      console.log("Updating Redux with:", updatedReduxData);
 
       // Dispatch the update to Redux
       dispatch(setCredentials(updatedReduxData));
@@ -413,13 +373,6 @@ const EditProfile = () => {
       // Create a preview URL for the selected image
       const objectUrl = URL.createObjectURL(selectedFile);
       setPreview(objectUrl);
-
-      console.log("File selected:", selectedFile.name);
-      console.log("File type:", selectedFile.type);
-      console.log(
-        "File size:",
-        (selectedFile.size / 1024 / 1024).toFixed(2) + "MB"
-      );
     }
   };
 
@@ -438,11 +391,6 @@ const EditProfile = () => {
       return Promise.resolve();
     }
   };
-
-  // In your component, add these console.logs
-  console.log("Redux state userInfo:", userInfo);
-  console.log("API data:", data);
-  console.log("Current state values:", { bio, username, email });
 
   // Add this state variable at the top with your other state declarations:
   const [isEditing, setIsEditing] = useState(false);
@@ -466,14 +414,11 @@ const EditProfile = () => {
   // Add a dedicated username update function
   const handleUsernameUpdate = async (newUsername) => {
     try {
-      console.log("SENDING USERNAME UPDATE REQUEST:", newUsername);
 
       // Send username directly without the user wrapper
       const usernameUpdateResponse = await updateUser({
         username: newUsername, // Changed from { user: { username: newUsername } }
       }).unwrap();
-
-      console.log("USERNAME UPDATE RESPONSE:", usernameUpdateResponse);
 
       // Force Redux update for username
       dispatch(
