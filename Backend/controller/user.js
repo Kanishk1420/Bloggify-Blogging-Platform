@@ -92,6 +92,82 @@ export const updateUser = async (req, res) => {
 };
 
 //delete user
+// Delete user account
+export const deleteUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Validate if the user exists
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ 
+        success: false, 
+        message: "User not found" 
+      });
+    }
+
+    // Authentication check - only allow users to delete their own account
+    // or admins to delete any account
+    if (req.userId.toString() !== id.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: "You are not authorized to delete this account"
+      });
+    }
+
+    // Delete user's posts
+    const { Post } = await import('../models/Post.js');
+    await Post.deleteMany({ userId: id });
+    
+    // Delete user's comments
+    const { Comment } = await import('../models/Comment.js');
+    await Comment.deleteMany({ userId: id });
+    
+    // Remove user from other users' followers/following lists
+    await User.updateMany(
+      { followers: id },
+      { $pull: { followers: id } }
+    );
+    
+    await User.updateMany(
+      { following: id },
+      { $pull: { following: id } }
+    );
+    
+    // Remove user's likes from posts
+    await Post.updateMany(
+      { likes: id },
+      { $pull: { likes: id } }
+    );
+    
+    // Remove user's bookmarks from posts
+    await Post.updateMany(
+      { bookmarks: id },
+      { $pull: { bookmarks: id } }
+    );
+    
+    // Finally delete the user
+    await User.findByIdAndDelete(id);
+    
+    // Clear auth cookie
+    res.clearCookie("token", {
+      expires: new Date(0),
+      sameSite: process.env.NODE_ENV === "development" ? "lax" : "none",
+      secure: process.env.NODE_ENV === "development" ? false : true,
+    });
+    
+    return res.status(200).json({
+      success: true,
+      message: "Account deleted successfully"
+    });
+  } catch (err) {
+    console.error("Delete user error:", err);
+    return res.status(500).json({
+      success: false,
+      message: "An error occurred while deleting your account"
+    });
+  }
+};
 
 //get user
 export const getUser = async (req, res) => {

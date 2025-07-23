@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import avatar from "../../assets/avatar.jpg";
 import { userApi } from "../../api/user";
-import { useGetUserQuery, useUpdateUserMutation } from "../../api/user";
+import { useGetUserQuery, useUpdateUserMutation, useDeleteUserMutation } from "../../api/user";
 import { setCredentials } from "../../slices/AuthSlice";
 import Navbar from "../../components/Navbar/Navbar";
 import Footer from "../../components/Footer/Footer";
@@ -512,6 +512,78 @@ const EditProfile = () => {
     const validation = validateEmailDomain(newEmail);
     setIsEmailValid(validation.valid);
     setEmailErrorMessage(validation.message);
+  };
+
+  // Add these new states for the delete modal
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  // Add this RTK query hook for the delete operation
+  const [deleteUser] = userApi.useDeleteUserMutation();
+
+  // Add this effect to handle delete confirmation
+  useEffect(() => {
+    if (isDeleting) {
+      const handleDelete = async () => {
+        try {
+          setLoading(10);
+          const response = await deleteUser(userId).unwrap();
+          toast.success("Account deleted successfully.");
+          setLoading(100);
+
+          // Navigate to home or login page after deletion
+          setTimeout(() => {
+            navigate("/");
+          }, 500);
+        } catch (err) {
+          console.error("Delete error:", err);
+          toast.error(err?.data?.message || "Failed to delete account");
+          setLoading(0);
+        }
+      };
+
+      handleDelete();
+    }
+  }, [isDeleting, deleteUser, userId, navigate]);
+
+  // Handle account deletion
+  const handleDeleteAccount = async () => {
+    if (deleteConfirmText !== "DELETE") return;
+    
+    try {
+      setIsDeleting(true);
+      setLoading(20);
+      
+      // Make the API call to delete user
+      const response = await deleteUser(userId).unwrap();
+      
+      // Display success message
+      toast.success("Your account has been permanently deleted");
+      setLoading(80);
+      
+      // Clear user data from Redux store
+      dispatch(setCredentials(null));
+      
+      // Clear localStorage
+      localStorage.removeItem("userInfo");
+      localStorage.removeItem("darkMode");
+      localStorage.removeItem("likedPosts");
+      localStorage.removeItem("bookmarkedPosts");
+      localStorage.removeItem("postData");
+      
+      // Redirect to homepage after a short delay
+      setTimeout(() => {
+        navigate('/');
+        setLoading(100);
+      }, 1000);
+    } catch (err) {
+      console.error("Delete account error:", err);
+      toast.error(err?.data?.message || "Failed to delete account. Please try again.");
+      setIsDeleting(false);
+      setShowDeleteModal(false);
+      setLoading(0);
+    }
   };
 
   return (
@@ -1070,6 +1142,19 @@ const EditProfile = () => {
                         "Save Changes"
                       )}
                     </button>
+
+                    {/* Add the Delete Account button */}
+                    <button
+                      type="button"
+                      onClick={() => setShowDeleteModal(true)}
+                      className={`px-6 py-2.5 rounded-lg text-sm font-medium 
+    ${theme
+      ? "bg-red-900/40 text-red-200 hover:bg-red-900/60"
+      : "bg-red-100 text-red-700 hover:bg-red-200"
+    } transition-colors ml-auto mr-4`}
+                    >
+                      Delete Account
+                    </button>
                   </div>
                 </form>
               </div>
@@ -1079,6 +1164,85 @@ const EditProfile = () => {
       </div>
 
       <Footer />
+
+      {/* Delete Account Confirmation Modal */}
+      {showDeleteModal && (
+        <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 ${theme ? "bg-black/80" : "bg-gray-900/50"}`}>
+          <div className={`w-full max-w-md p-6 rounded-lg shadow-lg ${theme ? "bg-zinc-800 text-white" : "bg-white text-gray-900"}`}>
+            {/* Warning Icon */}
+            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-6">
+              <svg className="h-8 w-8 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+
+            <h3 className={`text-xl font-bold mb-2 text-center ${theme ? "text-red-400" : "text-red-600"}`}>
+              Delete Account Permanently
+            </h3>
+            
+            <p className={`text-center mb-6 ${theme ? "text-gray-300" : "text-gray-600"}`}>
+              This action <span className="font-bold">cannot be undone</span>. All your posts, comments, and profile data will be permanently deleted.
+            </p>
+            
+            <div className="mb-6">
+              <label className={`block mb-2 text-sm font-medium ${theme ? "text-gray-300" : "text-gray-700"}`}>
+                Type <span className="font-mono font-bold">DELETE</span> to confirm:
+              </label>
+              <input
+                type="text"
+                value={deleteConfirmText}
+                onChange={(e) => setDeleteConfirmText(e.target.value)}
+                className={`w-full px-4 py-3 rounded-lg ${
+                  theme
+                    ? "bg-zinc-800 border border-zinc-700 text-white focus:border-red-500"
+                    : "bg-gray-50 border border-gray-300 text-gray-900 focus:border-red-500"
+                } focus:ring-red-500 focus:ring-1 outline-none transition-colors`}
+                placeholder="DELETE"
+                autoComplete="off"
+              />
+            </div>
+            
+            <div className="flex gap-4">
+              <button
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setDeleteConfirmText("");
+                }}
+                className={`flex-1 px-4 py-3 rounded-lg text-sm font-medium ${
+                  theme
+                    ? "bg-zinc-700 text-white hover:bg-zinc-600"
+                    : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                } transition-all duration-200`}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteAccount}
+                disabled={deleteConfirmText !== "DELETE" || isDeleting}
+                className={`flex-1 px-4 py-3 rounded-lg text-sm font-medium ${
+                  deleteConfirmText !== "DELETE" || isDeleting
+                    ? "bg-gray-400 text-white cursor-not-allowed"
+                    : theme
+                    ? "bg-red-600 text-white hover:bg-red-500"
+                    : "bg-red-600 text-white hover:bg-red-500"
+                } transition-all duration-200`}
+              >
+                {isDeleting ? (
+                  <span className="flex items-center justify-center">
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014.708 14H2c0 4.418 3.582 8 8 8v-2c-3.314 0-6-2.686-6-6zM20 12c0-4.418-3.582-8-8-8v2c3.314 0 6 2.686 6 6 0 1.385-.468 2.657-1.25 3.682l1.562 1.562A7.962 7.962 0 0020 12z"></path>
+                    </svg>
+                    Deleting...
+                  </span>
+                ) : (
+                  "Delete Permanently"
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };

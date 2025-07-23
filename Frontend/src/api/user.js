@@ -63,6 +63,14 @@ export const userApi = createApi({
     searchUser: builder.query({
       query: (search) => `/user/search/${search}`,
     }),
+
+    deleteUser: builder.mutation({
+      query: (userId) => ({
+        url: `/user/${userId}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['User'],
+    }),
   }),
 });
 
@@ -76,4 +84,5 @@ export const {
   useUnfollowUserMutation,
   useGetAllUsersListQuery,
   useSearchUserQuery,
+  useDeleteUserMutation,
 } = userApi;

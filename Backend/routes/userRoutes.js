@@ -4,6 +4,7 @@ import {
   getSearchedUser,
   getUser,
   updateUser,
+  deleteUser, // Add this import
 } from "../controller/user.js";
 import { isAuthenticated } from "../middleware/auth.js";
 import upload from "../middleware/multer.js";
@@ -37,4 +38,5 @@ router.put(
   updateUser
 );
 // router.post("/upload", upload.single("profilePhoto"), uploadProfilePhoto);
+router.delete("/:id", isAuthenticated, deleteUser); // Add this DELETE route
 export default router;
