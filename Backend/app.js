@@ -15,7 +15,7 @@ app.use(express.json());
 app.use(urlencoded({ extended: true }));
 // CORS
 const corsOptions = {
-  origin: ["http://localhost:5173", "http://localhost:3000"],
+  origin: ["http://localhost:5173", "http://localhost:3000", "http://localhost", "http://frontend"],
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   optionsSuccessStatus: 200,
   credentials: true,
