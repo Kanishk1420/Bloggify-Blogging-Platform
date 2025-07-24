@@ -1,0 +1,111 @@
+name: Bloggify CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, deployment ]
+  pull_request:
+    branches: [ main, deployment ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+        
+    # Backend tests
+    - name: Install Backend Dependencies
+      run: |
+        cd Backend
+        npm ci
+        
+    - name: Run Backend Tests
+      run: |
+        cd Backend
+        npm test
+      env:
+        PORT: 5000
+        MONGO_URI: ${{ secrets.MONGO_URI }}
+        JWT_KEY: ${{ secrets.JWT_KEY }}
+        NODE_ENV: test
+        
+    # Frontend tests
+    - name: Install Frontend Dependencies
+      run: |
+        cd Frontend
+        npm ci
+        
+    - name: Run Frontend Tests
+      run: |
+        cd Frontend
+        npm test
+      env:
+        VITE_API_URL: http://localhost:5000/api
+
+  # Add native npm audit scanning
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+    
+    - name: Backend Security Audit
+      run: |
+        cd Backend
+        npm audit --audit-level=high
+      continue-on-error: true
+      
+    - name: Frontend Security Audit
+      run: |
+        cd Frontend
+        npm audit --audit-level=high
+      continue-on-error: true
+
+  build-and-push:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    # Login to GitHub Container Registry
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+        
+    # Setup Docker Buildx
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+      
+    # Build and push Backend image
+    - name: Build and push Backend
+      uses: docker/build-push-action@v4
+      with:
+        context: ./Backend
+        push: true
+        tags: ghcr.io/${{ github.repository_owner }}/bloggify-backend:${{ github.ref_name }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        
+    # Build and push Frontend image
+    - name: Build and push Frontend
+      uses: docker/build-push-action@v4
+      with:
+        context: ./Frontend
+        push: true
+        tags: ghcr.io/${{ github.repository_owner }}/bloggify-frontend:${{ github.ref_name }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max

@@ -1,0 +1,55 @@
+version: 2
+updates:
+  # Frontend dependency updates
+  - package-ecosystem: "npm"
+    directory: "/Frontend"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "frontend"
+    ignore:
+      # Ignore major version updates that might break compatibility
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  # Backend dependency updates
+  - package-ecosystem: "npm"
+    directory: "/Backend"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "backend"
+    ignore:
+      # Ignore major version updates that might break compatibility
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+        
+  # Docker dependency updates
+  - package-ecosystem: "docker"
+    directory: "/Frontend"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "docker"
+      - "dependencies"
+      
+  - package-ecosystem: "docker"
+    directory: "/Backend"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "docker"
+      - "dependencies"
+
+  # GitHub Actions workflows
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "ci-cd"
+      - "dependencies"
