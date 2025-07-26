@@ -2,6 +2,8 @@ version: '3.8'
 
 services:
   frontend:
+    image: blogging-platform-frontend:latest
+    container_name: blogging-platform-frontend-1
     build:
       context: ./Frontend
       dockerfile: Dockerfile
@@ -16,6 +18,8 @@ services:
     restart: unless-stopped
 
   backend:
+    image: blogging-platform-backend:latest
+    container_name: blogging-platform-backend-1
     build:
       context: ./Backend
       dockerfile: Dockerfile
