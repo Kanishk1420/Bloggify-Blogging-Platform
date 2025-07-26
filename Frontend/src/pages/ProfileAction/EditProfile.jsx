@@ -477,7 +477,10 @@ const EditProfile = () => {
       // Make the API call to delete user
       const response = await deleteUser(userId).unwrap();
       setLoading(80);
-      navigate("/");
+      
+      // Change this to navigate to /home instead of /
+      navigate("/home");
+      
       toast.success("Your account has been permanently deleted");
       dispatch(logout());
       
