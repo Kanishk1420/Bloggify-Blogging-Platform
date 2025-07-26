@@ -18,7 +18,7 @@ RUN npm run build
 # Production stage
 FROM nginx:alpine
 
-# Install envsubst utility using Alpine's package manager (apk, not apt-get)
+# Install envsubst utility using Alpine's package manager
 RUN apk add --no-cache gettext
 
 # Copy built assets from the build stage
@@ -33,5 +33,5 @@ ENV BACKEND_URL=http://localhost:5000
 # Expose port
 EXPOSE 80
 
-# Start nginx with environment variable substitution
-CMD /bin/bash -c "envsubst '\$BACKEND_URL' < /etc/nginx/templates/default.conf.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"
+# Use /bin/sh instead of /bin/bash for Alpine compatibility
+CMD /bin/sh -c "envsubst '\$BACKEND_URL' < /etc/nginx/templates/default.conf.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"
