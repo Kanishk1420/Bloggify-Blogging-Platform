@@ -11,7 +11,7 @@ import {
   useUpdateUserMutation,
   useDeleteUserMutation,
 } from "../../api/user";
-import { setCredentials } from "../../slices/AuthSlice";
+import { setCredentials, logout } from "../../slices/AuthSlice";
 import Navbar from "../../components/Navbar/Navbar";
 import Footer from "../../components/Footer/Footer";
 import { FaCheck, FaTimes, FaEyeSlash, FaRegEye } from "react-icons/fa";
@@ -476,26 +476,12 @@ const EditProfile = () => {
 
       // Make the API call to delete user
       const response = await deleteUser(userId).unwrap();
-
-      // Display success message
-      toast.success("Your account has been permanently deleted");
       setLoading(80);
-
-      // Clear user data from Redux store
-      dispatch(setCredentials(null));
-
-      // Clear localStorage
-      localStorage.removeItem("userInfo");
-      localStorage.removeItem("darkMode");
-      localStorage.removeItem("likedPosts");
-      localStorage.removeItem("bookmarkedPosts");
-      localStorage.removeItem("postData");
-
-      // Redirect to homepage after a short delay
-      setTimeout(() => {
-        navigate("/");
-        setLoading(100);
-      }, 1000);
+      navigate("/");
+      toast.success("Your account has been permanently deleted");
+      dispatch(logout());
+      
+      setLoading(100);
     } catch (err) {
       console.error("Delete error:", err);
       toast.error(

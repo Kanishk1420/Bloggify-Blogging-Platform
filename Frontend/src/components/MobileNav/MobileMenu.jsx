@@ -18,20 +18,18 @@ const MobileMenu = () => {
 
   const handleLogout = async () => {
     try {
-      await fetch("http://localhost:5000/api/auth/logout", {
-        method: "GET",
-        credentials: "include",
-      });
+      // Use the RTK Query hook that's already imported
+      await userlogout().unwrap();
 
       // Clear Redux state
       dispatch(logout());
 
       // Clear any local storage items
       localStorage.removeItem("userInfo");
+      localStorage.removeItem("userToken"); // Add this line to clear the token
       localStorage.removeItem("likedPosts");
       localStorage.removeItem("bookmarkedPosts");
 
-      // Change this from '/login' to '/'
       navigate("/");
     } catch (error) {
       console.error("Logout failed:", error);

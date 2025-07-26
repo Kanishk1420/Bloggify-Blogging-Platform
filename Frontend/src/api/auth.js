@@ -3,16 +3,11 @@ import { fetchBaseQuery, createApi } from "@reduxjs/toolkit/query/react";
 export const authApi = createApi({
   reducerPath: "authApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: `${import.meta.env.VITE_API_URL}`,
+    baseUrl: import.meta.env.VITE_API_URL, // Remove string template literals
     credentials: "include",
     prepareHeaders: (headers, { getState }) => {
-      // Try to get token from Redux state first
-      let token = getState().auth.userInfo?.token;
-
-      // If not in state, try localStorage
-      if (!token) {
-        token = localStorage.getItem("userToken");
-      }
+      // Get the token from state or localStorage
+      const token = getState().auth.userInfo?.token || localStorage.getItem("userToken");
 
       if (token) {
         headers.set("Authorization", `Bearer ${token}`);

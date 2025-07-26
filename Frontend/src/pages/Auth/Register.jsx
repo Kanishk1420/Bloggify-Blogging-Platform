@@ -58,7 +58,10 @@ const Register = () => {
         console.log("Checking username availability for:", username);
         // Encode the username properly to handle special characters like hyphens
         const encodedUsername = encodeURIComponent(username);
-        const response = await axios.get(`http://localhost:5000/api/auth/check-username?username=${encodedUsername}`);
+        
+        // FIX: Use environment variable instead of hardcoded URL
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/auth/check-username?username=${encodedUsername}`);
+        
         console.log("Username check response:", response.data);
         setIsUsernameAvailable(response.data.available);
         setUsernameMessage(response.data.message);
