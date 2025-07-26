@@ -11,17 +11,22 @@ import cors from "cors";
 
 export const app = express();
 
+// Add CORS middleware BEFORE other middleware
+app.use(
+  cors({
+    origin: [
+      "https://bloggifyfrontend.azurewebsites.net",
+      "http://localhost:5173",
+      "http://localhost:3000",
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    credentials: true,
+  })
+);
+
+// Your existing middleware
 app.use(express.json());
 app.use(urlencoded({ extended: true }));
-// CORS
-const corsOptions = {
-  origin: ["http://localhost:5173", "http://localhost:3000", "http://localhost", "http://frontend"],
-  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-  optionsSuccessStatus: 200,
-  credentials: true,
-};
-
-app.use(cors(corsOptions));
 
 app.use(cookieParser());
 config({
