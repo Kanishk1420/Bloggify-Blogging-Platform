@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { useLikeCommentMutation, useUnlikeCommentMutation, useUndislikeCommentMutation } from '../../api/comment';
 
-const CommentLike = ({ comment }) => {
+const CommentLike = ({ comment, onLikeDislikeChange }) => {
     const { theme } = useSelector((state) => state.theme);
     const [likeCount, setLikeCount] = useState(0);
     const [isLiked, setIsLiked] = useState(false);
@@ -49,13 +49,12 @@ const CommentLike = ({ comment }) => {
             if (isDisliked) {
                 await undislikeComment({ id: comment._id, userId });
                 
-                // Update dislike count element if it exists
-                const dislikeCountElement = document.querySelector(`[data-comment-dislike-id="${comment._id}"] span`);
-                if (dislikeCountElement) {
-                    const currentCount = parseInt(dislikeCountElement.textContent);
-                    if (!isNaN(currentCount) && currentCount > 0) {
-                        dislikeCountElement.textContent = currentCount - 1;
-                    }
+                // IMPORTANT: Notify parent about the change
+                if (onLikeDislikeChange) {
+                    onLikeDislikeChange({
+                        type: 'UNDISLIKE',
+                        commentId: comment._id
+                    });
                 }
             }
             
@@ -63,7 +62,16 @@ const CommentLike = ({ comment }) => {
             setIsLiked(true);
             setLikeCount(prev => prev + 1);
             
-            await likeComment({ id: comment._id, userId });
+            const response = await likeComment({ id: comment._id, userId });
+            
+            // IMPORTANT: Notify parent with updated comment data
+            if (onLikeDislikeChange && response.data?.comment) {
+                onLikeDislikeChange({
+                    type: 'LIKE',
+                    commentId: comment._id,
+                    updatedComment: response.data.comment
+                });
+            }
             
         } catch (err) {
             console.error("Like error:", err);
@@ -80,7 +88,16 @@ const CommentLike = ({ comment }) => {
             setIsLiked(false);
             setLikeCount(prev => prev - 1);
             
-            await unlikeComment({ id: comment._id, userId });
+            const response = await unlikeComment({ id: comment._id, userId });
+            
+            // IMPORTANT: Notify parent with updated comment data
+            if (onLikeDislikeChange && response.data?.comment) {
+                onLikeDislikeChange({
+                    type: 'UNLIKE',
+                    commentId: comment._id,
+                    updatedComment: response.data.comment
+                });
+            }
             
         } catch (err) {
             console.error("Unlike error:", err);
@@ -104,7 +121,8 @@ const CommentLike = ({ comment }) => {
 };
 
 CommentLike.propTypes = {
-    comment: PropTypes.object.isRequired
+    comment: PropTypes.object.isRequired,
+    onLikeDislikeChange: PropTypes.func
 };
 
 export default CommentLike;

@@ -1,11 +1,11 @@
-import  { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { FaThumbsDown, FaRegThumbsDown } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { useDislikeCommentMutation, useUndislikeCommentMutation, useUnlikeCommentMutation } from '../../api/comment';
 
-const CommentDislike = ({ comment }) => {
+const CommentDislike = ({ comment, onLikeDislikeChange }) => {
     const { theme } = useSelector((state) => state.theme);
     const [dislikeCount, setDislikeCount] = useState(0);
     const [isDisliked, setIsDisliked] = useState(false);
@@ -49,13 +49,12 @@ const CommentDislike = ({ comment }) => {
             if (isLiked) {
                 await unlikeComment({ id: comment._id, userId });
                 
-                // Update like count element if it exists
-                const likeCountElement = document.querySelector(`[data-comment-like-id="${comment._id}"] span`);
-                if (likeCountElement) {
-                    const currentCount = parseInt(likeCountElement.textContent);
-                    if (!isNaN(currentCount) && currentCount > 0) {
-                        likeCountElement.textContent = currentCount - 1;
-                    }
+                // IMPORTANT: Notify parent about the change
+                if (onLikeDislikeChange) {
+                    onLikeDislikeChange({
+                        type: 'UNLIKE',
+                        commentId: comment._id
+                    });
                 }
             }
             
@@ -63,7 +62,16 @@ const CommentDislike = ({ comment }) => {
             setIsDisliked(true);
             setDislikeCount(prev => prev + 1);
             
-            await dislikeComment({ id: comment._id, userId });
+            const response = await dislikeComment({ id: comment._id, userId });
+            
+            // IMPORTANT: Notify parent with updated comment data
+            if (onLikeDislikeChange && response.data?.comment) {
+                onLikeDislikeChange({
+                    type: 'DISLIKE',
+                    commentId: comment._id,
+                    updatedComment: response.data.comment
+                });
+            }
             
         } catch (err) {
             console.error("Dislike error:", err);
@@ -80,7 +88,16 @@ const CommentDislike = ({ comment }) => {
             setIsDisliked(false);
             setDislikeCount(prev => prev - 1);
             
-            await undislikeComment({ id: comment._id, userId });
+            const response = await undislikeComment({ id: comment._id, userId });
+            
+            // IMPORTANT: Notify parent with updated comment data
+            if (onLikeDislikeChange && response.data?.comment) {
+                onLikeDislikeChange({
+                    type: 'UNDISLIKE',
+                    commentId: comment._id,
+                    updatedComment: response.data.comment
+                });
+            }
             
         } catch (err) {
             console.error("Undislike error:", err);
@@ -92,7 +109,7 @@ const CommentDislike = ({ comment }) => {
     };
     
     return (
-        <div className='flex gap-1 justify-start items-center' data-comment-dislike-id={comment._id}>
+        <div className='flex gap-1 justify-start items-center'>
             {isDisliked ? (
                 <FaThumbsDown size={14} className='cursor-pointer' color={theme ? '#f87171' : '#dc2626'} onClick={handleUndislike} />
             ) : (
@@ -104,7 +121,8 @@ const CommentDislike = ({ comment }) => {
 };
 
 CommentDislike.propTypes = {
-    comment: PropTypes.object.isRequired
+    comment: PropTypes.object.isRequired,
+    onLikeDislikeChange: PropTypes.func
 };
 
 export default CommentDislike;

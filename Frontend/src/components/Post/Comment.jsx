@@ -89,6 +89,51 @@ const Comment = ({ comment, userData }) => {
         }
     };
 
+    const handleLikeDislikeChange = ({ type, updatedComment }) => {
+        // Define userId from userInfo
+        const userId = userInfo?.user?._id || userInfo?.updatedUser?._id;
+        
+        if (updatedComment) {
+            // If we have full updated comment data, use it
+            setLocalComment(updatedComment);
+        } else {
+            // Otherwise make optimistic updates based on action type
+            const newComment = { ...localComment };
+            
+            if (type === 'LIKE') {
+                // Add user to likes if not already there
+                if (!newComment.likes.includes(userId)) {
+                    newComment.likes = [...newComment.likes, userId];
+                }
+                // Remove from dislikes if present
+                newComment.dislikes = newComment.dislikes.filter(id => 
+                    id !== userId && (typeof id === 'object' ? id._id !== userId : true)
+                );
+            } else if (type === 'UNLIKE') {
+                // Remove from likes
+                newComment.likes = newComment.likes.filter(id => 
+                    id !== userId && (typeof id === 'object' ? id._id !== userId : true)
+                );
+            } else if (type === 'DISLIKE') {
+                // Add to dislikes if not already there
+                if (!newComment.dislikes.includes(userId)) {
+                    newComment.dislikes = [...newComment.dislikes, userId];
+                }
+                // Remove from likes if present
+                newComment.likes = newComment.likes.filter(id => 
+                    id !== userId && (typeof id === 'object' ? id._id !== userId : true)
+                );
+            } else if (type === 'UNDISLIKE') {
+                // Remove from dislikes
+                newComment.dislikes = newComment.dislikes.filter(id => 
+                    id !== userId && (typeof id === 'object' ? id._id !== userId : true)
+                );
+            }
+            
+            setLocalComment(newComment);
+        }
+    };
+
     useEffect(() => {
         setEditedComment(comment.comment)
     }, [comment.comment])
@@ -168,8 +213,14 @@ const Comment = ({ comment, userData }) => {
                     {/* Adjusted margin on like/dislike buttons */}
                     {!editMode && (
                         <div className="flex items-center space-x-4 mt-2 ml-12">
-                            <CommentLike comment={localComment} />
-                            <CommentDislike comment={localComment} />
+                            <CommentLike 
+                              comment={localComment} 
+                              onLikeDislikeChange={handleLikeDislikeChange} 
+                            />
+                            <CommentDislike 
+                              comment={localComment} 
+                              onLikeDislikeChange={handleLikeDislikeChange}
+                            />
                         </div>
                     )}
                 </div>
