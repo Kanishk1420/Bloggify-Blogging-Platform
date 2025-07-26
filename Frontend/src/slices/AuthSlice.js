@@ -14,10 +14,14 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     setCredentials: (state, action) => {
-      state.userInfo = action.payload;
-      // Only set authenticated if we have both user data and token
-      state.isAuthenticated = !!(action.payload && action.payload.token);
-      localStorage.setItem("userInfo", JSON.stringify(action.payload));
+      // Make sure token is included in userInfo
+      state.userInfo = {
+        ...action.payload,
+        token: action.payload.token  // Explicitly include token
+      };
+      state.isAuthenticated = true;
+      localStorage.setItem("userInfo", JSON.stringify(state.userInfo));
+      localStorage.setItem("userToken", action.payload.token); // Keep this as a backup
     },
     logout: (state) => {
       state.userInfo = null;

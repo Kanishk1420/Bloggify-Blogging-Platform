@@ -277,5 +277,19 @@ export const getSearchedUser = async (req, res) => {
   }
 };
 
+// Prepare headers for requests
+export const prepareHeaders = (headers, { getState }) => {
+  const token = getState().auth.userInfo?.token;
+  const localToken = localStorage.getItem("userToken");
+  
+  console.log('Redux token:', token);
+  console.log('LocalStorage token:', localToken);
+
+  if (token || localToken) {
+    headers.set("Authorization", `Bearer ${token || localToken}`);
+  }
+  return headers;
+};
+
 
 

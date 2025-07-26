@@ -5,6 +5,20 @@ export const authApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: `${import.meta.env.VITE_API_URL}`,
     credentials: "include",
+    prepareHeaders: (headers, { getState }) => {
+      // Try to get token from Redux state first
+      let token = getState().auth.userInfo?.token;
+
+      // If not in state, try localStorage
+      if (!token) {
+        token = localStorage.getItem("userToken");
+      }
+
+      if (token) {
+        headers.set("Authorization", `Bearer ${token}`);
+      }
+      return headers;
+    },
   }),
   tagTypes: ["User"],
   endpoints: (builder) => ({
