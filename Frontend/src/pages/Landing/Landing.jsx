@@ -464,49 +464,26 @@ const Landing = () => {
                 
                 {/* Popular Tags - Dynamic with Purple Styling */}
                 <div>
-                  <span className={`${theme ? 'text-gray-300' : 'text-slate-600'} font-medium mr-4`}>Popular Tags:</span>
-                  <div className="inline-flex flex-wrap gap-3 mt-3">
-                    {popularCategories.length > 0 ? (
-                      popularCategories.map((category, index) => (
-                        <span 
-                          key={index} 
-                          className={`px-4 py-1.5 rounded-full text-base font-medium transition-colors ${
-                            theme 
-                              ? "bg-purple-900/50 text-purple-300 border border-purple-800/50 hover:bg-purple-800/40" 
-                              : "bg-purple-100 text-purple-700 border border-purple-200 hover:bg-purple-50"
-                          }`}
-                          onClick={() => checkAuthAndProceed(`/?category=${encodeURIComponent(category.name)}`)}
-                        >
-                          {category.name}
-                        </span>
-                      ))
-                    ) : (
-                      // Fallback to default categories if no data is available
-                      <>
-                        <span className={`px-4 py-1.5 rounded-full text-base font-medium transition-colors ${
-                          theme 
-                            ? "bg-purple-900/50 text-purple-300 border border-purple-800/50 hover:bg-purple-800/40" 
-                            : "bg-purple-100 text-purple-700 border border-purple-200 hover:bg-purple-50"
-                        }`}>
-                          Design
-                        </span>
-                        <span className={`px-4 py-1.5 rounded-full text-base font-medium transition-colors ${
-                          theme 
-                            ? "bg-purple-900/50 text-purple-300 border border-purple-800/50 hover:bg-purple-800/40" 
-                            : "bg-purple-100 text-purple-700 border border-purple-200 hover:bg-purple-50"
-                        }`}>
-                          Development
-                        </span>
-                        <span className={`px-4 py-1.5 rounded-full text-base font-medium transition-colors ${
-                          theme 
-                            ? "bg-purple-900/50 text-purple-300 border border-purple-800/50 hover:bg-purple-800/40" 
-                            : "bg-purple-100 text-purple-700 border border-purple-200 hover:bg-purple-50"
-                        }`}>
-                          Technology
-                        </span>
-                      </>
-                    )}
-                  </div>
+                  {popularCategories.length > 0 && (
+                    <>
+                      <span className={`${theme ? 'text-gray-300' : 'text-slate-600'} font-medium mr-4`}>Popular Tags:</span>
+                      <div className="inline-flex flex-wrap gap-3 mt-3">
+                        {popularCategories.map((category, index) => (
+                          <span 
+                            key={index} 
+                            className={`px-4 py-1.5 rounded-full text-base font-medium transition-colors ${
+                              theme 
+                                ? "bg-purple-900/50 text-purple-300 border border-purple-800/50 hover:bg-purple-800/40" 
+                                : "bg-purple-100 text-purple-700 border border-purple-200 hover:bg-purple-50"
+                            }`}
+                            onClick={() => checkAuthAndProceed(`/?category=${encodeURIComponent(category.name)}`)}
+                          >
+                            {category.name}
+                          </span>
+                        ))}
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
               
