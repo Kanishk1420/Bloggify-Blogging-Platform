@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import DOMPurify from "dompurify";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -8,6 +9,12 @@ const MyBookmark = () => {
   const { theme } = useSelector((state) => state.theme);
   const navigate = useNavigate();
   const [showLoader, setShowLoader] = useState(true);
+  const [filteredBookmarks, setFilteredBookmarks] = useState([]);
+  
+  // Get search query from URL
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const bookmarkSearchQuery = searchParams.get('bookmarksearch');
 
   useEffect(() => {
     const delay = setTimeout(() => {
@@ -16,6 +23,23 @@ const MyBookmark = () => {
 
     return () => clearTimeout(delay);
   }, []);
+
+  // Filter bookmarks based on search term from URL
+  useEffect(() => {
+    if (!bookmarkedPosts || bookmarkedPosts.length === 0) {
+      setFilteredBookmarks([]);
+      return;
+    }
+    
+    if (!bookmarkSearchQuery) {
+      setFilteredBookmarks(bookmarkedPosts);
+    } else {
+      const filtered = bookmarkedPosts.filter(post => 
+        post.postData.title.toLowerCase().includes(bookmarkSearchQuery.toLowerCase())
+      );
+      setFilteredBookmarks(filtered);
+    }
+  }, [bookmarkedPosts, bookmarkSearchQuery]);
 
   // Loading skeleton for bookmarks
   const LoadingSkeleton = () => (
@@ -76,9 +100,9 @@ const MyBookmark = () => {
 
   return (
     <div className="container mx-auto px-4">
-      {bookmarkedPosts.length > 0 ? (
+      {filteredBookmarks.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
-          {bookmarkedPosts.map((post) => (
+          {filteredBookmarks.map((post) => (
             <div
               key={post.postId}
               className={`
@@ -178,11 +202,6 @@ const MyBookmark = () => {
         <div
           className={`
           rounded-xl overflow-hidden p-10 text-center
-          ${
-            theme
-              ? "bg-zinc-800/30 text-gray-300 border border-zinc-700/30"
-              : "bg-gray-50 text-gray-600 border border-gray-100"
-          }
         `}
         >
           <svg
@@ -202,13 +221,15 @@ const MyBookmark = () => {
             />
           </svg>
           <h3
-            className={`text-xl font-divd mb-2 ${
-              theme ? "text-white" : "text-gray-800"
-            }`}
+            className={`text-xl font-divd mb-2`}
           >
-            No Bookmarked Posts
+            {bookmarkSearchQuery ? `No bookmarks found matching "${bookmarkSearchQuery}"` : "No Bookmarked Posts"}
           </h3>
-          <p className="mb-4">You haven&apos;t bookmarked any posts yet.</p>
+          <p className="mb-4">
+            {bookmarkSearchQuery 
+              ? "Try a different search term or check your bookmarks." 
+              : "You haven't bookmarked any posts yet."}
+          </p>
           <button
             onClick={() => navigate("/home")}
             className="px-4 py-2 bg-indigo-600 text-white rounded-full font-medium hover:bg-indigo-700 transition-colors"

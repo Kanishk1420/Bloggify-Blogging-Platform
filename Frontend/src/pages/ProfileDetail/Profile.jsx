@@ -149,6 +149,35 @@ const Profile = () => {
     setPostSearch(e.target.value);
   };
 
+  // Update the active tab handler
+  const setActiveTab = (tab) => {
+    setActiveLink(tab);
+    localStorage.setItem('activeProfileTab', tab);
+    
+    // Update URL to reflect current tab
+    const baseUrl = pathname.split('?')[0];
+    if (tab === 'bookmarks') {
+      navigate(`${baseUrl}?tab=bookmarks`);
+    } else {
+      navigate(baseUrl);
+    }
+  };
+
+  // Check for active tab in URL or localStorage on page load
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tabParam = params.get('tab');
+    
+    if (tabParam === 'bookmarks') {
+      setActiveLink('bookmarks');
+    } else {
+      const savedTab = localStorage.getItem('activeProfileTab');
+      if (savedTab) {
+        setActiveLink(savedTab);
+      }
+    }
+  }, []);
+
   return (
     <PageTransition type="slide">
     <section className='modal-content'>
@@ -185,7 +214,7 @@ const Profile = () => {
                         ? 'text-gray-300 hover:text-white' 
                         : 'text-gray-600 hover:text-[#1576D8]'
                   }`}
-                  onClick={() => setActiveLink('posts')}
+                  onClick={() => setActiveTab('posts')}
                 >
                   Your posts
                 </h1>
@@ -199,7 +228,7 @@ const Profile = () => {
                         ? 'text-gray-300 hover:text-white' 
                         : 'text-gray-600 hover:text-[#1576D8]'
                   }`}
-                  onClick={() => setActiveLink('bookmarks')}
+                  onClick={() => setActiveTab('bookmarks')}
                 >
                   Bookmarks
                 </h1>

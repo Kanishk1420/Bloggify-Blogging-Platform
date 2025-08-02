@@ -41,8 +41,20 @@ const Navbar = () => {
         // Search for users
         navigate(`/finduser?search=${search}&t=${timestamp}`);
       } else if (path.includes("/profile")) {
-        // Search for posts when on profile page
-        navigate(`${path}?postsearch=${search}&t=${timestamp}`);
+        // Check if we're on bookmarks tab by looking for the URL parameter
+        const isBookmarksTab =
+          path.includes("?tab=bookmarks") ||
+          localStorage.getItem("activeProfileTab") === "bookmarks";
+
+        if (isBookmarksTab) {
+          // Search in bookmarks
+          navigate(
+            `${path.split("?")[0]}?tab=bookmarks&bookmarksearch=${search}&t=${timestamp}`
+          );
+        } else {
+          // Search in posts (default)
+          navigate(`${path}?postsearch=${search}&t=${timestamp}`);
+        }
       } else if (["/", "/home"].includes(path)) {
         // General search on home page
         navigate(`/?search=${search}&t=${timestamp}`);
