@@ -41,25 +41,32 @@ const Navbar = () => {
         // Search for users
         navigate(`/finduser?search=${search}&t=${timestamp}`);
       } else if (path.includes("/profile")) {
-        // Check if we're on bookmarks tab by looking for the URL parameter
+        // Profile page search handling
         const isBookmarksTab =
           path.includes("?tab=bookmarks") ||
           localStorage.getItem("activeProfileTab") === "bookmarks";
 
         if (isBookmarksTab) {
-          // Search in bookmarks
           navigate(
             `${path.split("?")[0]}?tab=bookmarks&bookmarksearch=${search}&t=${timestamp}`
           );
         } else {
-          // Search in posts (default)
           navigate(`${path}?postsearch=${search}&t=${timestamp}`);
         }
       } else if (["/", "/home"].includes(path)) {
-        // General search on home page
-        navigate(`/?search=${search}&t=${timestamp}`);
+        // For home page, check if we're already searching
+        const currentParams = new URLSearchParams(window.location.search);
+        const currentSearch = currentParams.get("search");
+        if (currentSearch === search) {
+          console.log("Search already applied:", search);
+          return;
+        }
+
+        // Maintain the current path when searching
+        const basePath = path === "/home" ? "/home" : "/";
+        navigate(`${basePath}?search=${search}&t=${timestamp}`, { replace: true });
       } else {
-        // For other pages, we should keep the user on the current page
+        // For other pages, log but don't navigate
         console.log("Searching for:", search);
       }
     }
@@ -149,7 +156,7 @@ const Navbar = () => {
         </div>
 
         {/* Desktop Search Bar */}
-        {(["/", "/finduser"].includes(path) ||
+        {(["/", "/home", "/finduser"].includes(path) ||
           (path.includes("/profile") && !path.includes("/edit"))) && (
           <div className="flex-grow max-w-lg mx-4 hidden sm:flex justify-center items-center">
             <div className="relative w-full">
@@ -184,7 +191,7 @@ const Navbar = () => {
         )}
 
         {/* Mobile Search Bar */}
-        {(["/", "/finduser"].includes(path) ||
+        {(["/", "/home", "/finduser"].includes(path) ||
           (path.includes("/profile") && !path.includes("/edit"))) && (
           <div className="flex sm:hidden flex-grow mx-2">
             <div className="relative w-full">

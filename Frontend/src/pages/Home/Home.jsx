@@ -12,30 +12,48 @@ import { toast } from 'react-toastify';
 import { useNavigate } from "react-router-dom";
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Footer from '../../components/Footer/Footer';
+import { BsSearch } from 'react-icons/bs';
 
 const Home = () => {
     const { data, isLoading, error } = useGetAllPostQuery();
     const dispatch = useDispatch();
-    const { search } = useLocation();
+    const location = useLocation();
+    const navigate = useNavigate();
+    const searchParams = new URLSearchParams(location.search);
+    const searchQuery = searchParams.get('search'); // Get search from URL
+    
+    // Fix: define localSearchTerm state to maintain compatibility
+    const [localSearchTerm, setLocalSearchTerm] = useState("");
     const [searchedPosts, setSearchedPosts] = useState([]);
     const [followingPosts, setFollowingPosts] = useState([]);
     const [allPost, setAllPosts] = useState([]);
+    const [filteredFollowingPosts, setFilteredFollowingPosts] = useState([]);
+    const [filteredAllPosts, setFilteredAllPosts] = useState([]);
     const [activeLink, setActiveLink] = useState('explore');
     const { theme } = useSelector((state) => state.theme);
-    const navigate = useNavigate();
-    const [loading, setLoading] = useState(0)
+    const [loading, setLoading] = useState(0);
     const { userInfo } = useSelector((state) => state.auth);
     const [getSearchPost, { isLoading: searchLoader }] = useGetSearchPostMutation();
     const { data: followingData, isLoading: followingLoading } = useGetFollowingPostQuery();
-
+    
     const [activePage, setActivePage] = useState(1);
     const [postLength, setPostLength] = useState(0);
     const [showAllPosts, setShowAllPosts] = useState(false);
+    
+    // Fix: Sync localSearchTerm with URL searchQuery
+    useEffect(() => {
+        if (searchQuery) {
+            setLocalSearchTerm(searchQuery);
+        } else {
+            setLocalSearchTerm("");
+        }
+    }, [searchQuery]);
 
-    // Fix: Properly handle following posts data
+    // Fix: Handle following posts data
     useEffect(() => {
         if (followingData?.followingPost) {
             setFollowingPosts(followingData.followingPost);
+            setFilteredFollowingPosts(followingData.followingPost);
         }
     }, [followingData]);
 
@@ -43,8 +61,33 @@ const Home = () => {
     useEffect(() => {
         if (data?.allPost) {
             setAllPosts(data.allPost);
+            setFilteredAllPosts(data.allPost);
         }
     }, [data]);
+
+    // Filter posts based on URL search parameter
+    useEffect(() => {
+        if (!searchQuery || searchQuery.trim() === "") {
+            // Reset to original posts when search is cleared
+            setFilteredAllPosts(allPost);
+            setFilteredFollowingPosts(followingPosts);
+        } else {
+            // Filter posts based on search term from URL
+            const searchLower = searchQuery.toLowerCase();
+            
+            // Filter all posts
+            const filteredAll = allPost.filter(post => 
+                post.title.toLowerCase().includes(searchLower)
+            );
+            setFilteredAllPosts(filteredAll);
+            
+            // Filter following posts
+            const filteredFollowing = followingPosts.filter(post => 
+                post.title.toLowerCase().includes(searchLower)
+            );
+            setFilteredFollowingPosts(filteredFollowing);
+        }
+    }, [searchQuery, allPost, followingPosts]);
 
     // Loading indicator effect
     useEffect(() => {
@@ -61,10 +104,20 @@ const Home = () => {
     const fetchMorePosts = () => {
     };
 
+    // Handle search input change
+    const handleSearchChange = (e) => {
+        setLocalSearchTerm(e.target.value);
+    };
+
+    // Clear search
+    const clearSearch = () => {
+        setLocalSearchTerm("");
+    };
+
     useEffect(() => {
         const fetchSearch = async () => {
             try {
-                const { data } = await getSearchPost(search);
+                const { data } = await getSearchPost(location.search);
                 if (data && data.searchedPost) {
                     setSearchedPosts(data.searchedPost);
                 } else {
@@ -75,12 +128,12 @@ const Home = () => {
             }
         };
 
-        if (search) {
+        if (searchQuery) {
             fetchSearch();
         } else {
             setSearchedPosts([]);
         }
-    }, [search, getSearchPost]);
+    }, [searchQuery, getSearchPost, location.search]);
 
     return (
         <>
@@ -99,37 +152,39 @@ const Home = () => {
                 </div>
             )}
             <div className={`px-4 md:px-6 lg:px-8 min-h-screen py-8 ${theme ? "bg-gradient-to-b from-black to-gray-900 via-black text-white" : ""}`}>
-                {/* Tab navigation - Updated with blue color for light mode */}
-                {!search && userInfo && (
-                    <div className='flex justify-start items-center gap-5 mb-6'>
-                        <h1
-                            className={`text-xl font-semibold cursor-pointer ${
-                                activeLink === 'explore' 
-                                ? theme 
-                                    ? 'border-b-2 border-white text-white' 
-                                    : 'border-b-2 border-[#1576D8] text-[#1576D8]' 
-                                : theme 
-                                    ? 'text-gray-300 hover:text-white' 
-                                    : 'text-gray-600 hover:text-[#1576D8]'
-                            }`}
-                            onClick={() => setActiveLink('explore')}
-                        >
-                            Explore
-                        </h1>
-                        <h1
-                            className={`text-xl font-semibold cursor-pointer ${
-                                activeLink === 'following' 
-                                ? theme 
-                                    ? 'border-b-2 border-white text-white' 
-                                    : 'border-b-2 border-[#1576D8] text-[#1576D8]' 
-                                : theme 
-                                    ? 'text-gray-300 hover:text-white' 
-                                    : 'text-gray-600 hover:text-[#1576D8]'
-                            }`}
-                            onClick={() => setActiveLink('following')}
-                        >
-                            Following
-                        </h1>
+                {/* Tab navigation without search bar */}
+                {!searchQuery && userInfo && (
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                        <div className="flex items-center gap-5">
+                            <h1
+                                className={`text-xl font-semibold cursor-pointer ${
+                                    activeLink === 'explore' 
+                                    ? theme 
+                                        ? 'border-b-2 border-white text-white' 
+                                        : 'border-b-2 border-[#1576D8] text-[#1576D8]' 
+                                    : theme 
+                                        ? 'text-gray-300 hover:text-white' 
+                                        : 'text-gray-600 hover:text-[#1576D8]'
+                                }`}
+                                onClick={() => setActiveLink('explore')}
+                            >
+                                Explore
+                            </h1>
+                            <h1
+                                className={`text-xl font-semibold cursor-pointer ${
+                                    activeLink === 'following' 
+                                    ? theme 
+                                        ? 'border-b-2 border-white text-white' 
+                                        : 'border-b-2 border-[#1576D8] text-[#1576D8]' 
+                                    : theme 
+                                        ? 'text-gray-300 hover:text-white' 
+                                        : 'text-gray-600 hover:text-[#1576D8]'
+                                }`}
+                                onClick={() => setActiveLink('following')}
+                            >
+                                Following
+                            </h1>
+                        </div>
                     </div>
                 )}
 
@@ -142,73 +197,89 @@ const Home = () => {
                         {userInfo && (
                             <>
                                 {searchLoader && <Loader />}
-                                {!searchLoader && searchedPosts.length === 0 && search ? (
+                                {!searchLoader && searchedPosts.length === 0 && searchQuery ? (
                                     <h1 className='font-bold text-xl text-center h-[90vh] mt-8'>No Post Found</h1>
                                 ) : (
                                     <>
                                         {/* Grid layout for search results */}
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 mx-auto w-full">
                                             {searchedPosts?.map((post) => (
-                                                <Link to={`/posts/post/${post._id}`} key={post._id}>
-                                                    <HomePost post={post} />
+                                                <Link to={`/posts/post/${post._id}`} key={post._id} className="flex justify-center">
+                                                    <div className="w-full max-w-[450px]">
+                                                        <HomePost post={post} />
+                                                    </div>
                                                 </Link>
                                             ))}
                                         </div>
                                     </>
                                 )}
-                                {activeLink === "following" ? (
+                                {activeLink === "following" && !searchQuery ? (
                                     followingLoading ? (
                                         <Loader />
                                     ) : (
                                         <InfiniteScroll
-                                            dataLength={followingPosts?.length || 0}
+                                            dataLength={filteredFollowingPosts?.length || 0}
                                             next={fetchMoreFollowing}
                                             hasMore={false}
                                             loader={<Loader />}
                                             endMessage={
                                                 <div className={`text-center mt-5 ${theme ? "text-slate-400" : "text-black"}`}>
-                                                    {followingPosts.length > 0 ? "No more posts to show" : "Follow more users to see their posts"}
+                                                    {filteredFollowingPosts.length > 0 ? 
+                                                        localSearchTerm && filteredFollowingPosts.length < followingPosts.length ? 
+                                                            "No more matching posts" : "No more posts to show"
+                                                        : localSearchTerm ?
+                                                            "No posts matching your search" : "Follow more users to see their posts"
+                                                    }
                                                 </div>
                                             }
                                         >
                                             {/* Grid layout for following posts */}
-                                            {followingPosts.length === 0 ? (
-                                                <div className='text-center mt-10 font-bold text-xl'>No posts from users you follow</div>
-                                            ) : (
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                                    {followingPosts.map((post) => (
-                                                        <Link to={`/posts/post/${post._id}`} key={post._id}>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 mx-auto w-full">
+                                                {filteredFollowingPosts.map((post) => (
+                                                    <Link to={`/posts/post/${post._id}`} key={post._id} className="flex justify-center">
+                                                        <div className="w-full max-w-[450px]">
                                                             <HomePost post={post} />
-                                                        </Link>
-                                                    ))}
-                                                </div>
-                                            )}
+                                                        </div>
+                                                    </Link>
+                                                ))}
+                                            </div>
                                         </InfiniteScroll>
                                     )
-                                ) : (
+                                ) : (!searchQuery && (
                                     <InfiniteScroll
-                                        dataLength={allPost?.length || 0}
+                                        dataLength={filteredAllPosts?.length || 0}
                                         next={fetchMorePosts}
                                         hasMore={false}
                                         loader={<Loader />}
+                                        endMessage={
+                                            <div className={`text-center mt-5 ${theme ? "text-slate-400" : "text-black"}`}>
+                                                {filteredAllPosts.length > 0 ?
+                                                    localSearchTerm && filteredAllPosts.length < allPost.length ?
+                                                        "No more matching posts" : "No more posts to show"
+                                                    : "No posts matching your search"
+                                                }
+                                            </div>
+                                        }
                                     >
                                         {/* Grid layout for all posts */}
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                            {!search && allPost.map((post) => (
-                                                <Link to={`/posts/post/${post._id}`} key={post._id}>
-                                                    <HomePost post={post} />
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 mx-auto w-full">
+                                            {filteredAllPosts.map((post) => (
+                                                <Link to={`/posts/post/${post._id}`} key={post._id} className="flex justify-center">
+                                                    <div className="w-full max-w-[450px]">
+                                                        <HomePost post={post} />
+                                                    </div>
                                                 </Link>
                                             ))}
                                         </div>
                                     </InfiniteScroll>
-                                )}
+                                ))}
                             </>
                         )}
                         {!userInfo && <h1 className='text-2xl font-bold text-center mt-8'>Login to view posts</h1>}
                     </div>
 
                     {/* Sidebar */}
-                    {!search && userInfo && (
+                    {!searchQuery && userInfo && (
                         <div className="md:w-80 lg:w-96 order-1 md:order-2 mb-6 md:mb-0">
                             <Sidebar />
                         </div>
