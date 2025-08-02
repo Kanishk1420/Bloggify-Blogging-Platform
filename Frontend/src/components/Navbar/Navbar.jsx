@@ -34,16 +34,13 @@ const Navbar = () => {
 
   const handleSearch = () => {
     if (search.trim() !== "") {
+      // Add timestamp to force refresh of component when searching
+      const timestamp = new Date().getTime();
+
       if (path === "/finduser") {
-        navigate(`/finduser?search=${search}`);
+        navigate(`/finduser?search=${search}&t=${timestamp}`);
       } else {
-        navigate(`/?search=${search}`);
-      }
-    } else {
-      if (path === "/finduser") {
-        navigate("/finduser");
-      } else {
-        navigate("/");
+        navigate(`/?search=${search}&t=${timestamp}`);
       }
     }
   };
@@ -60,9 +57,6 @@ const Navbar = () => {
 
   const handleInputChange = (e) => {
     setSearch(e.target.value);
-    if (e.target.value.trim() === "") {
-      navigate("/");
-    }
   };
 
   const path = useLocation().pathname;
