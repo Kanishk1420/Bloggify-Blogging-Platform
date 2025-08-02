@@ -38,9 +38,17 @@ const Navbar = () => {
       const timestamp = new Date().getTime();
 
       if (path === "/finduser") {
+        // Search for users
         navigate(`/finduser?search=${search}&t=${timestamp}`);
-      } else {
+      } else if (path.includes("/profile")) {
+        // Search for posts when on profile page
+        navigate(`${path}?postsearch=${search}&t=${timestamp}`);
+      } else if (["/", "/home"].includes(path)) {
+        // General search on home page
         navigate(`/?search=${search}&t=${timestamp}`);
+      } else {
+        // For other pages, we should keep the user on the current page
+        console.log("Searching for:", search);
       }
     }
   };
@@ -57,6 +65,7 @@ const Navbar = () => {
 
   const handleInputChange = (e) => {
     setSearch(e.target.value);
+    // No navigation logic here - only update the state
   };
 
   const path = useLocation().pathname;

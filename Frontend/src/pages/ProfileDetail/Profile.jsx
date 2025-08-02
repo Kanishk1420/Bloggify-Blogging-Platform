@@ -16,6 +16,7 @@ import Loader from '../../components/Loader/Loader';
 import Userfollowing from './Userfollowing';
 import UserFollowers from './UserFollowers'
 import PageTransition from '../../components/PageTransition/PageTransition';
+import { BsSearch } from 'react-icons/bs';
 
 
 
@@ -40,7 +41,7 @@ const Profile = () => {
   const [followerCount, setFollowerCount] = useState(0);
   const [processing, setProcessing] = useState(false)
   const effectRun = useRef(false)
-
+  const [postSearch, setPostSearch] = useState("");
 
 
 
@@ -143,6 +144,11 @@ const Profile = () => {
     };
   }, [showModal]);
 
+  // Add a handler for search input
+  const handlePostSearch = (e) => {
+    setPostSearch(e.target.value);
+  };
+
   return (
     <PageTransition type="slide">
     <section className='modal-content'>
@@ -201,8 +207,10 @@ const Profile = () => {
             )}
             {activeLink === 'posts' ? (
               <>
-                <h1 className='text-xl font-bold mt-5'>Posts</h1>
-                <MyBlogs userId={userId} />
+                <div className="flex items-center justify-between mb-4">
+                  <h1 className='text-xl font-bold mt-5'>Posts</h1>
+                </div>
+                <MyBlogs userId={userId} searchTerm={postSearch} />
               </>
             ) : (
               <>

@@ -2,18 +2,23 @@
 /* eslint-disable no-unused-vars */
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import DOMPurify from 'dompurify';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useGetUserPostQuery } from '../../api/post';
 import { myPosts } from '../../slices/PostSlice';
 import Loader from '../Loader/Loader';
 import { Loader2 } from 'lucide-react';
+import DOMPurify from 'dompurify';
 
 const MyBlogs = ({ userId }) => {
     const { id } = useParams();
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
+    const postSearchQuery = searchParams.get('postsearch');
+    
     const { data, isLoading } = useGetUserPostQuery(userId);
     const [userPost, setUserPost] = useState([]);
+    const [filteredPosts, setFilteredPosts] = useState([]);
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { theme } = useSelector((state) => state.theme);
@@ -35,6 +40,20 @@ const MyBlogs = ({ userId }) => {
 
         return () => clearTimeout(delay);
     }, []);
+
+    // Filter posts based on search term from URL
+    useEffect(() => {
+        if (!data?.userPost) return;
+        
+        if (!postSearchQuery) {
+            setFilteredPosts(data.userPost);
+        } else {
+            const filtered = data.userPost.filter(post => 
+                post.title.toLowerCase().includes(postSearchQuery.toLowerCase())
+            );
+            setFilteredPosts(filtered);
+        }
+    }, [data, postSearchQuery]);
 
     // Loading skeleton for cards
     const LoadingSkeleton = () => (
@@ -70,9 +89,9 @@ const MyBlogs = ({ userId }) => {
 
     return (
         <>
-            {data?.userPost?.length > 0 ? (
+            {filteredPosts.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 mt-8">
-                    {data?.userPost?.map((post) => (
+                    {filteredPosts.map((post) => (
                         <div 
                             key={post._id} 
                             className={`
@@ -143,14 +162,30 @@ const MyBlogs = ({ userId }) => {
                     ))}
                 </div>
             ) : (
-                <h1 className='text-2xl font-bold text-center mt-8'>No Post Found</h1>
+                <div className={`
+                    flex flex-col items-center justify-center py-16 px-4 
+                    rounded-xl ${theme ? "bg-zinc-900" : "bg-white"} 
+                    shadow-lg text-center mt-4
+                `}>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mb-4 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                    </svg>
+                    <h1 className='text-2xl font-bold'>
+                        {postSearchQuery ? `No posts found matching "${postSearchQuery}"` : "No Posts Found"}
+                    </h1>
+                    <p className={`mt-2 ${theme ? "text-gray-400" : "text-gray-600"}`}>
+                        {postSearchQuery 
+                            ? "Try a different search term or check back later." 
+                            : "This user hasn't published any posts yet."}
+                    </p>
+                </div>
             )}
         </>
     );
 };
 
 MyBlogs.propTypes = {
-    userId: PropTypes.string.isRequired
+    userId: PropTypes.string.isRequired,
 };
 
 export default MyBlogs;
