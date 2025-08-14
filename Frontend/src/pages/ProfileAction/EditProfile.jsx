@@ -511,6 +511,13 @@ const EditProfile = () => {
     };
   }, [showDeleteModal]);
 
+  // Add this function to the EditProfile component
+    const generateRandomAvatar = () => {
+      const randomAvatar = `https://avatar.iran.liara.run/public?t=${new Date().getTime()}`;
+      setPreview(randomAvatar);
+      setFormChanged(true);
+    };
+
   return (
     <>
       <Navbar />
