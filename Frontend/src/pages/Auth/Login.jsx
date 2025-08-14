@@ -42,7 +42,17 @@ const Login = () => {
     e.preventDefault();
     try {
       const res = await login({ email, password }).unwrap();
-      toast.success(res?.message || 'Logged in successfully');
+      console.log("Login response:", res);
+      
+      // Access the firstname and lastname from the user object
+      let welcomeName = '';
+      if (res?.user?.firstname && res?.user?.lastname) {
+        welcomeName = `${res.user.firstname} ${res.user.lastname}`;
+      } else if (res?.user?.username) {
+        welcomeName = res.user.username;
+      }
+      
+      toast.success(`Welcome back, ${welcomeName}!`);
       dispatch(setCredentials(res))
       setLoading(false)
       

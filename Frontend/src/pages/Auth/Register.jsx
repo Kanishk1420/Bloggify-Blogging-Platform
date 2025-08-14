@@ -148,7 +148,10 @@ const Register = () => {
     try {
       const res = await register({ email, password, username, firstname, lastname }).unwrap();
       dispatch(setCredentials(res));
-      toast.success(res?.message || 'Registered successfully');
+      
+      // Replace generic success message with personalized welcome
+      toast.success(`Welcome to Bloggify, ${firstname} ${lastname}!`);
+      
       setLoading(false);
       
       // Change this from '/' to '/home' to match login behavior
