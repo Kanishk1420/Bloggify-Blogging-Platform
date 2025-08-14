@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import PropTypes from 'prop-types';
-import avatar from '../../assets/avatar.jpg';
 import { useFollowUserMutation, useUnfollowUserMutation } from '../../api/user';
+import { DEFAULT_AVATAR } from '../../utils/avatarUtil';
 
 const AllUsersList = ({ users: initialUsers }) => {
   const navigate = useNavigate();
@@ -94,7 +94,7 @@ const AllUsersList = ({ users: initialUsers }) => {
               onClick={() => navigateToProfile(user._id)}
             >
               <img
-                src={user.profilePhoto?.url || avatar}
+                src={user.profilePhoto?.url || DEFAULT_AVATAR}
                 alt={user.username}
                 className="w-12 h-12 rounded-full object-cover border border-gray-200 shadow-sm"
               />

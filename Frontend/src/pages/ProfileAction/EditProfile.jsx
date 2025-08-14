@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
-import avatar from "../../assets/avatar.jpg";
+import { DEFAULT_AVATAR } from '../../utils/avatarUtil';
 import { userApi } from "../../api/user";
 import {
   useGetUserQuery,
@@ -279,6 +279,13 @@ const EditProfile = () => {
       if (password) {
         formData.append("password", password);
       }
+
+      // Add this to handle the selected avatar
+      if (selectedAvatar && !file) {
+        // If user selected an avatar from gallery but didn't upload a file
+        formData.append("profilePhotoUrl", selectedAvatar);
+      }
+
       setLoading(50);
 
       // Update user with FormData
@@ -512,11 +519,37 @@ const EditProfile = () => {
   }, [showDeleteModal]);
 
   // Add this function to the EditProfile component
-    const generateRandomAvatar = () => {
-      const randomAvatar = `https://avatar.iran.liara.run/public?t=${new Date().getTime()}`;
-      setPreview(randomAvatar);
-      setFormChanged(true);
-    };
+  const generateRandomAvatar = () => {
+    const randomAvatar = `https://avatar.iran.liara.run/public?t=${new Date().getTime()}`;
+    setPreview(randomAvatar);
+    setFormChanged(true);
+  };
+
+  // First, add a new state to track avatar gallery visibility
+  const [showAvatarGallery, setShowAvatarGallery] = useState(false);
+  const [avatarGallery, setAvatarGallery] = useState([]);
+  const [selectedAvatar, setSelectedAvatar] = useState(null);
+
+  // Function to load avatars
+  const loadAvatarGallery = () => {
+    // Create an array of 24 numbered avatars
+    const avatars = [];
+    for (let i = 1; i <= 24; i++) {
+      avatars.push({
+        id: i,
+        url: `https://avatar.iran.liara.run/public/${i}`
+      });
+    }
+    setAvatarGallery(avatars);
+    setShowAvatarGallery(true);
+  };
+
+  // Function to select an avatar
+  const selectAvatar = (avatarUrl) => {
+    setPreview(avatarUrl);
+    setSelectedAvatar(avatarUrl);
+    setFormChanged(true);
+  };
 
   return (
     <>
@@ -625,7 +658,7 @@ const EditProfile = () => {
                             preview ||
                             (data?.user?.profilePhoto
                               ? `${img}${data?.user?.profilePhoto}`
-                              : avatar)
+                              : DEFAULT_AVATAR)
                           }
                           alt="Profile Avatar"
                         />
@@ -699,6 +732,100 @@ const EditProfile = () => {
                           Change photo
                         </button>
                       </div>
+                    </div>
+                  </div>
+
+                  {/* Custom Avatar Options */}
+                  <div className="mb-8 pb-8 border-t border-dashed border-gray-700/30 pt-8">
+                    <h2
+                      className={`text-lg font-semibold mb-4 ${
+                        theme ? "text-gray-200" : "text-gray-700"
+                      }`}
+                    >
+                      Custom Avatar Options
+                    </h2>
+
+                    <div className="flex flex-col space-y-4">
+                      <p className={`text-sm ${theme ? "text-gray-400" : "text-gray-500"}`}>
+                        Choose from our collection of custom avatars or generate a random one.
+                      </p>
+
+                      <div className="flex flex-wrap gap-3">
+                        <button
+                          type="button"
+                          onClick={generateRandomAvatar}
+                          className={`py-2 px-4 text-sm font-medium rounded-lg ${
+                            theme
+                              ? "bg-indigo-600/70 text-white hover:bg-indigo-600"
+                              : "bg-indigo-500 text-white hover:bg-indigo-600"
+                          } transition-all duration-200`}
+                        >
+                          Generate Random Avatar
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={loadAvatarGallery}
+                          className={`py-2 px-4 text-sm font-medium rounded-lg ${
+                            theme
+                              ? "bg-zinc-800 text-white hover:bg-zinc-700"
+                              : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                          } transition-all duration-200`}
+                        >
+                          Browse Avatar Gallery
+                        </button>
+                      </div>
+
+                      {/* Avatar Gallery Grid */}
+                      {showAvatarGallery && (
+                        <div className="mt-4">
+                          <div className="flex justify-between items-center mb-3">
+                            <h3 className={`font-medium ${theme ? "text-white" : "text-gray-800"}`}>
+                              Select an Avatar
+                            </h3>
+                            <button
+                              type="button"
+                              onClick={() => setShowAvatarGallery(false)}
+                              className={`text-sm ${theme ? "text-gray-400 hover:text-white" : "text-gray-500 hover:text-gray-800"}`}
+                            >
+                              Close Gallery
+                            </button>
+                          </div>
+
+                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 max-h-[400px] overflow-y-auto p-2">
+                            {avatarGallery.map((avatar) => (
+                              <div 
+                                key={avatar.id} 
+                                className={`relative rounded-lg overflow-hidden cursor-pointer transition-all duration-200 transform hover:scale-105 ${
+                                  preview === avatar.url ? 'ring-2 ring-offset-2 ring-blue-500' : ''
+                                }`}
+                                onClick={() => selectAvatar(avatar.url)}
+                              >
+                                <img 
+                                  src={avatar.url} 
+                                  alt={`Avatar option #${avatar.id}`} 
+                                  className="w-full h-auto object-cover"
+                                  loading="lazy"
+                                />
+                                <div className={`absolute bottom-0 left-0 right-0 bg-black/50 text-white text-xs py-1 px-2 text-center ${theme ? "" : ""}`}>
+                                  #{avatar.id}
+                                </div>
+
+                                {/* Selection indicator */}
+                                {preview === avatar.url && (
+                                  <div className="absolute inset-0 bg-blue-500/20 flex items-center justify-center">
+                                    <div className="bg-blue-500 rounded-full p-1">
+                                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                      </svg>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
 

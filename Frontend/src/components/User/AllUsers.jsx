@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import { useFollowUserMutation } from '../../api/user';
 import PropTypes from 'prop-types';
 import { toast } from 'react-toastify';
-import avatar from '../../assets/avatar.jpg';
+import { DEFAULT_AVATAR } from '../../utils/avatarUtil';
 
 const AllUsers = ({ user, onFollowSuccess }) => {
     const { theme } = useSelector((state) => state.theme);
@@ -29,7 +29,7 @@ const AllUsers = ({ user, onFollowSuccess }) => {
             <Link to={`/profile/${user._id}`} className="flex items-center gap-3 flex-grow">
                 <div className="relative">
                     <img
-                        src={user.profilePhoto?.url || avatar}
+                        src={user.profilePhoto?.url || DEFAULT_AVATAR}
                         alt={user.username}
                         className="w-10 h-10 rounded-full object-cover border border-gray-200 shadow-sm"
                     />

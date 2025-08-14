@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import avatar from '../../assets/avatar.jpg';
+import { DEFAULT_AVATAR } from '../../utils/avatarUtil';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useUserFollowerListQuery } from '../../api/user';
@@ -68,7 +68,7 @@ const UserFollowing = () => {
                         >
                             <div className="flex items-center gap-3">
                                 <img
-                                    src={followingUser.profilePhoto?.url ?? avatar}
+                                    src={followingUser.profilePhoto?.url ?? DEFAULT_AVATAR}
                                     className={`w-12 h-12 object-cover rounded-full ${
                                         theme 
                                             ? "border border-zinc-700" 

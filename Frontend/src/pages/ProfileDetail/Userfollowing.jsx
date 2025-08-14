@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import { useEffect, useRef } from 'react';
 import { Loader2 } from 'lucide-react';
-import avatar from '../../assets/avatar.jpg'
+import { DEFAULT_AVATAR } from '../../utils/avatarUtil';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
@@ -72,7 +72,7 @@ const Userfollowing = () => {
                         >
                             <div className="flex items-center gap-3">
                                 <img
-                                    src={followingUser.profilePhoto?.url ?? avatar}
+                                    src={followingUser.profilePhoto?.url ?? DEFAULT_AVATAR}
                                     className={`w-12 h-12 object-cover rounded-full ${
 
                                         theme

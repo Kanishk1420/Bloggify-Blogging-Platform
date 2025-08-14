@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useRef, useState } from 'react';
-import avatar from '../../assets/avatar.jpg'
+import { DEFAULT_AVATAR } from '../../utils/avatarUtil';
 import { useSelector } from 'react-redux';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { FaTimes } from 'react-icons/fa';
@@ -272,7 +272,7 @@ const Profile = () => {
                       theme ? "border-zinc-900 bg-zinc-900" : "border-white bg-white"
                     } shadow-md`}>
                       <img 
-                        src={userData?.profilePhoto?.url ?? avatar} 
+                        src={userData?.profilePhoto?.url ?? DEFAULT_AVATAR} 
                         alt='profile' 
                         className="w-full h-full object-cover" 
                       />

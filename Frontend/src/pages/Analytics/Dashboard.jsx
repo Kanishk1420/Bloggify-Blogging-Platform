@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { FaBookmark, FaHeart, FaUser, FaThumbsDown } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import avatar from "../../assets/avatar.jpg";
+import { DEFAULT_AVATAR } from '../../utils/avatarUtil';
 import Navbar from "../../components/Navbar/Navbar";
 import Footer from "../../components/Footer/Footer";
 import PageTransition from "../../components/PageTransition/PageTransition";
@@ -325,7 +325,7 @@ const Dashboard = () => {
                             }`}
                           >
                             <img
-                              src={followingUser.profilePhoto?.url ?? avatar}
+                              src={followingUser.profilePhoto?.url ?? DEFAULT_AVATAR}
                               className="w-12 h-12 rounded-full object-cover border-2 border-purple-500 p-0.5"
                               alt={followingUser.username || "Follower"}
                             />
