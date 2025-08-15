@@ -419,11 +419,7 @@ const Dashboard = () => {
                     </>
                   ) : (
                     <div
-                      className={`flex flex-col items-center justify-center p-6 rounded-lg ${
-                        theme
-                          ? "bg-zinc-900 border border-zinc-800"
-                          : "bg-white border border-gray-200"
-                      }`}
+                      className={`flex flex-col items-center justify-center p-6 rounded-lg bg-opacity-10 backdrop-blur-sm border border-gray-700/30`}
                     >
                       <p className="text-lg font-medium mb-1">
                         No followers yet
