@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import PropTypes from 'prop-types';
-import avatar from '../../assets/avatar.jpg';
 import { useFollowUserMutation, useUnfollowUserMutation } from '../../api/user';
+import { DEFAULT_AVATAR, getRandomAvatar } from '../../utils/avatarUtil';
+import OptimizedAvatar from '../../components/Avatar/OptimizedAvatar';
 
 const AllUsersList = ({ users: initialUsers }) => {
   const navigate = useNavigate();
@@ -93,10 +94,12 @@ const AllUsersList = ({ users: initialUsers }) => {
               className="flex items-center gap-3 flex-grow cursor-pointer"
               onClick={() => navigateToProfile(user._id)}
             >
-              <img
-                src={user.profilePhoto?.url || avatar}
+              <OptimizedAvatar
+                src={user.profilePhoto?.url || getRandomAvatar(user._id)}
                 alt={user.username}
                 className="w-12 h-12 rounded-full object-cover border border-gray-200 shadow-sm"
+                fallbackSrc={DEFAULT_AVATAR}
+                loading="lazy"
               />
               <div className="user-details">
                 <p className={`font-bold ${theme ? "text-white" : "text-gray-900"}`}>

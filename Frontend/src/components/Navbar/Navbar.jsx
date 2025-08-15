@@ -4,7 +4,8 @@ import { BsSearch } from "react-icons/bs";
 import { useDispatch, useSelector } from "react-redux";
 import MobileMenu from "../MobileNav/MobileMenu.jsx";
 import { TfiPencilAlt } from "react-icons/tfi";
-import avatar from "../../assets/avatar.jpg";
+import { DEFAULT_AVATAR } from '../../utils/avatarUtil';
+import OptimizedAvatar from '../Avatar/OptimizedAvatar';
 import darkLogo from "../../assets/Bloggify white.png";
 import lightLogo from "../../assets/Bloggify.png";
 import { BsMoonStarsFill } from "react-icons/bs";
@@ -256,10 +257,12 @@ const Navbar = () => {
                   onClick={toggleNav}
                   className="flex items-center justify-center"
                 >
-                  <img
-                    src={profilePhoto || avatar}
+                  <OptimizedAvatar
+                    src={profilePhoto || DEFAULT_AVATAR}
                     className="w-10 h-10 rounded-full object-cover"
                     alt="Profile"
+                    fallbackSrc={DEFAULT_AVATAR}
+                    loading="eager"
                   />
                 </button>
 

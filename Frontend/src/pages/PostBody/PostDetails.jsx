@@ -8,7 +8,7 @@ import {
   useCreateCommentMutation,
   useGetAllCommentQuery,
 } from "../../api/comment";
-import avatar from "../../assets/avatar.jpg";
+import { DEFAULT_AVATAR } from '../../utils/avatarUtil';
 import { BiEdit } from "react-icons/bi";
 import { MdDelete } from "react-icons/md";
 import PostDetailSkeleton from "../../components/Skeleton/PostDetailSkeleton";
@@ -334,7 +334,7 @@ const PostDetails = () => {
                   src={
                     userData?.user?.profilePhoto?.url
                       ? userData.user.profilePhoto?.url
-                      : avatar
+                      : DEFAULT_AVATAR
                   }
                   className="w-10 h-10 rounded-full ring-1 ring-gray-300 cursor-pointer object-cover shadow-sm"
                   alt="Author"

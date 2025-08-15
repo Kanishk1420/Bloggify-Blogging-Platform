@@ -5,7 +5,8 @@ import { useSelector } from 'react-redux';
 import { useDeleteCommentMutation, useUpdateCommentMutation } from '../../api/comment'
 import { toast } from 'react-toastify';
 import { useGetUserQuery } from '../../api/user'
-import avatar from '../../assets/avatar.jpg'
+const defaultAvatar = 'https://avatar.iran.liara.run/public';
+
 import CommentLike from '../Comment/CommentLike';
 import CommentDislike from '../Comment/CommentDislike';
 
@@ -143,7 +144,7 @@ const Comment = ({ comment, userData }) => {
                     {/* User image */}
                     <div className="flex-shrink-0 mr-3">
                         <img
-                          src={data?.user?.profilePhoto?.url ?? avatar}
+                          src={data?.user?.profilePhoto?.url ?? defaultAvatar}
                           alt=""
                           className="w-10 h-10 object-cover rounded-full"
                         />

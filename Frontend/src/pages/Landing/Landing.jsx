@@ -1,4 +1,4 @@
-/* eslint-disable react-hooks/exhaustive-deps */
+ 
 import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -19,7 +19,7 @@ import blogSVG from "../../assets/undraw_blog_1ca8.svg";
 import blogPostSVG from "../../assets/undraw_blog-post_f68f.svg";
 import fashionBloggingSVG from "../../assets/undraw_fashion-blogging_wfoz.svg";
 import publishSVG from "../../assets/undraw_publish-article_u3z6.svg";
-import defaultAvatar from "../../assets/avatar.jpg";
+import { DEFAULT_AVATAR } from '../../utils/avatarUtil';
 
 
 
@@ -133,7 +133,7 @@ const BlogCard = ({ post, theme }) => {
     if (post?.author?.avatar) return post.author.avatar;
     
     // Custom default avatar - replace with actual path to your 3D avatar image
-    return defaultAvatar;
+    return DEFAULT_AVATAR;
   };
 
   // Get the author name from various possible locations

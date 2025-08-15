@@ -10,7 +10,7 @@ export const updateUser = async (req, res) => {
     console.log("Update request body fields:", Object.keys(req.body));
 
     const id = req.userId;
-    const { password, username, firstname, lastname, email, bio } = req.body;
+    const { password, username, firstname, lastname, email, bio, profilePhotoUrl } = req.body;
     const updateFields = {};
 
     // Check if the user exists
@@ -42,19 +42,33 @@ export const updateUser = async (req, res) => {
     if (email) updateFields.email = email;
     updateFields.bio = bio !== undefined ? bio : authUser.bio;
 
+    // Handle profile photo update (file upload or URL)
     const file = req.file;
     if (file) {
+      // Handle file upload
       const filUri = getDataUri(file);
       const result = await cloudinary.uploader.upload(filUri.content, {
         folder: "profile",
         resource_type: "auto",
         use_filename: true,
         public_id: file.originalname.split(".")[0],
+        // Add optimization settings
+        quality: "auto",
+        fetch_format: "auto",
+        crop: "fill",
+        width: 400,
+        height: 400,
       });
 
       updateFields.profilePhoto = {
         public_id: result.public_id,
         url: result.secure_url,
+      };
+    } else if (profilePhotoUrl) {
+      // Handle external URL (like avatar gallery selection)
+      updateFields.profilePhoto = {
+        public_id: null, // No Cloudinary public_id for external URLs
+        url: profilePhotoUrl,
       };
     }
 

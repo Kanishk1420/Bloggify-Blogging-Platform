@@ -146,15 +146,18 @@ const Register = () => {
     
     setLoading(true);
     try {
-      const res = await register({ email, password, username, firstname, lastname }).unwrap();
+      // Remove the avatarUrl from registration data
+      const res = await register({ 
+        email, 
+        password, 
+        username, 
+        firstname, 
+        lastname
+      }).unwrap();
+      
       dispatch(setCredentials(res));
-      
-      // Replace generic success message with personalized welcome
       toast.success(`Welcome to Bloggify, ${firstname} ${lastname}!`);
-      
       setLoading(false);
-      
-      // Change this from '/' to '/home' to match login behavior
       navigate('/home');
     } catch (err) {
       setLoading(false);
@@ -256,7 +259,7 @@ const Register = () => {
           <div className={`rounded-lg border ${theme ? "border-slate-800 bg-black/70 text-white" : "border-gray-200 bg-white text-zinc-900"} shadow-md max-w-md w-full`}>
             <div className="flex h-full flex-col justify-center gap-4 p-6">
               <div className="left-0 right-0 inline-block border-gray-200 px-2 py-2.5 sm:px-4">
-                <form className="flex flex-col gap-4 pb-4" onSubmit={handleSubmit}>
+                <form className="flex flex-col gap-4 pb-6" onSubmit={handleSubmit}>
                   <h1 className="mb-4 text-2xl font-bold ">Register</h1>
 
 
@@ -402,6 +405,7 @@ const Register = () => {
                       </div>
                     </div>
                   </div>
+
                   <div className="flex flex-col gap-2">
                     {/* Primary Register Button */}
                     <button 
