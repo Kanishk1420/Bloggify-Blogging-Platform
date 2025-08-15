@@ -530,18 +530,38 @@ const EditProfile = () => {
   const [avatarGallery, setAvatarGallery] = useState([]);
   const [selectedAvatar, setSelectedAvatar] = useState(null);
 
-  // Function to load avatars
+  // Add these state variables for pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const AVATARS_PER_PAGE = 24;
+
+  // Update the loadAvatarGallery function to handle all available avatars
   const loadAvatarGallery = () => {
-    // Create an array of 24 numbered avatars
     const avatars = [];
-    for (let i = 1; i <= 24; i++) {
+    for (let i = 1; i <= 100; i++) {
       avatars.push({
         id: i,
         url: `https://avatar.iran.liara.run/public/${i}`
       });
     }
     setAvatarGallery(avatars);
+    // Calculate total pages based on 24 avatars per page
+    setTotalPages(Math.ceil(avatars.length / AVATARS_PER_PAGE));
+    setCurrentPage(1);
     setShowAvatarGallery(true);
+  };
+
+  // Add navigation functions
+  const goToPreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
   };
 
   // Function to select an avatar
@@ -550,6 +570,9 @@ const EditProfile = () => {
     setSelectedAvatar(avatarUrl);
     setFormChanged(true);
   };
+
+  // Add this state to track which section is active
+  const [activeSection, setActiveSection] = useState('personal-info'); // Options: 'personal-info', 'avatar-options'
 
   return (
     <>
@@ -601,10 +624,18 @@ const EditProfile = () => {
                 <nav className="space-y-2">
                   <a
                     href="#personal-info"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setActiveSection('personal-info');
+                    }}
                     className={`flex items-center px-4 py-2.5 rounded-lg ${
-                      theme
-                        ? "bg-blue-900/30 text-blue-200"
-                        : "bg-blue-50 text-blue-700"
+                      activeSection === 'personal-info'
+                        ? theme
+                          ? "bg-blue-900/30 text-blue-200"
+                          : "bg-blue-50 text-blue-700"
+                        : theme
+                        ? "hover:bg-zinc-800 text-gray-300"
+                        : "hover:bg-gray-100 text-gray-700"
                     }`}
                   >
                     <svg
@@ -623,6 +654,40 @@ const EditProfile = () => {
                     </svg>
                     Personal Info
                   </a>
+                  
+                  {/* Add new avatar options menu item */}
+                  <a
+                    href="#avatar-options"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setActiveSection('avatar-options');
+                    }}
+                    className={`flex items-center px-4 py-2.5 rounded-lg ${
+                      activeSection === 'avatar-options'
+                        ? theme
+                          ? "bg-blue-900/30 text-blue-200"
+                          : "bg-blue-50 text-blue-700"
+                        : theme
+                        ? "hover:bg-zinc-800 text-gray-300"
+                        : "hover:bg-gray-100 text-gray-700"
+                    }`}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5 mr-3"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    Custom Avatar
+                  </a>
                 </nav>
               </div>
             </aside>
@@ -636,121 +701,511 @@ const EditProfile = () => {
                     : "bg-white shadow-lg"
                 }`}
               >
-                <h1 className="text-2xl font-bold mb-8">Public Profile</h1>
-
-                <form onSubmit={handleSubmit}>
-                  {/* Profile Picture Section */}
-                  <div className="mb-8 pb-8 border-b border-dashed border-gray-700/30">
-                    <h2
-                      className={`text-lg font-semibold mb-4 ${
-                        theme ? "text-gray-200" : "text-gray-700"
-                      }`}
-                    >
-                      Profile Photo
-                    </h2>
-
-                    <div className="flex flex-col md:flex-row items-center gap-8">
-                      <div className="relative">
-                        <img
-                          className="w-36 h-36 object-cover rounded-full ring-4 ring-offset-2 shadow-lg 
-                          ${theme ? 'ring-blue-600 ring-offset-zinc-900' : 'ring-blue-500 ring-offset-white'}"
-                          src={
-                            preview ||
-                            (data?.user?.profilePhoto
-                              ? `${img}${data?.user?.profilePhoto}`
-                              : DEFAULT_AVATAR)
-                          }
-                          alt="Profile Avatar"
-                        />
-
-                        <div className="absolute bottom-0 right-0 transform translate-x-1/4">
-                          <label
-                            htmlFor="profilePicInput"
-                            className={`flex items-center justify-center w-10 h-10 rounded-full cursor-pointer shadow-lg ${
-                              theme
-                                ? "bg-blue-600 hover:bg-blue-700"
-                                : "bg-blue-500 hover:bg-blue-600"
-                            }`}
-                          >
-                            <input
-                              type="file"
-                              id="profilePicInput"
-                              className="hidden"
-                              onChange={handleFileChange}
-                            />
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-5 w-5 text-white"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
-                              />
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
-                              />
-                            </svg>
-                          </label>
-                        </div>
-                      </div>
-
-                      <div>
-                        <h3
-                          className={`text-md font-medium mb-2 ${
+                {activeSection === 'personal-info' ? (
+                  <>
+                    <h1 className="text-2xl font-bold mb-8">Public Profile</h1>
+                    
+                    <form onSubmit={handleSubmit}>
+                      {/* Profile Picture Section */}
+                      <div className="mb-8 pb-8 border-b border-dashed border-gray-700/30">
+                        <h2
+                          className={`text-lg font-semibold mb-4 ${
                             theme ? "text-gray-200" : "text-gray-700"
                           }`}
                         >
-                          Profile photo
-                        </h3>
-                        <p
-                          className={`text-sm mb-4 ${
-                            theme ? "text-gray-400" : "text-gray-500"
+                          Profile Photo
+                        </h2>
+
+                        <div className="flex flex-col md:flex-row items-center gap-8">
+                          <div className="relative">
+                            <img
+                              className="w-36 h-36 object-cover rounded-full ring-4 ring-offset-2 shadow-lg 
+                              ${theme ? 'ring-blue-600 ring-offset-zinc-900' : 'ring-blue-500 ring-offset-white'}"
+                              src={
+                                preview ||
+                                (data?.user?.profilePhoto
+                                  ? `${img}${data?.user?.profilePhoto}`
+                                  : DEFAULT_AVATAR)
+                              }
+                              alt="Profile Avatar"
+                            />
+
+                            <div className="absolute bottom-0 right-0 transform translate-x-1/4">
+                              <label
+                                htmlFor="profilePicInput"
+                                className={`flex items-center justify-center w-10 h-10 rounded-full cursor-pointer shadow-lg ${
+                                  theme
+                                    ? "bg-blue-600 hover:bg-blue-700"
+                                    : "bg-blue-500 hover:bg-blue-600"
+                                }`}
+                              >
+                                <input
+                                  type="file"
+                                  id="profilePicInput"
+                                  className="hidden"
+                                  onChange={handleFileChange}
+                                />
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  className="h-5 w-5 text-white"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                                  />
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+                                  />
+                                </svg>
+                              </label>
+                            </div>
+                          </div>
+
+                          <div>
+                            <h3
+                              className={`text-md font-medium mb-2 ${
+                                theme ? "text-gray-200" : "text-gray-700"
+                              }`}
+                            >
+                              Profile photo
+                            </h3>
+                            <p
+                              className={`text-sm mb-4 ${
+                                theme ? "text-gray-400" : "text-gray-500"
+                              }`}
+                            >
+                              Add a photo to personalize your profile. Recommended
+                              size: 400x400px (max 5MB).
+                            </p>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                document.getElementById("profilePicInput").click()
+                              }
+                              className={`py-2 px-4 text-sm font-medium rounded-lg ${
+                                theme
+                                  ? "bg-zinc-800 text-white hover:bg-zinc-700"
+                                  : "bg-gray-200 text-gray-800 hover:bg-[#1576D8] hover:text-white"
+                              } transition-all duration-200`}
+                            >
+                              Change photo
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Personal Information Section */}
+                      <div className="mb-8 pb-8 border-b border-dashed border-gray-700/30">
+                        <h2
+                          className={`text-lg font-semibold mb-4 ${
+                            theme ? "text-gray-200" : "text-gray-700"
                           }`}
                         >
-                          Add a photo to personalize your profile. Recommended
-                          size: 400x400px (max 5MB).
-                        </p>
+                          Personal Information
+                        </h2>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div>
+                            <label
+                              className={`block mb-2 text-sm font-medium ${
+                                theme ? "text-gray-300" : "text-gray-700"
+                              }`}
+                            >
+                              First Name
+                            </label>
+                            <input
+                              type="text"
+                              value={firstname}
+                              onChange={(e) => {
+                                setFirstname(e.target.value);
+                                setFormChanged(true);
+                              }}
+                              className={`w-full px-4 py-3 rounded-lg ${
+                                theme
+                                  ? "bg-zinc-800 border border-zinc-700 text-white focus:border-blue-500"
+                                  : "bg-gray-50 border border-gray-300 text-gray-900 focus:border-blue-500"
+                              } focus:ring-blue-500 focus:ring-1 outline-none transition-colors`}
+                              placeholder="First name"
+                              required
+                            />
+                          </div>
+
+                          <div>
+                            <label
+                              className={`block mb-2 text-sm font-medium ${
+                                theme ? "text-gray-300" : "text-gray-700"
+                              }`}
+                            >
+                              Last Name
+                            </label>
+                            <input
+                              type="text"
+                              value={lastname}
+                              onChange={(e) => {
+                                setLastname(e.target.value);
+                                setFormChanged(true);
+                              }}
+                              className={`w-full px-4 py-3 rounded-lg ${
+                                theme
+                                  ? "bg-zinc-800 border border-zinc-700 text-white focus:border-blue-500"
+                                  : "bg-gray-50 border border-gray-300 text-gray-900 focus:border-blue-500"
+                              } focus:ring-blue-500 focus:ring-1 outline-none transition-colors`}
+                              placeholder="Last name"
+                              required
+                            />
+                          </div>
+
+                          <div className="col-span-1 md:col-span-2">
+                            <label
+                              className={`block mb-2 text-sm font-medium ${
+                                theme ? "text-gray-300" : "text-gray-700"
+                              }`}
+                            >
+                              Username
+                            </label>
+                            <div className="relative">
+                              <input
+                                type="text"
+                                value={username}
+                                onChange={handleUsernameChange}
+                                className={`w-full px-4 py-3 rounded-lg ${
+                                  theme
+                                    ? "bg-zinc-800 border text-white"
+                                    : "bg-gray-50 border text-gray-900"
+                                } focus:ring-1 outline-none transition-colors ${
+                                  !isUsernameAvailable &&
+                                  username !== originalUsername
+                                    ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                                    : !validateUsername(username).valid
+                                    ? "border-yellow-500 focus:border-yellow-500 focus:ring-yellow-500"
+                                    : isUsernameAvailable &&
+                                      username !== originalUsername
+                                    ? "border-green-500 focus:border-green-500 focus:ring-green-500"
+                                    : theme
+                                    ? "border-zinc-700 focus:border-blue-500 focus:ring-blue-500"
+                                    : "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                                }`}
+                                placeholder="@username"
+                                required
+                              />
+
+                              {username !== originalUsername && (
+                                <div className="absolute inset-y-0 right-0 flex items-center pr-4">
+                                  {isCheckingUsername ? (
+                                    <svg
+                                      className="animate-spin h-5 w-5 text-gray-500"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <circle
+                                        className="opacity-25"
+                                        cx="12"
+                                        cy="12"
+                                        r="10"
+                                        stroke="currentColor"
+                                        strokeWidth="4"
+                                      ></circle>
+                                      <path
+                                        className="opacity-75"
+                                        fill="currentColor"
+                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014.708 14H2c0 4.418 3.582 8 8 8v-2c-3.314 0-6-2.686-6-6zM20 12c0-4.418-3.582-8-8-8v2c3.314 0 6 2.686 6 6 0 1.385-.468 2.657-1.25 3.682l1.562 1.562A7.962 7.962 0 0020 12z"
+                                      ></path>
+                                    </svg>
+                                  ) : !validateUsername(username).valid ? (
+                                    <FaTimes className="text-yellow-500" />
+                                  ) : isUsernameAvailable ? (
+                                    <FaCheck className="text-green-500" />
+                                  ) : (
+                                    <FaTimes className="text-red-500" />
+                                  )}
+                                </div>
+                              )}
+                            </div>
+
+                            {username !== originalUsername && (
+                              <p
+                                className={`mt-2 text-sm ${
+                                  !validateUsername(username).valid
+                                    ? "text-yellow-500"
+                                    : isUsernameAvailable
+                                    ? "text-green-500"
+                                    : "text-red-500"
+                                }`}
+                              >
+                                {!validateUsername(username).valid
+                                  ? validateUsername(username).message
+                                  : usernameMessage}
+                              </p>
+                            )}
+                          </div>
+
+                          <div className="col-span-1 md:col-span-2">
+                            <label
+                              className={`block mb-2 text-sm font-medium ${
+                                theme ? "text-gray-300" : "text-gray-700"
+                              }`}
+                            >
+                              Email Address
+                            </label>
+                            <input
+                              type="email"
+                              value={email}
+                              onChange={handleEmailChange}
+                              className={`w-full px-4 py-3 rounded-lg ${
+                                theme
+                                  ? "bg-zinc-800 border text-white"
+                                  : "bg-gray-50 border text-gray-900"
+                              } focus:ring-1 outline-none transition-colors ${
+                                !isEmailValid
+                                  ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                                  : theme
+                                  ? "border-zinc-700 focus:border-blue-500 focus:ring-blue-500"
+                                  : "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                              }`}
+                              placeholder="Your email address"
+                              required
+                            />
+
+                            {!isEmailValid && (
+                              <p className="mt-2 text-sm text-red-500">
+                                {emailErrorMessage ||
+                                  "Please enter a valid email address"}
+                              </p>
+                            )}
+                          </div>
+
+                          <div className="col-span-1 md:col-span-2">
+                            <label
+                              className={`block mb-2 text-sm font-medium ${
+                                theme ? "text-gray-300" : "text-gray-700"
+                              }`}
+                            >
+                              Bio
+                            </label>
+                            <textarea
+                              rows="4"
+                              value={bio || ""}
+                              onChange={(e) => {
+                                setBio(e.target.value);
+                                setFormChanged(true);
+                              }}
+                              className={`w-full px-4 py-3 rounded-lg ${
+                                theme
+                                  ? "bg-zinc-800 border border-zinc-700 text-white focus:border-blue-500"
+                                  : "bg-gray-50 border border-gray-300 text-gray-900 focus:border-blue-500"
+                              } focus:ring-blue-500 focus:ring-1 outline-none transition-colors`}
+                              placeholder="Write a short bio about yourself..."
+                              required
+                            ></textarea>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Password Section */}
+                      <div className="mb-8">
+                        <h2
+                          className={`text-lg font-semibold mb-4 ${
+                            theme ? "text-gray-200" : "text-gray-700"
+                          }`}
+                        >
+                          Change Password
+                        </h2>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div>
+                            <label
+                              className={`block mb-2 text-sm font-medium ${
+                                theme ? "text-gray-300" : "text-gray-700"
+                              }`}
+                            >
+                              New Password
+                            </label>
+                            <div className="relative">
+                              <input
+                                type={showPassword ? "text" : "password"}
+                                value={password}
+                                onChange={(e) => {
+                                  setPassword(e.target.value);
+                                  setFormChanged(true);
+                                }}
+                                className={`w-full pl-4 pr-12 py-3 rounded-lg ${
+                                  theme
+                                    ? "bg-zinc-800 border text-white"
+                                    : "bg-gray-50 border text-gray-900"
+                                } focus:ring-1 outline-none transition-colors ${
+                                  passwordError
+                                    ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                                    : theme
+                                    ? "border-zinc-700 focus:border-blue-500 focus:ring-blue-500"
+                                    : "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                                }`}
+                                placeholder="Leave blank to keep current password"
+                              />
+
+                              <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-500"
+                              >
+                                {showPassword ? (
+                                  <FaRegEye size={18} />
+                                ) : (
+                                  <FaEyeSlash size={18} />
+                                )}
+                              </button>
+                            </div>
+                          </div>
+
+                          <div>
+                            <label
+                              className={`block mb-2 text-sm font-medium ${
+                                theme ? "text-gray-300" : "text-gray-700"
+                              }`}
+                            >
+                              Confirm New Password
+                            </label>
+                            <div className="relative">
+                              <input
+                                type={showConfirmPassword ? "text" : "password"}
+                                value={confirmPassword}
+                                onChange={(e) => {
+                                  setConfirmPassword(e.target.value);
+                                  setFormChanged(true);
+                                }}
+                                className={`w-full pl-4 pr-12 py-3 rounded-lg ${
+                                  theme
+                                    ? "bg-zinc-800 border text-white"
+                                    : "bg-gray-50 border text-gray-900"
+                                } focus:ring-1 outline-none transition-colors ${
+                                  passwordError
+                                    ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                                    : theme
+                                    ? "border-zinc-700 focus:border-blue-500 focus:ring-blue-500"
+                                    : "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                                }`}
+                                placeholder="Confirm your new password"
+                              />
+
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setShowConfirmPassword(!showConfirmPassword)
+                                }
+                                className="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-500"
+                              >
+                                {showConfirmPassword ? (
+                                  <FaRegEye size={18} />
+                                ) : (
+                                  <FaEyeSlash size={18} />
+                                )}
+                              </button>
+                            </div>
+                          </div>
+
+                          {passwordError && (
+                            <p className="col-span-1 md:col-span-2 text-sm text-red-500 mt-0">
+                              {passwordError}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Form Actions - Improved Layout */}
+                      <div className="flex flex-wrap justify-between items-center gap-4 pt-6 border-t border-gray-700/30">
+                        {/* Left: Cancel Button */}
                         <button
                           type="button"
-                          onClick={() =>
-                            document.getElementById("profilePicInput").click()
-                          }
-                          className={`py-2 px-4 text-sm font-medium rounded-lg ${
+                          onClick={() => navigate(`/profile/${id}`)}
+                          className={`px-6 py-2.5 rounded-lg text-sm font-medium ${
                             theme
-                              ? "bg-zinc-800 text-white hover:bg-zinc-700"
-                              : "bg-gray-200 text-gray-800 hover:bg-[#1576D8] hover:text-white"
-                          } transition-all duration-200`}
+                              ? "bg-transparent text-white hover:bg-zinc-800"
+                              : "bg-transparent text-gray-700 hover:bg-gray-100"
+                          } transition-colors`}
                         >
-                          Change photo
+                          Cancel
                         </button>
+
+                        {/* Right: Action Buttons Container */}
+                        <div className="flex gap-4">
+                          {/* Delete Account Button */}
+                          <button
+                            type="button"
+                            onClick={() => setShowDeleteModal(true)}
+                            className={`px-6 py-2.5 rounded-lg text-sm font-medium ${
+                              theme
+                                ? "bg-red-900/40 text-red-200 hover:bg-red-900/60"
+                                : "bg-red-100 text-red-700 hover:bg-red-200"
+                            } transition-colors`}
+                          >
+                            Delete Account
+                          </button>
+
+                          {/* Save Changes Button */}
+                          <button
+                            type="submit"
+                            disabled={!formChanged && !hasChanges()}
+                            className={`px-6 py-2.5 rounded-lg text-sm font-medium ${
+                              !formChanged && !hasChanges()
+                                ? "bg-gray-400 cursor-not-allowed text-white"
+                                : theme
+                                ? "bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white"
+                                : "bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white"
+                            } transition-colors`}
+                          >
+                            {loading > 0 ? (
+                              <span className="flex items-center">
+                                <svg
+                                  className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <circle
+                                    className="opacity-25"
+                                    cx="12"
+                                    cy="12"
+                                    r="10"
+                                    stroke="currentColor"
+                                    strokeWidth="4"
+                                  ></circle>
+                                  <path
+                                    className="opacity-75"
+                                    fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014.708 14H2c0 4.418 3.582 8 8 8v-2c-3.314 0-6-2.686-6-6zM20 12c0-4.418-3.582-8-8-8v2c3.314 0 6 2.686 6 6 0 1.385-.468 2.657-1.25 3.682l1.562 1.562A7.962 7.962 0 0020 12z"
+                                  ></path>
+                                </svg>
+                                Saving...
+                              </span>
+                            ) : !formChanged && !hasChanges() ? (
+                              "No Changes"
+                            ) : (
+                              "Save Changes"
+                            )}
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-
-                  {/* Custom Avatar Options */}
-                  <div className="mb-8 pb-8 border-t border-dashed border-gray-700/30 pt-8">
-                    <h2
-                      className={`text-lg font-semibold mb-4 ${
-                        theme ? "text-gray-200" : "text-gray-700"
-                      }`}
-                    >
-                      Custom Avatar Options
-                    </h2>
-
-                    <div className="flex flex-col space-y-4">
-                      <p className={`text-sm ${theme ? "text-gray-400" : "text-gray-500"}`}>
+                    </form>
+                  </>
+                ) : activeSection === 'avatar-options' ? (
+                  <>
+                    <h1 className="text-2xl font-bold mb-8">Custom Avatar Options</h1>
+                    
+                    <div className="mb-8">
+                      <p className={`text-sm mb-6 ${theme ? "text-gray-400" : "text-gray-500"}`}>
                         Choose from our collection of custom avatars or generate a random one.
+                        Changes will be automatically saved to your profile.
                       </p>
 
-                      <div className="flex flex-wrap gap-3">
+                      <div className="flex flex-wrap gap-3 mb-8">
                         <button
                           type="button"
                           onClick={generateRandomAvatar}
@@ -776,7 +1231,27 @@ const EditProfile = () => {
                         </button>
                       </div>
 
-                      {/* Avatar Gallery Grid */}
+                      {/* Preview of current avatar */}
+                      <div className="flex flex-col items-center mb-8">
+                        <h3 className={`text-lg font-medium mb-4 ${theme ? "text-gray-300" : "text-gray-700"}`}>
+                          Current Avatar
+                        </h3>
+                        <div className="relative">
+                          <img
+                            className="w-36 h-36 object-cover rounded-full ring-4 ring-offset-2 shadow-lg 
+                            ${theme ? 'ring-blue-600 ring-offset-zinc-900' : 'ring-blue-500 ring-offset-white'}"
+                            src={
+                              preview ||
+                              (data?.user?.profilePhoto
+                                ? `${img}${data?.user?.profilePhoto}`
+                                : DEFAULT_AVATAR)
+                            }
+                            alt="Profile Avatar"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Avatar Gallery Grid - show only when requested */}
                       {showAvatarGallery && (
                         <div className="mt-4">
                           <div className="flex justify-between items-center mb-3">
@@ -792,435 +1267,107 @@ const EditProfile = () => {
                             </button>
                           </div>
 
-                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 max-h-[400px] overflow-y-auto p-2">
-                            {avatarGallery.map((avatar) => (
-                              <div 
-                                key={avatar.id} 
-                                className={`relative rounded-lg overflow-hidden cursor-pointer transition-all duration-200 transform hover:scale-105 ${
-                                  preview === avatar.url ? 'ring-2 ring-offset-2 ring-blue-500' : ''
-                                }`}
-                                onClick={() => selectAvatar(avatar.url)}
-                              >
-                                <img 
-                                  src={avatar.url} 
-                                  alt={`Avatar option #${avatar.id}`} 
-                                  className="w-full h-auto object-cover"
-                                  loading="lazy"
-                                />
-                                <div className={`absolute bottom-0 left-0 right-0 bg-black/50 text-white text-xs py-1 px-2 text-center ${theme ? "" : ""}`}>
-                                  #{avatar.id}
-                                </div>
-
-                                {/* Selection indicator */}
-                                {preview === avatar.url && (
-                                  <div className="absolute inset-0 bg-blue-500/20 flex items-center justify-center">
-                                    <div className="bg-blue-500 rounded-full p-1">
-                                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                      </svg>
-                                    </div>
+                          {/* Pagination Avatar Grid */}
+                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 p-2">
+                            {avatarGallery
+                              .slice(
+                                (currentPage - 1) * AVATARS_PER_PAGE, 
+                                currentPage * AVATARS_PER_PAGE
+                              )
+                              .map((avatar) => (
+                                <div 
+                                  key={avatar.id} 
+                                  className={`relative rounded-lg overflow-hidden cursor-pointer transition-all duration-200 transform hover:scale-105 ${
+                                    preview === avatar.url ? 'ring-2 ring-offset-2 ring-blue-500' : ''
+                                  }`}
+                                  onClick={() => selectAvatar(avatar.url)}
+                                >
+                                  <img 
+                                    src={avatar.url} 
+                                    alt={`Avatar option #${avatar.id}`} 
+                                    className="w-full h-auto object-cover"
+                                    loading="lazy"
+                                  />
+                                  <div className={`absolute bottom-0 left-0 right-0 bg-black/50 text-white text-xs py-1 px-2 text-center`}>
+                                    #{avatar.id}
                                   </div>
-                                )}
-                              </div>
-                            ))}
+                                  
+                                  {/* Selection indicator */}
+                                  {preview === avatar.url && (
+                                    <div className="absolute inset-0 bg-blue-500/20 flex items-center justify-center">
+                                      <div className="bg-blue-500 rounded-full p-1">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
+                                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                        </svg>
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
+                          </div>
+
+                          {/* Pagination Controls */}
+                          <div className="flex justify-between items-center mt-6">
+                            <div className="text-sm text-gray-500">
+                              Page {currentPage} of {totalPages}
+                            </div>
+                            
+                            <div className="flex space-x-2">
+                              <button
+                                onClick={goToPreviousPage}
+                                disabled={currentPage === 1}
+                                className={`p-2 rounded-lg ${
+                                  currentPage === 1
+                                    ? "opacity-50 cursor-not-allowed"
+                                    : theme
+                                      ? "bg-zinc-800 hover:bg-zinc-700"
+                                      : "bg-gray-200 hover:bg-gray-300"
+                                }`}
+                                aria-label="Previous page"
+                              >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                                </svg>
+                              </button>
+                              
+                              <button
+                                onClick={goToNextPage}
+                                disabled={currentPage === totalPages}
+                                className={`p-2 rounded-lg ${
+                                  currentPage === totalPages
+                                    ? "opacity-50 cursor-not-allowed"
+                                    : theme
+                                      ? "bg-zinc-800 hover:bg-zinc-700"
+                                      : "bg-gray-200 hover:bg-gray-300"
+                                }`}
+                                aria-label="Next page"
+                              >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                </svg>
+                              </button>
+                            </div>
                           </div>
                         </div>
                       )}
-                    </div>
-                  </div>
-
-                  {/* Personal Information Section */}
-                  <div className="mb-8 pb-8 border-b border-dashed border-gray-700/30">
-                    <h2
-                      className={`text-lg font-semibold mb-4 ${
-                        theme ? "text-gray-200" : "text-gray-700"
-                      }`}
-                    >
-                      Personal Information
-                    </h2>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div>
-                        <label
-                          className={`block mb-2 text-sm font-medium ${
-                            theme ? "text-gray-300" : "text-gray-700"
-                          }`}
-                        >
-                          First Name
-                        </label>
-                        <input
-                          type="text"
-                          value={firstname}
-                          onChange={(e) => {
-                            setFirstname(e.target.value);
-                            setFormChanged(true);
-                          }}
-                          className={`w-full px-4 py-3 rounded-lg ${
+                      
+                      {/* Return to Profile Button */}
+                      <div className="mt-10 pt-6 border-t border-gray-700/30">
+                        <button
+                          type="button"
+                          onClick={() => setActiveSection('personal-info')}
+                          className={`py-2 px-4 text-sm font-medium rounded-lg ${
                             theme
-                              ? "bg-zinc-800 border border-zinc-700 text-white focus:border-blue-500"
-                              : "bg-gray-50 border border-gray-300 text-gray-900 focus:border-blue-500"
-                          } focus:ring-blue-500 focus:ring-1 outline-none transition-colors`}
-                          placeholder="First name"
-                          required
-                        />
-                      </div>
-
-                      <div>
-                        <label
-                          className={`block mb-2 text-sm font-medium ${
-                            theme ? "text-gray-300" : "text-gray-700"
-                          }`}
+                              ? "bg-zinc-800 text-white hover:bg-zinc-700"
+                              : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                          } transition-all duration-200`}
                         >
-                          Last Name
-                        </label>
-                        <input
-                          type="text"
-                          value={lastname}
-                          onChange={(e) => {
-                            setLastname(e.target.value);
-                            setFormChanged(true);
-                          }}
-                          className={`w-full px-4 py-3 rounded-lg ${
-                            theme
-                              ? "bg-zinc-800 border border-zinc-700 text-white focus:border-blue-500"
-                              : "bg-gray-50 border border-gray-300 text-gray-900 focus:border-blue-500"
-                          } focus:ring-blue-500 focus:ring-1 outline-none transition-colors`}
-                          placeholder="Last name"
-                          required
-                        />
-                      </div>
-
-                      <div className="col-span-1 md:col-span-2">
-                        <label
-                          className={`block mb-2 text-sm font-medium ${
-                            theme ? "text-gray-300" : "text-gray-700"
-                          }`}
-                        >
-                          Username
-                        </label>
-                        <div className="relative">
-                          <input
-                            type="text"
-                            value={username}
-                            onChange={handleUsernameChange}
-                            className={`w-full px-4 py-3 rounded-lg ${
-                              theme
-                                ? "bg-zinc-800 border text-white"
-                                : "bg-gray-50 border text-gray-900"
-                            } focus:ring-1 outline-none transition-colors ${
-                              !isUsernameAvailable &&
-                              username !== originalUsername
-                                ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-                                : !validateUsername(username).valid
-                                ? "border-yellow-500 focus:border-yellow-500 focus:ring-yellow-500"
-                                : isUsernameAvailable &&
-                                  username !== originalUsername
-                                ? "border-green-500 focus:border-green-500 focus:ring-green-500"
-                                : theme
-                                ? "border-zinc-700 focus:border-blue-500 focus:ring-blue-500"
-                                : "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                            }`}
-                            placeholder="@username"
-                            required
-                          />
-
-                          {username !== originalUsername && (
-                            <div className="absolute inset-y-0 right-0 flex items-center pr-4">
-                              {isCheckingUsername ? (
-                                <svg
-                                  className="animate-spin h-5 w-5 text-gray-500"
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <circle
-                                    className="opacity-25"
-                                    cx="12"
-                                    cy="12"
-                                    r="10"
-                                    stroke="currentColor"
-                                    strokeWidth="4"
-                                  ></circle>
-                                  <path
-                                    className="opacity-75"
-                                    fill="currentColor"
-                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014.708 14H2c0 4.418 3.582 8 8 8v-2c-3.314 0-6-2.686-6-6zM20 12c0-4.418-3.582-8-8-8v2c3.314 0 6 2.686 6 6 0 1.385-.468 2.657-1.25 3.682l1.562 1.562A7.962 7.962 0 0020 12z"
-                                  ></path>
-                                </svg>
-                              ) : !validateUsername(username).valid ? (
-                                <FaTimes className="text-yellow-500" />
-                              ) : isUsernameAvailable ? (
-                                <FaCheck className="text-green-500" />
-                              ) : (
-                                <FaTimes className="text-red-500" />
-                              )}
-                            </div>
-                          )}
-                        </div>
-
-                        {username !== originalUsername && (
-                          <p
-                            className={`mt-2 text-sm ${
-                              !validateUsername(username).valid
-                                ? "text-yellow-500"
-                                : isUsernameAvailable
-                                ? "text-green-500"
-                                : "text-red-500"
-                            }`}
-                          >
-                            {!validateUsername(username).valid
-                              ? validateUsername(username).message
-                              : usernameMessage}
-                          </p>
-                        )}
-                      </div>
-
-                      <div className="col-span-1 md:col-span-2">
-                        <label
-                          className={`block mb-2 text-sm font-medium ${
-                            theme ? "text-gray-300" : "text-gray-700"
-                          }`}
-                        >
-                          Email Address
-                        </label>
-                        <input
-                          type="email"
-                          value={email}
-                          onChange={handleEmailChange}
-                          className={`w-full px-4 py-3 rounded-lg ${
-                            theme
-                              ? "bg-zinc-800 border text-white"
-                              : "bg-gray-50 border text-gray-900"
-                          } focus:ring-1 outline-none transition-colors ${
-                            !isEmailValid
-                              ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-                              : theme
-                              ? "border-zinc-700 focus:border-blue-500 focus:ring-blue-500"
-                              : "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                          }`}
-                          placeholder="Your email address"
-                          required
-                        />
-
-                        {!isEmailValid && (
-                          <p className="mt-2 text-sm text-red-500">
-                            {emailErrorMessage ||
-                              "Please enter a valid email address"}
-                          </p>
-                        )}
-                      </div>
-
-                      <div className="col-span-1 md:col-span-2">
-                        <label
-                          className={`block mb-2 text-sm font-medium ${
-                            theme ? "text-gray-300" : "text-gray-700"
-                          }`}
-                        >
-                          Bio
-                        </label>
-                        <textarea
-                          rows="4"
-                          value={bio || ""}
-                          onChange={(e) => {
-                            setBio(e.target.value);
-                            setFormChanged(true);
-                          }}
-                          className={`w-full px-4 py-3 rounded-lg ${
-                            theme
-                              ? "bg-zinc-800 border border-zinc-700 text-white focus:border-blue-500"
-                              : "bg-gray-50 border border-gray-300 text-gray-900 focus:border-blue-500"
-                          } focus:ring-blue-500 focus:ring-1 outline-none transition-colors`}
-                          placeholder="Write a short bio about yourself..."
-                          required
-                        ></textarea>
+                          Return to Profile Settings
+                        </button>
                       </div>
                     </div>
-                  </div>
-
-                  {/* Password Section */}
-                  <div className="mb-8">
-                    <h2
-                      className={`text-lg font-semibold mb-4 ${
-                        theme ? "text-gray-200" : "text-gray-700"
-                      }`}
-                    >
-                      Change Password
-                    </h2>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div>
-                        <label
-                          className={`block mb-2 text-sm font-medium ${
-                            theme ? "text-gray-300" : "text-gray-700"
-                          }`}
-                        >
-                          New Password
-                        </label>
-                        <div className="relative">
-                          <input
-                            type={showPassword ? "text" : "password"}
-                            value={password}
-                            onChange={(e) => {
-                              setPassword(e.target.value);
-                              setFormChanged(true);
-                            }}
-                            className={`w-full pl-4 pr-12 py-3 rounded-lg ${
-                              theme
-                                ? "bg-zinc-800 border text-white"
-                                : "bg-gray-50 border text-gray-900"
-                            } focus:ring-1 outline-none transition-colors ${
-                              passwordError
-                                ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-                                : theme
-                                ? "border-zinc-700 focus:border-blue-500 focus:ring-blue-500"
-                                : "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                            }`}
-                            placeholder="Leave blank to keep current password"
-                          />
-
-                          <button
-                            type="button"
-                            onClick={() => setShowPassword(!showPassword)}
-                            className="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-500"
-                          >
-                            {showPassword ? (
-                              <FaRegEye size={18} />
-                            ) : (
-                              <FaEyeSlash size={18} />
-                            )}
-                          </button>
-                        </div>
-                      </div>
-
-                      <div>
-                        <label
-                          className={`block mb-2 text-sm font-medium ${
-                            theme ? "text-gray-300" : "text-gray-700"
-                          }`}
-                        >
-                          Confirm New Password
-                        </label>
-                        <div className="relative">
-                          <input
-                            type={showConfirmPassword ? "text" : "password"}
-                            value={confirmPassword}
-                            onChange={(e) => {
-                              setConfirmPassword(e.target.value);
-                              setFormChanged(true);
-                            }}
-                            className={`w-full pl-4 pr-12 py-3 rounded-lg ${
-                              theme
-                                ? "bg-zinc-800 border text-white"
-                                : "bg-gray-50 border text-gray-900"
-                            } focus:ring-1 outline-none transition-colors ${
-                              passwordError
-                                ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-                                : theme
-                                ? "border-zinc-700 focus:border-blue-500 focus:ring-blue-500"
-                                : "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                            }`}
-                            placeholder="Confirm your new password"
-                          />
-
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setShowConfirmPassword(!showConfirmPassword)
-                            }
-                            className="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-500"
-                          >
-                            {showConfirmPassword ? (
-                              <FaRegEye size={18} />
-                            ) : (
-                              <FaEyeSlash size={18} />
-                            )}
-                          </button>
-                        </div>
-                      </div>
-
-                      {passwordError && (
-                        <p className="col-span-1 md:col-span-2 text-sm text-red-500 mt-0">
-                          {passwordError}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Form Actions - Improved Layout */}
-                  <div className="flex flex-wrap justify-between items-center gap-4 pt-6 border-t border-gray-700/30">
-                    {/* Left: Cancel Button */}
-                    <button
-                      type="button"
-                      onClick={() => navigate(`/profile/${id}`)}
-                      className={`px-6 py-2.5 rounded-lg text-sm font-medium ${
-                        theme
-                          ? "bg-transparent text-white hover:bg-zinc-800"
-                          : "bg-transparent text-gray-700 hover:bg-gray-100"
-                      } transition-colors`}
-                    >
-                      Cancel
-                    </button>
-
-                    {/* Right: Action Buttons Container */}
-                    <div className="flex gap-4">
-                      {/* Delete Account Button */}
-                      <button
-                        type="button"
-                        onClick={() => setShowDeleteModal(true)}
-                        className={`px-6 py-2.5 rounded-lg text-sm font-medium ${
-                          theme
-                            ? "bg-red-900/40 text-red-200 hover:bg-red-900/60"
-                            : "bg-red-100 text-red-700 hover:bg-red-200"
-                        } transition-colors`}
-                      >
-                        Delete Account
-                      </button>
-
-                      {/* Save Changes Button */}
-                      <button
-                        type="submit"
-                        disabled={!formChanged && !hasChanges()}
-                        className={`px-6 py-2.5 rounded-lg text-sm font-medium ${
-                          !formChanged && !hasChanges()
-                            ? "bg-gray-400 cursor-not-allowed text-white"
-                            : theme
-                            ? "bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white"
-                            : "bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white"
-                        } transition-colors`}
-                      >
-                        {loading > 0 ? (
-                          <span className="flex items-center">
-                            <svg
-                              className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                            >
-                              <circle
-                                className="opacity-25"
-                                cx="12"
-                                cy="12"
-                                r="10"
-                                stroke="currentColor"
-                                strokeWidth="4"
-                              ></circle>
-                              <path
-                                className="opacity-75"
-                                fill="currentColor"
-                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014.708 14H2c0 4.418 3.582 8 8 8v-2c-3.314 0-6-2.686-6-6zM20 12c0-4.418-3.582-8-8-8v2c3.314 0 6 2.686 6 6 0 1.385-.468 2.657-1.25 3.682l1.562 1.562A7.962 7.962 0 0020 12z"
-                              ></path>
-                            </svg>
-                            Saving...
-                          </span>
-                        ) : !formChanged && !hasChanges() ? (
-                          "No Changes"
-                        ) : (
-                          "Save Changes"
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                </form>
+                  </>
+                ) : null}
               </div>
             </main>
           </div>
