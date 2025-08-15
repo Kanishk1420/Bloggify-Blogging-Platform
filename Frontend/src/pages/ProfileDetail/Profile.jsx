@@ -1,7 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useRef, useState } from 'react';
-import { DEFAULT_AVATAR } from '../../utils/avatarUtil';
+import { DEFAULT_AVATAR, getRandomAvatar } from '../../utils/avatarUtil';
+import OptimizedAvatar from '../../components/Avatar/OptimizedAvatar';
 import { useSelector } from 'react-redux';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { FaTimes } from 'react-icons/fa';
@@ -271,10 +272,12 @@ const Profile = () => {
                     <div className={`w-24 h-24 rounded-full overflow-hidden border-4 ${
                       theme ? "border-zinc-900 bg-zinc-900" : "border-white bg-white"
                     } shadow-md`}>
-                      <img 
-                        src={userData?.profilePhoto?.url ?? DEFAULT_AVATAR} 
+                      <OptimizedAvatar 
+                        src={userData?.profilePhoto?.url || getRandomAvatar(userId)} 
                         alt='profile' 
-                        className="w-full h-full object-cover" 
+                        className="w-full h-full object-cover"
+                        fallbackSrc={DEFAULT_AVATAR}
+                        loading="eager"
                       />
                     </div>
                   )}

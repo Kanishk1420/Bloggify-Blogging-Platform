@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
-import { DEFAULT_AVATAR } from '../../utils/avatarUtil';
+import { DEFAULT_AVATAR, getRandomAvatar } from '../../utils/avatarUtil';
+import OptimizedAvatar from '../../components/Avatar/OptimizedAvatar';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useUserFollowerListQuery } from '../../api/user';
@@ -67,14 +68,15 @@ const UserFollowing = () => {
                             onClick={() => navigateToProfile(followingUser._id)}
                         >
                             <div className="flex items-center gap-3">
-                                <img
-                                    src={followingUser.profilePhoto?.url ?? DEFAULT_AVATAR}
+                                <OptimizedAvatar
+                                    src={followingUser.profilePhoto?.url || getRandomAvatar(followingUser._id)}
                                     className={`w-12 h-12 object-cover rounded-full ${
                                         theme 
                                             ? "border border-zinc-700" 
                                             : "border-2 border-blue-100"
                                     } shadow-sm`}
                                     alt={`${followingUser.username}'s profile`}
+                                    fallbackSrc={DEFAULT_AVATAR}
                                     loading="lazy"
                                 />
                                 <div>
