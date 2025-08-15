@@ -1299,13 +1299,10 @@ const EditProfile = () => {
                               >
                                 <OptimizedAvatar
                                   src={avatar.url}
-                                  alt={`Avatar option #${avatar.id}`}
+                                  alt={`Avatar option`}
                                   className="w-full aspect-square"
                                   loading="lazy"
                                 />
-                                <div className={`absolute bottom-0 left-0 right-0 bg-black/50 text-white text-xs py-1 px-2 text-center`}>
-                                  #{avatar.id}
-                                </div>
                                 
                                 {/* Selection indicator */}
                                 {preview === avatar.url && (
@@ -1366,19 +1363,66 @@ const EditProfile = () => {
                         </div>
                       )}
                       
-                      {/* Return to Profile Button */}
+                      {/* Save Changes and Return Button */}
                       <div className="mt-10 pt-6 border-t border-gray-700/30">
-                        <button
-                          type="button"
-                          onClick={() => setActiveSection('personal-info')}
-                          className={`py-2 px-4 text-sm font-medium rounded-lg ${
-                            theme
-                              ? "bg-zinc-800 text-white hover:bg-zinc-700"
-                              : "bg-gray-200 text-gray-800 hover:bg-gray-300"
-                          } transition-all duration-200`}
-                        >
-                          Return to Profile Settings
-                        </button>
+                        <div className="flex justify-between items-center">
+                          {/* Left: Return Button */}
+                          <button
+                            type="button"
+                            onClick={() => setActiveSection('personal-info')}
+                            className={`px-6 py-2.5 text-sm font-medium rounded-lg ${
+                              theme
+                                ? "bg-zinc-800 text-white hover:bg-zinc-700"
+                                : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                            } transition-all duration-200`}
+                          >
+                            Return to Profile Settings
+                          </button>
+
+                          {/* Right: Save Changes Button */}
+                          <button
+                            type="button"
+                            onClick={handleSubmit}
+                            disabled={!formChanged && !hasChanges()}
+                            className={`px-6 py-2.5 rounded-lg text-sm font-medium ${
+                              !formChanged && !hasChanges()
+                                ? "bg-gray-400 cursor-not-allowed text-white"
+                                : theme
+                                ? "bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white"
+                                : "bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white"
+                            } transition-colors`}
+                          >
+                            {loading > 0 ? (
+                              <span className="flex items-center">
+                                <svg
+                                  className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <circle
+                                    className="opacity-25"
+                                    cx="12"
+                                    cy="12"
+                                    r="10"
+                                    stroke="currentColor"
+                                    strokeWidth="4"
+                                  ></circle>
+                                  <path
+                                    className="opacity-75"
+                                    fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014.708 14H2c0 4.418 3.582 8 8 8v-2c-3.314 0-6-2.686-6-6zM20 12c0-4.418-3.582-8-8-8v2c3.314 0 6 2.686 6 6 0 1.385-.468 2.657-1.25 3.682l1.562 1.562A7.962 7.962 0 0020 12z"
+                                  ></path>
+                                </svg>
+                                Saving...
+                              </span>
+                            ) : !formChanged && !hasChanges() ? (
+                              "No Changes"
+                            ) : (
+                              "Save Changes"
+                            )}
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </>
