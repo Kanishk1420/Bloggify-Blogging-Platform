@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
-import { DEFAULT_AVATAR } from '../../utils/avatarUtil';
+import { DEFAULT_AVATAR, getAvatarsForPage, batchPreloadImages, preloadImage } from '../../utils/avatarUtil';
+import OptimizedAvatar from '../../components/Avatar/OptimizedAvatar';
 import { userApi } from "../../api/user";
 import {
   useGetUserQuery,
@@ -535,32 +536,38 @@ const EditProfile = () => {
   const [totalPages, setTotalPages] = useState(1);
   const AVATARS_PER_PAGE = 24;
 
-  // Update the loadAvatarGallery function to handle all available avatars
-  const loadAvatarGallery = () => {
-    const avatars = [];
-    for (let i = 1; i <= 100; i++) {
-      avatars.push({
-        id: i,
-        url: `https://avatar.iran.liara.run/public/${i}`
-      });
-    }
-    setAvatarGallery(avatars);
-    // Calculate total pages based on 24 avatars per page
-    setTotalPages(Math.ceil(avatars.length / AVATARS_PER_PAGE));
-    setCurrentPage(1);
+  // Optimized loadAvatarGallery function with preloading
+  const loadAvatarGallery = async () => {
     setShowAvatarGallery(true);
+    
+    // Get first page of avatars with preloading
+    const firstPageAvatars = getAvatarsForPage(1, AVATARS_PER_PAGE);
+    setAvatarGallery(firstPageAvatars);
+    setTotalPages(Math.ceil(100 / AVATARS_PER_PAGE));
+    setCurrentPage(1);
+    
+    // Preload current user's avatar if it's from the gallery
+    if (preview && preview.includes('avatar.iran.liara.run')) {
+      preloadImage(preview);
+    }
   };
 
-  // Add navigation functions
+  // Optimized navigation functions with preloading
   const goToPreviousPage = () => {
     if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
+      const newPage = currentPage - 1;
+      setCurrentPage(newPage);
+      const pageAvatars = getAvatarsForPage(newPage, AVATARS_PER_PAGE);
+      setAvatarGallery(pageAvatars);
     }
   };
 
   const goToNextPage = () => {
     if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
+      const newPage = currentPage + 1;
+      setCurrentPage(newPage);
+      const pageAvatars = getAvatarsForPage(newPage, AVATARS_PER_PAGE);
+      setAvatarGallery(pageAvatars);
     }
   };
 
@@ -1267,43 +1274,38 @@ const EditProfile = () => {
                             </button>
                           </div>
 
-                          {/* Pagination Avatar Grid */}
+                          {/* Optimized Avatar Grid with Lazy Loading */}
                           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 p-2">
-                            {avatarGallery
-                              .slice(
-                                (currentPage - 1) * AVATARS_PER_PAGE, 
-                                currentPage * AVATARS_PER_PAGE
-                              )
-                              .map((avatar) => (
-                                <div 
-                                  key={avatar.id} 
-                                  className={`relative rounded-lg overflow-hidden cursor-pointer transition-all duration-200 transform hover:scale-105 ${
-                                    preview === avatar.url ? 'ring-2 ring-offset-2 ring-blue-500' : ''
-                                  }`}
-                                  onClick={() => selectAvatar(avatar.url)}
-                                >
-                                  <img 
-                                    src={avatar.url} 
-                                    alt={`Avatar option #${avatar.id}`} 
-                                    className="w-full h-auto object-cover"
-                                    loading="lazy"
-                                  />
-                                  <div className={`absolute bottom-0 left-0 right-0 bg-black/50 text-white text-xs py-1 px-2 text-center`}>
-                                    #{avatar.id}
-                                  </div>
-                                  
-                                  {/* Selection indicator */}
-                                  {preview === avatar.url && (
-                                    <div className="absolute inset-0 bg-blue-500/20 flex items-center justify-center">
-                                      <div className="bg-blue-500 rounded-full p-1">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
-                                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                        </svg>
-                                      </div>
-                                    </div>
-                                  )}
+                            {avatarGallery.map((avatar) => (
+                              <div 
+                                key={avatar.id} 
+                                className={`relative rounded-lg overflow-hidden cursor-pointer transition-all duration-200 transform hover:scale-105 ${
+                                  preview === avatar.url ? 'ring-2 ring-offset-2 ring-blue-500' : ''
+                                }`}
+                                onClick={() => selectAvatar(avatar.url)}
+                              >
+                                <OptimizedAvatar
+                                  src={avatar.url}
+                                  alt={`Avatar option #${avatar.id}`}
+                                  className="w-full aspect-square"
+                                  loading="lazy"
+                                />
+                                <div className={`absolute bottom-0 left-0 right-0 bg-black/50 text-white text-xs py-1 px-2 text-center`}>
+                                  #{avatar.id}
                                 </div>
-                              ))}
+                                
+                                {/* Selection indicator */}
+                                {preview === avatar.url && (
+                                  <div className="absolute inset-0 bg-blue-500/20 flex items-center justify-center">
+                                    <div className="bg-blue-500 rounded-full p-1">
+                                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                      </svg>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            ))}
                           </div>
 
                           {/* Pagination Controls */}
