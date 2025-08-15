@@ -4,7 +4,8 @@ import { useSelector } from 'react-redux';
 import { useFollowUserMutation } from '../../api/user';
 import PropTypes from 'prop-types';
 import { toast } from 'react-toastify';
-import { DEFAULT_AVATAR } from '../../utils/avatarUtil';
+import { DEFAULT_AVATAR, getRandomAvatar } from '../../utils/avatarUtil';
+import OptimizedAvatar from '../Avatar/OptimizedAvatar';
 
 const AllUsers = ({ user, onFollowSuccess }) => {
     const { theme } = useSelector((state) => state.theme);
@@ -28,10 +29,12 @@ const AllUsers = ({ user, onFollowSuccess }) => {
         <div className="flex items-center justify-between">
             <Link to={`/profile/${user._id}`} className="flex items-center gap-3 flex-grow">
                 <div className="relative">
-                    <img
-                        src={user.profilePhoto?.url || DEFAULT_AVATAR}
+                    <OptimizedAvatar
+                        src={user.profilePhoto?.url || getRandomAvatar(user._id)}
                         alt={user.username}
                         className="w-10 h-10 rounded-full object-cover border border-gray-200 shadow-sm"
+                        fallbackSrc={DEFAULT_AVATAR}
+                        loading="lazy"
                     />
                 </div>
                 <div className="flex flex-col">

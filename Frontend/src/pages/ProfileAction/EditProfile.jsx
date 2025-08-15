@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
-import { DEFAULT_AVATAR, getAvatarsForPage, batchPreloadImages, preloadImage } from '../../utils/avatarUtil';
+import { DEFAULT_AVATAR, getAvatarsForPage, batchPreloadImages, preloadImage, getRandomAvatar } from '../../utils/avatarUtil';
 import OptimizedAvatar from '../../components/Avatar/OptimizedAvatar';
 import { userApi } from "../../api/user";
 import {
@@ -108,6 +108,8 @@ const EditProfile = () => {
 
       if (user.profilePhoto?.url) {
         setPreview(user.profilePhoto.url);
+        // Clear selectedAvatar since we're using the existing profile photo
+        setSelectedAvatar(null);
       }
     }
     // Fallback to Redux if API data isn't available
@@ -124,6 +126,8 @@ const EditProfile = () => {
 
       if (user.profilePhoto?.url) {
         setPreview(user.profilePhoto.url);
+        // Clear selectedAvatar since we're using the existing profile photo
+        setSelectedAvatar(null);
       }
     }
   }, [data, userInfo, username]); // Add username to dependencies
@@ -212,6 +216,11 @@ const EditProfile = () => {
   const hasChanges = () => {
     // Check if file was added (new profile picture)
     if (file) {
+      return true;
+    }
+
+    // Check if custom avatar was selected
+    if (selectedAvatar && selectedAvatar !== initialState.profilePhotoUrl) {
       return true;
     }
 
@@ -377,6 +386,7 @@ const EditProfile = () => {
       }
 
       setFile(selectedFile);
+      setSelectedAvatar(null); // Clear any selected avatar from gallery
 
       // Create a preview URL for the selected image
       const objectUrl = URL.createObjectURL(selectedFile);
@@ -521,8 +531,10 @@ const EditProfile = () => {
 
   // Add this function to the EditProfile component
   const generateRandomAvatar = () => {
-    const randomAvatar = `https://avatar.iran.liara.run/public?t=${new Date().getTime()}`;
+    const randomAvatar = getRandomAvatar(); // Use the fixed function without timestamp
     setPreview(randomAvatar);
+    setSelectedAvatar(randomAvatar);
+    setFile(null); // Clear any uploaded file
     setFormChanged(true);
   };
 
@@ -575,6 +587,7 @@ const EditProfile = () => {
   const selectAvatar = (avatarUrl) => {
     setPreview(avatarUrl);
     setSelectedAvatar(avatarUrl);
+    setFile(null); // Clear any uploaded file
     setFormChanged(true);
   };
 

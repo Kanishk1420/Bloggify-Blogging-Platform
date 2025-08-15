@@ -10,9 +10,16 @@ export const DEFAULT_AVATAR = 'https://avatar.iran.liara.run/public';
 const imageCache = new Map();
 const preloadPromises = new Map();
 
-// Get a random avatar with caching
-export const getRandomAvatar = () => {
-  return `${DEFAULT_AVATAR}?t=${new Date().getTime()}`;
+// Get a random avatar with caching (generates a consistent random avatar based on user)
+export const getRandomAvatar = (userId = null) => {
+  if (userId) {
+    // Generate a consistent "random" avatar based on user ID
+    const avatarId = (parseInt(userId.slice(-2), 16) % 100) + 1;
+    return `${DEFAULT_AVATAR}/${avatarId}`;
+  }
+  // For true random generation (only when explicitly requested)
+  const randomId = Math.floor(Math.random() * 100) + 1;
+  return `${DEFAULT_AVATAR}/${randomId}`;
 };
 
 // Get a specific avatar by ID with caching
