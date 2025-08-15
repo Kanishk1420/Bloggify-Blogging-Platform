@@ -739,7 +739,7 @@ const EditProfile = () => {
                         <div className="flex flex-col md:flex-row items-center gap-8">
                           <div className="relative">
                             <img
-                              className="w-36 h-36 object-cover rounded-full ring-4 ring-offset-2 shadow-lg 
+                              className="w-24 h-24 md:w-36 md:h-36 object-cover rounded-full ring-4 ring-offset-2 shadow-lg 
                               ${theme ? 'ring-blue-600 ring-offset-zinc-900' : 'ring-blue-500 ring-offset-white'}"
                               src={
                                 preview ||
@@ -1229,7 +1229,7 @@ const EditProfile = () => {
                         <button
                           type="button"
                           onClick={generateRandomAvatar}
-                          className={`py-2 px-4 text-sm font-medium rounded-lg ${
+                          className={`py-1.5 md:py-2 px-3 md:px-4 text-xs md:text-sm font-medium rounded-lg ${
                             theme
                               ? "bg-indigo-600/70 text-white hover:bg-indigo-600"
                               : "bg-indigo-500 text-white hover:bg-indigo-600"
@@ -1252,20 +1252,15 @@ const EditProfile = () => {
                       </div>
 
                       {/* Preview of current avatar */}
-                      <div className="flex flex-col items-center mb-8">
-                        <h3 className={`text-lg font-medium mb-4 ${theme ? "text-gray-300" : "text-gray-700"}`}>
+                      <div className="flex flex-col items-center mb-6">
+                        <h3 className={`text-base md:text-lg font-medium mb-3 ${theme ? "text-gray-300" : "text-gray-700"}`}>
                           Current Avatar
                         </h3>
                         <div className="relative">
                           <img
-                            className="w-36 h-36 object-cover rounded-full ring-4 ring-offset-2 shadow-lg 
+                            className="w-20 h-20 md:w-32 md:h-32 object-cover rounded-full ring-4 ring-offset-1 md:ring-offset-2 shadow-lg 
                             ${theme ? 'ring-blue-600 ring-offset-zinc-900' : 'ring-blue-500 ring-offset-white'}"
-                            src={
-                              preview ||
-                              (data?.user?.profilePhoto
-                                ? `${img}${data?.user?.profilePhoto}`
-                                : DEFAULT_AVATAR)
-                            }
+                            src={preview || DEFAULT_AVATAR}
                             alt="Profile Avatar"
                           />
                         </div>
@@ -1288,12 +1283,12 @@ const EditProfile = () => {
                           </div>
 
                           {/* Optimized Avatar Grid with Lazy Loading */}
-                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 p-2">
+                          <div className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-6 gap-2 md:gap-3 p-1 md:p-2">
                             {avatarGallery.map((avatar) => (
                               <div 
                                 key={avatar.id} 
                                 className={`relative rounded-lg overflow-hidden cursor-pointer transition-all duration-200 transform hover:scale-105 ${
-                                  preview === avatar.url ? 'ring-2 ring-offset-2 ring-blue-500' : ''
+                                  preview === avatar.url ? 'ring-2 ring-offset-1 ring-blue-500' : ''
                                 }`}
                                 onClick={() => selectAvatar(avatar.url)}
                               >
@@ -1307,8 +1302,8 @@ const EditProfile = () => {
                                 {/* Selection indicator */}
                                 {preview === avatar.url && (
                                   <div className="absolute inset-0 bg-blue-500/20 flex items-center justify-center">
-                                    <div className="bg-blue-500 rounded-full p-1">
-                                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
+                                    <div className="bg-blue-500 rounded-full p-0.5 md:p-1">
+                                      <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 md:h-4 md:w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
                                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                                       </svg>
                                     </div>
@@ -1319,16 +1314,16 @@ const EditProfile = () => {
                           </div>
 
                           {/* Pagination Controls */}
-                          <div className="flex justify-between items-center mt-6">
-                            <div className="text-sm text-gray-500">
+                          <div className="flex justify-between items-center mt-4 md:mt-6">
+                            <div className="text-xs md:text-sm text-gray-500">
                               Page {currentPage} of {totalPages}
                             </div>
                             
-                            <div className="flex space-x-2">
+                            <div className="flex space-x-1 md:space-x-2">
                               <button
                                 onClick={goToPreviousPage}
                                 disabled={currentPage === 1}
-                                className={`p-2 rounded-lg ${
+                                className={`p-1.5 md:p-2 rounded-lg ${
                                   currentPage === 1
                                     ? "opacity-50 cursor-not-allowed"
                                     : theme
@@ -1337,7 +1332,7 @@ const EditProfile = () => {
                                 }`}
                                 aria-label="Previous page"
                               >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 md:h-5 md:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                                 </svg>
                               </button>
@@ -1345,7 +1340,7 @@ const EditProfile = () => {
                               <button
                                 onClick={goToNextPage}
                                 disabled={currentPage === totalPages}
-                                className={`p-2 rounded-lg ${
+                                className={`p-1.5 md:p-2 rounded-lg ${
                                   currentPage === totalPages
                                     ? "opacity-50 cursor-not-allowed"
                                     : theme
@@ -1354,7 +1349,7 @@ const EditProfile = () => {
                                 }`}
                                 aria-label="Next page"
                               >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 md:h-5 md:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                                 </svg>
                               </button>
@@ -1365,7 +1360,7 @@ const EditProfile = () => {
                       
                       {/* Save Changes and Return Button */}
                       <div className="mt-10 pt-6 border-t border-gray-700/30">
-                        <div className="flex justify-between items-center">
+                        <div className="flex justify-between items-center gap-4">
                           {/* Left: Return Button */}
                           <button
                             type="button"
