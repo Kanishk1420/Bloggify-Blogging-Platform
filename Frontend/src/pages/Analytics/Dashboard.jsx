@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { FaBookmark, FaHeart, FaUser, FaThumbsDown } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { DEFAULT_AVATAR } from '../../utils/avatarUtil';
+import { DEFAULT_AVATAR, getRandomAvatar } from '../../utils/avatarUtil';
+import OptimizedAvatar from "../../components/Avatar/OptimizedAvatar";
 import Navbar from "../../components/Navbar/Navbar";
 import Footer from "../../components/Footer/Footer";
 import PageTransition from "../../components/PageTransition/PageTransition";
@@ -324,10 +325,12 @@ const Dashboard = () => {
                                 : "bg-white hover:bg-gray-50 shadow-sm hover:shadow"
                             }`}
                           >
-                            <img
-                              src={followingUser.profilePhoto?.url ?? DEFAULT_AVATAR}
+                            <OptimizedAvatar
+                              src={followingUser.profilePhoto?.url || getRandomAvatar(followingUser._id)}
                               className="w-12 h-12 rounded-full object-cover border-2 border-purple-500 p-0.5"
                               alt={followingUser.username || "Follower"}
+                              fallbackSrc={DEFAULT_AVATAR}
+                              loading="lazy"
                             />
                             <div className="ml-3">
                               {/* Show full name first as primary information */}
